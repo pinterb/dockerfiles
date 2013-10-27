@@ -19,9 +19,17 @@ RUN cd /go && hg update go1.1.2
 
 ENV GOROOT /go
 ENV GOBIN /go/bin
+ENV GOPATH /go/gocode
+
+RUN mkdir $GOPATH
+RUN mkdir $GOPATH/pkg
+RUN mkdir $GOPATH/bin
+RUN mkdir $GOPATH/src
 
 RUN apt-get install -y gcc g++ make build-essential 
 
 RUN cd /go/src && ./all.bash
 ENV PATH $PATH:/go/bin
-RUN /bin/bash -c "git clone git://github.com/davecheney/golang-crosscompile.git && source golang-crosscompile/crosscompile.bash && go-crosscompile-build-all"
+
+# install goxc
+RUN go get github.com/laher/goxc
