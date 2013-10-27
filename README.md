@@ -7,7 +7,7 @@ A collection of [Docker](http://www.docker.io/) Dockerfiles and configs.
 
 * **Build** a Dockerfile
 
-    sudo docker build -t pinter/golang:latest golang/ . 
+    sudo docker build -t pinter/golang:latest golang/. 
 
 * **Verify** a Dockerfile build by logging on to container
 
