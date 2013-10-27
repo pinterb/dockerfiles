@@ -1,1 +1,1 @@
-Ubuntu:precise image with some must-have packages installed 
+Ubuntu:precise image with some handy packages installed 
