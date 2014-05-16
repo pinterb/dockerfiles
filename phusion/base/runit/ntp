@@ -1,3 +1,6 @@
 #!/bin/sh
 set -e
-exec /usr/sbin/ntpd -p /var/run/ntpd.pid -g
+
+MEM=`head -1 ./env/MEM`
+exec softlimit -m "${MEM}" \
+  ntpd -n -g -p /var/run/ntpd.pid
