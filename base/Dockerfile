@@ -3,20 +3,33 @@
 # VERSION       1.0
 
 # use the ubuntu base image provided by dotCloud
-FROM ubuntu:precise
+FROM stackbrew/ubuntu:trusty
 
 MAINTAINER Brad Pinter brad.pinter@gmail.com
 
-# make sure the package repository is up to date
-RUN echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt/sources.list
-RUN apt-get update
-RUN apt-get upgrade -y
+RUN apt-get update && apt-get install -y \
+    git \
+    wget \
+    curl \
+    rsync \
+    mercurial \
+    bzr \
+    unzip \
+    tree \
+    python-pip \
+    locales \
+    ntp \
+    supervisor
 
-RUN apt-get install -y wget curl htop vim git mercurial rsync ntp python-software-properties supervisor
+RUN dpkg-reconfigure locales && \
+    locale-gen C.UTF-8 && \
+    /usr/sbin/update-locale LANG=C.UTF-8
 
 # timezone
 ADD ntp.conf /etc/ntp.conf
 ADD timezone.conf /etc/timezone
 RUN dpkg-reconfigure --frontend noninteractive tzdata
+
+ENV LC_ALL C.UTF-8
 
 # TODO: Set up a supervisor conf to run ntp, your apps, etc.
