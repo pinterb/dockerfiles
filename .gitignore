@@ -1,0 +1,8 @@
+.vagrant/
+.idea
+*.swp
+*.rpm
+*.tar.gz
+*.jar
+*.pub
+feh
