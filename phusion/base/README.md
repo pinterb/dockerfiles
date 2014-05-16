@@ -1,6 +1,6 @@
 # pinterb/phusion-base
 
-A base docker image based on phusion/baseimage.  Currently this is an Ubuntu 14.04 image.
+A docker image based on phusion/baseimage.  Currently this is an Ubuntu 14.04 image.
 
 Features include:   
 - some handy packages installed   
