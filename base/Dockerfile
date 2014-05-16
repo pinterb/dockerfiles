@@ -22,14 +22,14 @@ RUN apt-get update && apt-get install -y \
     supervisor
 
 RUN dpkg-reconfigure locales && \
-    locale-gen C.UTF-8 && \
-    /usr/sbin/update-locale LANG=C.UTF-8
+    locale-gen en_US.UTF-8 && \
+    /usr/sbin/update-locale LANG=en_US.UTF-8
 
 # timezone
 ADD ntp.conf /etc/ntp.conf
 ADD timezone.conf /etc/timezone
 RUN dpkg-reconfigure --frontend noninteractive tzdata
 
-ENV LC_ALL C.UTF-8
+ENV LC_ALL en_US.UTF-8
 
 # TODO: Set up a supervisor conf to run ntp, your apps, etc.
