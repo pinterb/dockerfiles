@@ -1,4 +1,4 @@
-# Base 
+# ubuntu-base
 #
 # VERSION       1.0
 

@@ -2,7 +2,7 @@
 
 A base docker image based on stackbrew/ubuntu:14.04
 
-Features include:
+Features include:   
 * some handy packages installed   
 * ntp installed with new timezone   
 
