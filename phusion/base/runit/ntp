@@ -1,6 +1,5 @@
 #!/bin/sh
 set -e
 
-MEM=`head -1 ./env/MEM`
-exec softlimit -m "${MEM}" \
-  ntpd -n -g -p /var/run/ntpd.pid
+#. /etc/default/ntp
+exec chpst -u ntp /usr/sbin/ntpd -n -g -p /var/run/ntpd.pid
