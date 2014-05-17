@@ -10,4 +10,4 @@ To pull this image:
 `docker pull pinterb/phusion-base`
 
 Or better yet, to look around a bit:
-`docker run --rm -t -i pinterb/phusion-base /sbin/my_init -- bash -l`
+`docker run -it --rm pinterb/phusion-base /sbin/my_init -- bash -l`
