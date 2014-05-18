@@ -1,5 +1,5 @@
 #!/bin/sh
 set -e
 
-exec chpst -u ntp /usr/sbin/ntpd -n -g
-#exec /usr/bin/ntpd -u ntp -n -g 2>&1
+#exec chpst -u ntp /usr/sbin/ntpd -n -g
+exec /usr/bin/ntpd -u ntp -n -g 2>&1
