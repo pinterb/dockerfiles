@@ -2,5 +2,4 @@
 set -e
 
 # exec chpst -ulog svlogd -tt /var/log/ntpd/
-# exec svlogd -tt /var/log/ntpd/
-exec svlogd -tt /var/log/ntpd/ntpd.log
+exec svlogd -tt /var/log/ntpd/
