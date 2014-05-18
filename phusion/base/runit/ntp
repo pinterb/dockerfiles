@@ -1,4 +1,4 @@
 #!/bin/sh
 set -e
 
-exec chpst -u ntp /usr/sbin/ntpd -n -g -p /var/run/ntpd.pid
+exec chpst -u ntp /usr/sbin/ntpd -n -g
