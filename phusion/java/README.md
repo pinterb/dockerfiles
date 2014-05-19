@@ -1,13 +1,13 @@
-# pinterb/phusion-python
+# pinterb/phusion-java
 
 A docker image based on pinterb/phusion-base.
 
 Features include:   
-- python, python2.7, and python3 packages installed   
+- Oracle Java v8.0.x   
 - virtualenv, virtualenvwrapper, tox, and pbundler installed   
 
 To pull this image:
-`docker pull pinterb/phusion-python`
+`docker pull pinterb/phusion-java`
 
 Or better yet, to look around a bit:
-`docker run -it --rm pinterb/phusion-python /sbin/my_init -- bash -l`
+`docker run -it --rm pinterb/phusion-java /sbin/my_init -- bash -l`
