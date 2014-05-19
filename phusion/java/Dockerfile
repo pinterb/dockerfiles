@@ -1,4 +1,4 @@
-# phusion-python
+# phusion-java
 #
 # VERSION       1.0
 
