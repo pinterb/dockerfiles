@@ -10,4 +10,5 @@ ENV HOME /root
 RUN mkdir -p /build
 ADD . /build
 RUN /build/install.sh
+RUN echo HELLO
 CMD ["/sbin/my_init"]
