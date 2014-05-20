@@ -11,3 +11,4 @@ To pull this image:
 
 Or better yet, to look around a bit:
 `docker run -it --rm pinterb/phusion-base /sbin/my_init -- bash -l`
+
