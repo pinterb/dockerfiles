@@ -7,7 +7,7 @@ FROM pinterb/phusion-base
 MAINTAINER Brad Pinter brad.pinter@gmail.com
 
 ENV HOME /root
-RUN mkdir /build
+RUN mkdir -p /build
 ADD . /build
 RUN /build/install.sh
 CMD ["/sbin/my_init"]
