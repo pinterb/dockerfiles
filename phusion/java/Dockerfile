@@ -2,7 +2,7 @@
 #
 # VERSION       1.0
 
-FROM pinterb/phusion-base
+FROM pinterb/phusion-base:0.0.2
 
 MAINTAINER Brad Pinter brad.pinter@gmail.com
 

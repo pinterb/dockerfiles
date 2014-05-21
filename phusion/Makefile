@@ -1,5 +1,5 @@
 NAME = pinterb/phusion
-VERSION = 0.0.1
+VERSION = 0.0.2
 
 .PHONY: all build_all tag_latest release clean \
 				build_base
