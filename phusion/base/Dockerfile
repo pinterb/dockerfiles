@@ -58,5 +58,4 @@ RUN rm -f /build/{Dockerfile,README.md,buildconfig,insecure_key*}
 
 
 ### run our init
-RUN echo HELLO
 CMD ["/sbin/my_init"]

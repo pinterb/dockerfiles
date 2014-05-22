@@ -2,13 +2,16 @@ NAME = pinterb/phusion
 VERSION = 0.0.2
 
 .PHONY: all build_all tag_latest release clean \
-				build_base
+				build_base test_base
 
 all: build_all
 
 build_all: build_base
 
-build_base:
+test_base:
+		base/test/verify.sh ; /usr/bin/test "$$?" -eq 0
+
+build_base: test_base
 		rm -rf base_image
 		cp -pR base base_image
 		docker build -t $(NAME)-base:$(VERSION) --rm base_image
