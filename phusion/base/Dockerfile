@@ -51,9 +51,8 @@ RUN mkdir /var/run/ntpd
 ### finalize build
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-RUN rm -rf /build/runit/* /build/config/*
-RUN rm -f /build/{install,enable_repos,prepare,finalize,packages,configure}.sh
+RUN rm -rf /build/runit/* /build/config/* /build/test/*
+RUN rm -rf /build/test
 RUN rm -f /build/{Dockerfile,README.md,buildconfig,insecure_key*}
 
 
