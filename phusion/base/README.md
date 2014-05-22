@@ -6,8 +6,8 @@ Features include:
 - some handy packages installed   
 - ntp installed with new timezone   
 
-To pull this image:
+To pull this image:   
 `docker pull pinterb/phusion-base`
 
-Or better yet, to look around a bit:
+Or better yet, to look around a bit:   
 `docker run -it --rm pinterb/phusion-base /sbin/my_init -- bash -l`
