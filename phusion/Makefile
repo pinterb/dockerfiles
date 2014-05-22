@@ -37,3 +37,4 @@ release: tag_latest
 
 clean:
 		rm -rf base_image
+		rm -rf python_image
