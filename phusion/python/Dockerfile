@@ -22,6 +22,7 @@ RUN chown app:app /home/app/.virtualenvs
 ### install packages
 RUN apt-get install -y --no-install-recommends python python2.7 python3 \
  python-pip python3-pip \
+ python-dev python3-dev \
  python-virtualenv virtualenvwrapper python-tox pbundler \
  python-sphinx python3-sphinx python-docutils python3-docutils \
  python-sphinxcontrib.issuetracker python-sphinxcontrib-httpdomain python-sphinxcontrib.blockdiag python-sphinxcontrib.nwdiag \

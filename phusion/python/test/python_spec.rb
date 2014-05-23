@@ -6,6 +6,8 @@ packages = [
   'python3',
   'python-pip',
   'python3-pip',
+  'python-dev',
+  'python3-dev',
   'python-virtualenv',
   'virtualenvwrapper',
   'python-tox',
