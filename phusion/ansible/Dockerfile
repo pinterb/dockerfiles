@@ -33,6 +33,8 @@ RUN ansible --version
 ### finalize build
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN rm -rf /build/test/*
+RUN rm -rf /build/test
 
 
 ### run our init

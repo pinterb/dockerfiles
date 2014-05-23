@@ -1,7 +1,7 @@
 #!/bin/bash
 
 IMAGE_REPO_NAME="pinterb/phusion"
-IMAGE_BASE_NAME="ansible"
+IMAGE_BASE_NAME="jvm"
 
 DOCKER_IMAGE="$IMAGE_REPO_NAME-$IMAGE_BASE_NAME-sspectest"
 KEEP_TEST_IMAGE=1
