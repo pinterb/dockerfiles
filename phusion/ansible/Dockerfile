@@ -1,8 +1,8 @@
 # phusion-ansible
 #
-# VERSION      0.0.2
+# VERSION      0.0.3
 
-FROM pinterb/phusion-python:0.0.2
+FROM pinterb/phusion-python:0.0.3
 
 MAINTAINER Brad Pinter brad.pinter@gmail.com
 

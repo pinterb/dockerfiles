@@ -11,7 +11,7 @@ describe "Checks for Phusion jvm image" do
   end # packages
 
   describe "Checks for important directories and files" do
-    describe file('/etc/profile.d/java.sh') do
+    describe file('/etc/profile.d/jdk.sh') do
         it { should be_file }
     end
 
@@ -21,7 +21,7 @@ describe "Checks for Phusion jvm image" do
   end # directories and files
 
   describe "Checks for expected java version" do
-    describe command('cat /etc/profile.d/java.sh | grep "JAVA_HOME=/usr/lib/jvm/java-8-oracle"') do
+    describe command('cat /etc/profile.d/jdk.sh | grep "JAVA_HOME=/usr/lib/jvm/java-8-oracle"') do
       it { should return_exit_status 0 }
     end
 

@@ -1,4 +1,4 @@
-## pinterb/phusion-jvm serverspec test(s)
+## pinterb/phusion-base serverspec test(s)
 
 Some [Serverspec](http://serverspec.org/) tests for this Docker image.
 

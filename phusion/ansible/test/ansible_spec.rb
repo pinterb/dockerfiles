@@ -1,6 +1,6 @@
 require_relative 'spec_helper'
 
-ansible_version='ansible 1.6.1'
+ansible_version='ansible 1.6.2'
 
 packages = [
   'libyaml-dev',

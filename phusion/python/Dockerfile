@@ -1,8 +1,8 @@
 # phusion-python
 #
-# VERSION      0.0.2
+# VERSION      0.0.3
 
-FROM pinterb/phusion-base:0.0.2
+FROM pinterb/phusion-base:0.0.3
 
 MAINTAINER Brad Pinter brad.pinter@gmail.com
 

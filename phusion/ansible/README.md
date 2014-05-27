@@ -3,7 +3,7 @@
 A docker image based on pinterb/phusion-python.
 
 Features include:   
-- ansible v1.6.1   
+- ansible v1.6.2   
 
 To pull this image:
 `docker pull pinterb/phusion-ansible`

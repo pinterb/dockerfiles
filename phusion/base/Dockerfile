@@ -1,6 +1,6 @@
 # phusion-base
 #
-# VERSION      0.0.2
+# VERSION      0.0.3
 
 FROM phusion/passenger-customizable:0.9.10
 

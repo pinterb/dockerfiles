@@ -1,8 +1,8 @@
 # phusion-jvm
 #
-# VERSION      0.0.2
+# VERSION      0.0.3
 
-FROM pinterb/phusion-base:0.0.2
+FROM pinterb/phusion-base:0.0.3
 
 MAINTAINER Brad Pinter brad.pinter@gmail.com
 
@@ -26,20 +26,11 @@ RUN update-alternatives --display java
 
 
 ### configure
-RUN mkdir -p /build
-ADD . /build
-
-# configure /etc/provile.d/ with java info
-RUN cp /build/config/java.sh /etc/profile.d/java.sh
 
 
 ### finalize build
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-RUN rm -rf /build/config/*
-RUN rm -rf /build/test/*
-RUN rm -rf /build/test
-RUN rm -f /build/{Dockerfile,README.md,buildconfig,insecure_key*}
 
 
 ### run our init
