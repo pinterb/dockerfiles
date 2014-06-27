@@ -1,12 +1,13 @@
 require_relative 'spec_helper'
 
 packages = [
-  'python3',
-  'python3-setuptools',
-  'python3-all-dev',
-  'python3-pip']
+  'pylint',
+  'python-coverage',
+  'python3-coverage',
+  'pep8',
+  'python3-pep8']
 
-describe "Checks for Phusion Python image" do
+describe "Checks for Phusion Python development image" do
 
   packages.each do|p|
     describe package(p) do

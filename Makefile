@@ -13,11 +13,12 @@ NAME = pinterb
 				build_golang test_golang
 
 all: build_all
-build_all: build_base
+build_all: build_base build_python
 build_base: build_phusion_base build_ubuntu_base
 
-build_python: build_python_base
+build_python: build_python_base build_python_dev
 build_python_base: build_phusion_python_base build_ubuntu_python_base
+build_python_dev: build_phusion_python_dev build_ubuntu_python_dev
 
 
 ## Base Images
@@ -73,6 +74,31 @@ build_ubuntu_python_base: prep_ubuntu_python_base
 		docker build --rm -t $(NAME)/ubuntu-python:$(VERSION) ubuntu_python_base_image
 		cp ubuntu_python_base_image/Dockerfile images/ubuntu/python/
 
+prep_phusion_python_dev:
+		rm -rf phusion_python_dev_image
+		cp -pR templates/phusion/python-dev phusion_python_dev_image
+		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/phusion-python-dev/g' phusion_python_dev_image/Dockerfile
+		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' phusion_python_dev_image/Dockerfile
+		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/phusion-python:$(VERSION)/g' phusion_python_dev_image/Dockerfile
+
+test_phusion_python_dev: prep_phusion_python_dev
+		phusion_python_dev_image/tests/verify.sh --force --image=$(NAME)/phusion-python-dev-sspectest ; /usr/bin/test "$$?" -eq 0
+
+build_phusion_python_dev: test_phusion_python_dev
+		docker build --rm -t $(NAME)/phusion-python-dev:$(VERSION) phusion_python_dev_image
+		cp phusion_python_dev_image/Dockerfile images/phusion/python-dev/
+
+prep_ubuntu_python_dev:
+		rm -rf ubuntu_python_dev_image
+		cp -pR templates/ubuntu/python-dev ubuntu_python_dev_image
+		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/ubuntu-python-dev/g' ubuntu_python_dev_image/Dockerfile
+		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_python_dev_image/Dockerfile
+		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/ubuntu-python:$(VERSION)/g' ubuntu_python_dev_image/Dockerfile
+
+build_ubuntu_python_dev: prep_ubuntu_python_dev
+		docker build --rm -t $(NAME)/ubuntu-python-dev:$(VERSION) ubuntu_python_dev_image
+		cp ubuntu_python_dev_image/Dockerfile images/ubuntu/python-dev/
+
 
 
 
@@ -82,16 +108,22 @@ tag_latest:
 		docker tag $(NAME)/ubuntu-base:$(VERSION) $(NAME)/ubuntu-base:latest
 		docker tag $(NAME)/phusion-python:$(VERSION) $(NAME)/phusion-python:latest
 		docker tag $(NAME)/ubuntu-python:$(VERSION) $(NAME)/ubuntu-python:latest
+		docker tag $(NAME)/phusion-python:$(VERSION) $(NAME)/phusion-python-dev:latest
+		docker tag $(NAME)/ubuntu-python:$(VERSION) $(NAME)/ubuntu-python-dev:latest
 
 release: tag_latest
 		@if ! docker images $(NAME)/phusion-base | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/phusion-base version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ubuntu-base | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-base version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/phusion-python | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/phusion-python version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ubuntu-python | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-python version $(VERSION) is not yet built. Please run 'make build'"; false; fi
+		@if ! docker images $(NAME)/phusion-python-dev | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/phusion-python-dev version $(VERSION) is not yet built. Please run 'make build'"; false; fi
+		@if ! docker images $(NAME)/ubuntu-python-dev | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-python-dev version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		docker push $(NAME)/phusion-base
 		docker push $(NAME)/ubuntu-base
 		docker push $(NAME)/phusion-python
 		docker push $(NAME)/ubuntu-python
+		docker push $(NAME)/phusion-python-dev
+		docker push $(NAME)/ubuntu-python-dev
 		@echo "*** Don't forget to create a tag. git tag rel-$(VERSION) && git push origin rel-$(VERSION)"
 
 clean: clean_untagged
@@ -99,6 +131,8 @@ clean: clean_untagged
 		rm -rf ubuntu_base_image
 		rm -rf phusion_python_base_image
 		rm -rf ubuntu_python_base_image
+		rm -rf phusion_python_dev_image
+		rm -rf ubuntu_python_dev_image
 
 clean_untagged:
 		for i in `docker ps --no-trunc -a -q`;do docker rm $$i;done
