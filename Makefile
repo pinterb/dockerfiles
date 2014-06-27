@@ -16,7 +16,7 @@ all: build_all
 
 build_all: build_base
 
-build_base: build_phusion_base
+build_base: build_phusion_base build_ubuntu_base
 
 
 ## Base Images
@@ -25,7 +25,7 @@ prep_phusion_base:
 		cp -pR templates/phusion/base phusion_base_image
 		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/phusion-base/g' phusion_base_image/Dockerfile
 		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' phusion_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/phusion\/passenger-customizable:$(PASSENGER_VER)/g' phusion_base_image/Dockerfile
+		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/phusion\/passenger-customizable:0.9.11/g' phusion_base_image/Dockerfile
 
 test_phusion_base: prep_phusion_base
 		phusion_base_image/tests/verify.sh --force --image=$(NAME)/phusion-base-sspectest ; /usr/bin/test "$$?" -eq 0
@@ -36,10 +36,15 @@ build_phusion_base: test_phusion_base
 
 
 prep_ubuntu_base:
+		rm -rf ubuntu_base_image
+		cp -pR templates/ubuntu/base ubuntu_base_image
+		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/ubuntu-base/g' ubuntu_base_image/Dockerfile
+		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_base_image/Dockerfile
+		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/ubuntu:14.04/g' ubuntu_base_image/Dockerfile
 
-test_ubuntu_base: prep_ubuntu_base
-
-build_ubuntu_base: test_ubuntu_base
+build_ubuntu_base: prep_ubuntu_base
+		docker build --rm -t $(NAME)/ubuntu-base:$(VERSION) ubuntu_base_image
+		cp ubuntu_base_image/Dockerfile images/ubuntu/base/
 
 
 

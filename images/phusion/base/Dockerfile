@@ -2,7 +2,7 @@
 #
 # VERSION      0.0.1
 
-FROM phusion/passenger-customizable:0.9.10
+FROM phusion/passenger-customizable:0.9.11
 
 MAINTAINER Brad Pinter brad.pinter@gmail.com
 

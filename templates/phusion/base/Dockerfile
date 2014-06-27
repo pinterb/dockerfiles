@@ -1,8 +1,8 @@
-# pinterb/phusion-base
+# ###-->ZZZ_IMAGE<--###
 #
-# VERSION      0.0.1
+# VERSION      ###-->ZZZ_VERSION<--###
 
-FROM phusion/passenger-customizable:0.9.10
+FROM ###-->ZZZ_BASE_IMAGE<--###
 
 MAINTAINER Brad Pinter brad.pinter@gmail.com
 
