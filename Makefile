@@ -28,7 +28,7 @@ prep_phusion_base:
 		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/phusion\/passenger-customizable:$(PASSENGER_VER)/g' phusion_base_image/Dockerfile
 
 test_phusion_base: prep_phusion_base
-		phusion_base_image/test/verify.sh --force --image=$(NAME)/phusion-base-sspectest ; /usr/bin/test "$$?" -eq 0
+		phusion_base_image/tests/verify.sh --force --image=$(NAME)/phusion-base-sspectest ; /usr/bin/test "$$?" -eq 0
 
 build_phusion_base: test_phusion_base
 		docker build --rm -t $(NAME)/phusion-base:$(VERSION) phusion_base_image
