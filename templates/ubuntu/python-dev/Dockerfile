@@ -1,6 +1,8 @@
 # ###-->ZZZ_IMAGE<--###
 #
-# VERSION      ###-->ZZZ_VERSION<--###
+# VERSION     ###-->ZZZ_VERSION<--###
+#
+# CREATED ON  ###-->ZZZ_DATE<--###
 
 FROM ###-->ZZZ_BASE_IMAGE<--###
 

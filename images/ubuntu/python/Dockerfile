@@ -1,6 +1,8 @@
 # pinterb/ubuntu-python
 #
-# VERSION      0.0.1
+# VERSION     0.0.1
+#
+# CREATED ON  2014-06-30T09:44:39CDT
 
 FROM pinterb/ubuntu-base:0.0.1
 

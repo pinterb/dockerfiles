@@ -1,6 +1,8 @@
 # ###-->ZZZ_IMAGE<--###
 #
-# VERSION      ###-->ZZZ_VERSION<--###
+# VERSION     ###-->ZZZ_VERSION<--###
+#
+# CREATED ON  ###-->ZZZ_DATE<--###
 
 FROM ###-->ZZZ_BASE_IMAGE<--###
 
@@ -10,6 +12,7 @@ ENV HOME /root
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
+ENV PERL_INSTALL_VERSION 5.20.0
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -21,7 +24,7 @@ RUN apt-get install -y \
 RUN env --unset=DEBIAN_FRONTEND
 
 RUN mkdir -p /usr/src/perl \
-	&& curl -SL http://www.cpan.org/src/5.0/perl-5.20.0.tar.gz \
+	&& curl -SL http://www.cpan.org/src/5.0/perl-$PERL_INSTALL_VERSION.tar.gz \
 		| tar -xz --strip-components=1 -C /usr/src/perl
 
 WORKDIR /usr/src/perl
