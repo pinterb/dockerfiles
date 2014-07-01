@@ -178,15 +178,16 @@ release: tag_latest
 		@if ! docker images $(NAME)/ubuntu-golang | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-golang version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ubuntu-perl | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-perl version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ubuntu-perl-dev | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-perl-dev version $(VERSION) is not yet built. Please run 'make build'"; false; fi
-		docker push $(NAME)/phusion-base
-		docker push $(NAME)/ubuntu-base
-		docker push $(NAME)/phusion-python
-		docker push $(NAME)/ubuntu-python
-		docker push $(NAME)/phusion-python-dev
-		docker push $(NAME)/ubuntu-python-dev
-		docker push $(NAME)/ubuntu-golang
-		docker push $(NAME)/ubuntu-perl
-		docker push $(NAME)/ubuntu-perl-dev
+# Right now, these images are "trusted builds" on hub.docker.com.  So you can not perform a docker push"
+#		docker push $(NAME)/phusion-base
+#		docker push $(NAME)/ubuntu-base
+#		docker push $(NAME)/phusion-python
+#		docker push $(NAME)/ubuntu-python
+#		docker push $(NAME)/phusion-python-dev
+#		docker push $(NAME)/ubuntu-python-dev
+#		docker push $(NAME)/ubuntu-golang
+#		docker push $(NAME)/ubuntu-perl
+#		docker push $(NAME)/ubuntu-perl-dev
 		@echo "*** Don't forget to create a tag. git tag rel-$(VERSION) && git push origin rel-$(VERSION)"
 
 clean: clean_untagged
