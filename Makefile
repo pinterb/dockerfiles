@@ -1,4 +1,4 @@
-VERSION = 0.0.1
+VERSION = 0.0.5
 NAME = pinterb
 CREATE_DATE := $(shell date +%FT%T%Z)
 
