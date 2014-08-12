@@ -2,7 +2,7 @@
 #
 # VERSION     0.0.7
 #
-# CREATED ON  2014-08-11T20:50:38CDT
+# CREATED ON  2014-08-11T21:02:11CDT
 
 FROM ubuntu:14.04
 
@@ -39,30 +39,30 @@ RUN cd /usr/local/bin && \
  rm watchf_x86_64.tar.gz
 
 ### create a user for whatever application we choose to run.
-RUN addgroup --gid 9999 app && \
- alias adduser='useradd' && \
- adduser --uid 9999 --gid 9999 --disabled-password --gecos "Application" app && \
- usermod -L app && \
- mkdir -p /home/app/.ssh && \
- mkdir -p /home/app/bin && \
- chmod 700 /home/app/.ssh && \
- chown app:app /home/app/.ssh && \
- chown app:app /home/app/bin
+# DOCKER BUG RUN addgroup --gid 9999 app && \
+# alias adduser='useradd' && \
+# adduser --uid 9999 --gid 9999 --disabled-password --gecos "Application" app && \
+# usermod -L app && \
+# mkdir -p /home/app/.ssh && \
+# mkdir -p /home/app/bin && \
+# chmod 700 /home/app/.ssh && \
+# chown app:app /home/app/.ssh && \
+# chown app:app /home/app/bin
 
 ### create a user for logging.
-RUN addgroup --gid 9998 log && \
- adduser --uid 9998 --gid 9998 --disabled-password --no-create-home --gecos "Logger" log && \
- usermod -L log
+# DOCKER BUG RUN addgroup --gid 9998 log && \
+# adduser --uid 9998 --gid 9998 --disabled-password --no-create-home --gecos "Logger" log && \
+# usermod -L log
 
 # Create a shared data volume
 # We need to create an empty file, otherwise the volume will
 # belong to root.
 # This is probably a Docker bug.
-RUN mkdir /var/shared/ && \
- touch /var/shared/placeholder && \
- chown -R app:app /var/shared
+# DOCKER BUG RUN mkdir /var/shared/ && \
+# touch /var/shared/placeholder && \
+# chown -R app:app /var/shared
 
-VOLUME /var/shared
+#VOLUME /var/shared
 
 ### make debian interactive...
 RUN env --unset=DEBIAN_FRONTEND
