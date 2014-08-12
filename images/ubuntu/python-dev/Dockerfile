@@ -2,7 +2,7 @@
 #
 # VERSION     0.0.7
 #
-# CREATED ON  2014-08-11T19:54:59CDT
+# CREATED ON  2014-08-12T05:31:13CDT
 
 FROM pinterb/ubuntu-python:0.0.7
 
@@ -24,8 +24,8 @@ RUN apt-get install -y \
 
 
 ## create a virtualenv environment for app user to use.
-RUN mkdir -p /home/app/.virtualenvs
-RUN chown app:app /home/app/.virtualenvs
+# DOCKER BUG RUN mkdir -p /home/app/.virtualenvs
+# DOCKER BUG RUN chown app:app /home/app/.virtualenvs
 
 ### install virtualenv packages
 RUN apt-get install -y \
