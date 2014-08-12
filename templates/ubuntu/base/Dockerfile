@@ -40,6 +40,7 @@ RUN cd /usr/local/bin && \
 
 ### create a user for whatever application we choose to run.
 RUN addgroup --gid 9999 app && \
+ alias adduser='useradd' && \
  adduser --uid 9999 --gid 9999 --disabled-password --gecos "Application" app && \
  usermod -L app && \
  mkdir -p /home/app/.ssh && \
