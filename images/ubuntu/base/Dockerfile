@@ -1,8 +1,8 @@
 # pinterb/ubuntu-base
 #
-# VERSION     0.0.6
+# VERSION     0.0.7
 #
-# CREATED ON  2014-08-11T19:20:53CDT
+# CREATED ON  2014-08-11T19:54:59CDT
 
 FROM ubuntu:14.04
 

@@ -1,4 +1,4 @@
-VERSION = 0.0.6
+VERSION = 0.0.7
 NAME = pinterb
 CREATE_DATE := $(shell date +%FT%T%Z)
 PERL_VERSION = 5.20.0 
@@ -25,7 +25,7 @@ build_python_dev: build_phusion_python_dev build_ubuntu_python_dev
 build_golang: build_golang_base
 build_golang_base: build_ubuntu_golang_base
 
-build_perl: build_perl_base build_perl_dev
+build_perl: build_perl_base build_perl_dev build_perl_mojo
 build_perl_base: build_ubuntu_perl_base
 build_perl_dev: build_ubuntu_perl_dev
 build_perl_mojo: build_ubuntu_perl_mojo
@@ -147,7 +147,7 @@ build_ubuntu_perl_base: prep_ubuntu_perl_base
 prep_ubuntu_perl_dev:
 		rm -rf ubuntu_perl_dev_image
 		cp -pR templates/ubuntu/perl-dev ubuntu_perl_dev_image
-		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/ubuntu-perl/g' ubuntu_perl_dev_image/Dockerfile
+		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/ubuntu-perl-dev/g' ubuntu_perl_dev_image/Dockerfile
 		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_perl_dev_image/Dockerfile
 		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/ubuntu-perl:$(VERSION)/g' ubuntu_perl_dev_image/Dockerfile
 		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_perl_dev_image/Dockerfile
@@ -159,7 +159,7 @@ build_ubuntu_perl_dev: prep_ubuntu_perl_dev
 prep_ubuntu_perl_mojo:
 		rm -rf ubuntu_perl_mojo_image
 		cp -pR templates/ubuntu/perl-mojo ubuntu_perl_mojo_image
-		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/ubuntu-perl/g' ubuntu_perl_mojo_image/Dockerfile
+		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/ubuntu-perl-mojo/g' ubuntu_perl_mojo_image/Dockerfile
 		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_perl_mojo_image/Dockerfile
 		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/ubuntu-perl:$(VERSION)/g' ubuntu_perl_mojo_image/Dockerfile
 		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_perl_mojo_image/Dockerfile

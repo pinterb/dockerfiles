@@ -1,10 +1,10 @@
 # pinterb/ubuntu-golang
 #
-# VERSION     0.0.6
+# VERSION     0.0.7
 #
-# CREATED ON  2014-08-11T19:20:53CDT
+# CREATED ON  2014-08-11T19:54:59CDT
 
-FROM pinterb/ubuntu-base:0.0.6
+FROM pinterb/ubuntu-base:0.0.7
 
 MAINTAINER Brad Pinter brad.pinter@gmail.com
 

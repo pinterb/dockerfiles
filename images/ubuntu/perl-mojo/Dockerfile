@@ -1,10 +1,10 @@
-# pinterb/ubuntu-perl
+# pinterb/ubuntu-perl-mojo
 #
-# VERSION     0.0.6
+# VERSION     0.0.7
 #
-# CREATED ON  2014-08-11T18:43:49CDT
+# CREATED ON  2014-08-11T19:54:59CDT
 
-FROM pinterb/ubuntu-perl:0.0.6
+FROM pinterb/ubuntu-perl:0.0.7
 
 MAINTAINER Brad Pinter brad.pinter@gmail.com
 
