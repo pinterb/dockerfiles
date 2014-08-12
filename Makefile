@@ -1,6 +1,7 @@
-VERSION = 0.0.5
+VERSION = 0.0.6
 NAME = pinterb
 CREATE_DATE := $(shell date +%FT%T%Z)
+PERL_VERSION = 5.20.0 
 
 .PHONY: all build_all tag_latest release clean clean_untagged \
 				prep_phusion_base test_phusion_base build_phusion_base \
@@ -27,6 +28,7 @@ build_golang_base: build_ubuntu_golang_base
 build_perl: build_perl_base build_perl_dev
 build_perl_base: build_ubuntu_perl_base
 build_perl_dev: build_ubuntu_perl_dev
+build_perl_mojo: build_ubuntu_perl_mojo
 
 
 ## Base Images
@@ -136,6 +138,7 @@ prep_ubuntu_perl_base:
 		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_perl_base_image/Dockerfile
 		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/ubuntu-base:$(VERSION)/g' ubuntu_perl_base_image/Dockerfile
 		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_perl_base_image/Dockerfile
+		sed -i 's/###-->ZZZ_PERL_VERSION<--###/$(PERL_VERSION)/g' ubuntu_perl_base_image/Dockerfile
 
 build_ubuntu_perl_base: prep_ubuntu_perl_base
 		docker build --rm -t $(NAME)/ubuntu-perl:$(VERSION) ubuntu_perl_base_image
@@ -153,6 +156,19 @@ build_ubuntu_perl_dev: prep_ubuntu_perl_dev
 		docker build --rm -t $(NAME)/ubuntu-perl-dev:$(VERSION) ubuntu_perl_dev_image
 		cp ubuntu_perl_dev_image/Dockerfile images/ubuntu/perl-dev/
 
+prep_ubuntu_perl_mojo:
+		rm -rf ubuntu_perl_mojo_image
+		cp -pR templates/ubuntu/perl-mojo ubuntu_perl_mojo_image
+		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/ubuntu-perl/g' ubuntu_perl_mojo_image/Dockerfile
+		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_perl_mojo_image/Dockerfile
+		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/ubuntu-perl:$(VERSION)/g' ubuntu_perl_mojo_image/Dockerfile
+		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_perl_mojo_image/Dockerfile
+
+build_ubuntu_perl_mojo: prep_ubuntu_perl_mojo
+		docker build --rm -t $(NAME)/ubuntu-perl-mojo:$(VERSION) ubuntu_perl_mojo_image
+		cp ubuntu_perl_mojo_image/Dockerfile images/ubuntu/perl-mojo/
+
+
 
 
 
@@ -167,6 +183,7 @@ tag_latest:
 		docker tag $(NAME)/ubuntu-golang:$(VERSION) $(NAME)/ubuntu-golang:latest
 		docker tag $(NAME)/ubuntu-perl:$(VERSION) $(NAME)/ubuntu-perl:latest
 		docker tag $(NAME)/ubuntu-perl-dev:$(VERSION) $(NAME)/ubuntu-perl-dev:latest
+		docker tag $(NAME)/ubuntu-perl-mojo:$(VERSION) $(NAME)/ubuntu-perl-mojo:latest
 
 release: tag_latest
 		@if ! docker images $(NAME)/phusion-base | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/phusion-base version $(VERSION) is not yet built. Please run 'make build'"; false; fi
@@ -178,6 +195,7 @@ release: tag_latest
 		@if ! docker images $(NAME)/ubuntu-golang | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-golang version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ubuntu-perl | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-perl version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ubuntu-perl-dev | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-perl-dev version $(VERSION) is not yet built. Please run 'make build'"; false; fi
+		@if ! docker images $(NAME)/ubuntu-perl-mojo | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-perl-mojo version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 # Right now, these images are "trusted builds" on hub.docker.com.  So you can not perform a docker push"
 #		docker push $(NAME)/phusion-base
 #		docker push $(NAME)/ubuntu-base
@@ -188,6 +206,7 @@ release: tag_latest
 #		docker push $(NAME)/ubuntu-golang
 #		docker push $(NAME)/ubuntu-perl
 #		docker push $(NAME)/ubuntu-perl-dev
+#		docker push $(NAME)/ubuntu-perl-mojo
 		@echo "*** Don't forget to create a tag. git tag rel-$(VERSION) && git push origin rel-$(VERSION)"
 
 clean: clean_untagged
@@ -200,6 +219,7 @@ clean: clean_untagged
 		rm -rf ubuntu_golang_base_image
 		rm -rf ubuntu_perl_base_image
 		rm -rf ubuntu_perl_dev_image
+		rm -rf ubuntu_perl_mojo_image
 
 clean_untagged:
 		for i in `docker ps --no-trunc -a -q`;do docker rm $$i;done

@@ -1,10 +1,10 @@
 # pinterb/ubuntu-perl
 #
-# VERSION     0.0.5
+# VERSION     0.0.6
 #
-# CREATED ON  2014-07-01T10:21:58CDT
+# CREATED ON  2014-08-11T19:20:53CDT
 
-FROM pinterb/ubuntu-base:0.0.5
+FROM pinterb/ubuntu-base:0.0.6
 
 MAINTAINER Brad Pinter brad.pinter@gmail.com
 
@@ -12,7 +12,7 @@ ENV HOME /root
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
-ENV PERL_INSTALL_VERSION 5.20.0
+ENV PERL_INSTALL_VERSION 5.20.0 
 
 ENV DEBIAN_FRONTEND noninteractive
 

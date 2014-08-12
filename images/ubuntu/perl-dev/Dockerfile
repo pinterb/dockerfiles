@@ -1,10 +1,10 @@
 # pinterb/ubuntu-perl
 #
-# VERSION     0.0.5
+# VERSION     0.0.6
 #
-# CREATED ON  2014-07-01T10:21:58CDT
+# CREATED ON  2014-08-11T19:20:53CDT
 
-FROM pinterb/ubuntu-perl:0.0.5
+FROM pinterb/ubuntu-perl:0.0.6
 
 MAINTAINER Brad Pinter brad.pinter@gmail.com
 

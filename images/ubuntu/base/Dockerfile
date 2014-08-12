@@ -1,8 +1,8 @@
 # pinterb/ubuntu-base
 #
-# VERSION     0.0.5
+# VERSION     0.0.6
 #
-# CREATED ON  2014-07-01T10:21:58CDT
+# CREATED ON  2014-08-11T19:20:53CDT
 
 FROM ubuntu:14.04
 
@@ -28,18 +28,38 @@ RUN apt-get update -q && \
  locales daemontools cron \
  git mercurial bzr subversion
 
+# Create a generic "build" directory
+RUN mkdir /build/
+
+## Put watcherf in $PATH
+ADD http://dl.bintray.com/pinterb/watchf/linux/watchf_x86_64.tar.gz /usr/local/bin/
+RUN cd /usr/local/bin && \
+ tar -xvf watchf_x86_64.tar.gz && \
+ chmod +x watchf && \
+ rm watchf_x86_64.tar.gz
+
 ### create a user for whatever application we choose to run.
 RUN addgroup --gid 9999 app && \
  adduser --uid 9999 --gid 9999 --disabled-password --gecos "Application" app && \
  usermod -L app && \
- mkdir -p /home/app/.ssh && \
+ mkdir -p /home/app/.ssh /home/app/bin && \
  chmod 700 /home/app/.ssh && \
- chown app:app /home/app/.ssh
+ chown app:app /home/app/.ssh /home/app/bin
 
 ### create a user for logging.
 RUN addgroup --gid 9998 log && \
  adduser --uid 9998 --gid 9998 --disabled-password --no-create-home --gecos "Logger" log && \
  usermod -L log
+
+# Create a shared data volume
+# We need to create an empty file, otherwise the volume will
+# belong to root.
+# This is probably a Docker bug.
+RUN mkdir /var/shared/ && \
+ touch /var/shared/placeholder && \
+ chown -R app:app /var/shared
+
+VOLUME /var/shared
 
 ### make debian interactive...
 RUN env --unset=DEBIAN_FRONTEND
