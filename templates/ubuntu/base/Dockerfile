@@ -30,7 +30,7 @@ RUN apt-get update -q && \
 
 # Create a generic "build" directory
 RUN mkdir /build/
-
+ 
 ## Put watcherf in $PATH
 ADD http://dl.bintray.com/pinterb/watchf/linux/watchf_x86_64.tar.gz /usr/local/bin/
 RUN cd /usr/local/bin && \
@@ -42,9 +42,11 @@ RUN cd /usr/local/bin && \
 RUN addgroup --gid 9999 app && \
  adduser --uid 9999 --gid 9999 --disabled-password --gecos "Application" app && \
  usermod -L app && \
- mkdir -p /home/app/.ssh /home/app/bin && \
+ mkdir -p /home/app/.ssh && \
+ mkdir -p /home/app/bin && \
  chmod 700 /home/app/.ssh && \
- chown app:app /home/app/.ssh /home/app/bin
+ chown app:app /home/app/.ssh && \
+ chown app:app /home/app/bin
 
 ### create a user for logging.
 RUN addgroup --gid 9998 log && \
