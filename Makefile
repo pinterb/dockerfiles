@@ -1,4 +1,4 @@
-VERSION = 0.0.7
+VERSION = 0.0.9
 NAME = pinterb
 CREATE_DATE := $(shell date +%FT%T%Z)
 PERL_VERSION = 5.20.0 
@@ -18,9 +18,10 @@ all: build_all
 build_all: build_base build_python build_golang build_perl
 build_base: build_phusion_base build_ubuntu_base
 
-build_python: build_python_base build_python_dev
+build_python: build_python_base build_python_dev build_python_falcon
 build_python_base: build_phusion_python_base build_ubuntu_python_base
 build_python_dev: build_phusion_python_dev build_ubuntu_python_dev
+build_python_falcon: build_ubuntu_python_falcon
 
 build_golang: build_golang_base
 build_golang_base: build_ubuntu_golang_base
@@ -116,6 +117,24 @@ build_ubuntu_python_dev: prep_ubuntu_python_dev
 		cp ubuntu_python_dev_image/Dockerfile images/ubuntu/python-dev/
 
 
+
+prep_ubuntu_python_falcon:
+		rm -rf ubuntu_python_falcon_image
+		cp -pR templates/ubuntu/python-falcon ubuntu_python_falcon_image
+		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/ubuntu-python-falcon/g' ubuntu_python_falcon_image/Dockerfile
+		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_python_falcon_image/Dockerfile
+		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/ubuntu-python:$(VERSION)/g' ubuntu_python_falcon_image/Dockerfile
+		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_python_falcon_image/Dockerfile
+
+build_ubuntu_python_falcon: prep_ubuntu_python_falcon
+		docker build --rm -t $(NAME)/ubuntu-python-falcon:$(VERSION) ubuntu_python_falcon_image
+		cp ubuntu_python_falcon_image/Dockerfile images/ubuntu/python-falcon/
+
+
+
+
+
+
 ## Golang Images
 prep_ubuntu_golang_base:
 		rm -rf ubuntu_golang_base_image
@@ -180,6 +199,7 @@ tag_latest:
 		docker tag $(NAME)/ubuntu-python:$(VERSION) $(NAME)/ubuntu-python:latest
 		docker tag $(NAME)/phusion-python-dev:$(VERSION) $(NAME)/phusion-python-dev:latest
 		docker tag $(NAME)/ubuntu-python-dev:$(VERSION) $(NAME)/ubuntu-python-dev:latest
+		docker tag $(NAME)/ubuntu-python-falcon:$(VERSION) $(NAME)/ubuntu-python-falcon:latest
 		docker tag $(NAME)/ubuntu-golang:$(VERSION) $(NAME)/ubuntu-golang:latest
 		docker tag $(NAME)/ubuntu-perl:$(VERSION) $(NAME)/ubuntu-perl:latest
 		docker tag $(NAME)/ubuntu-perl-dev:$(VERSION) $(NAME)/ubuntu-perl-dev:latest
@@ -192,6 +212,7 @@ release: tag_latest
 		@if ! docker images $(NAME)/ubuntu-python | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-python version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/phusion-python-dev | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/phusion-python-dev version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ubuntu-python-dev | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-python-dev version $(VERSION) is not yet built. Please run 'make build'"; false; fi
+		@if ! docker images $(NAME)/ubuntu-python-falcon | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-python-falcon version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ubuntu-golang | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-golang version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ubuntu-perl | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-perl version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ubuntu-perl-dev | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-perl-dev version $(VERSION) is not yet built. Please run 'make build'"; false; fi
@@ -203,6 +224,7 @@ release: tag_latest
 #		docker push $(NAME)/ubuntu-python
 #		docker push $(NAME)/phusion-python-dev
 #		docker push $(NAME)/ubuntu-python-dev
+#		docker push $(NAME)/ubuntu-python-falcon
 #		docker push $(NAME)/ubuntu-golang
 #		docker push $(NAME)/ubuntu-perl
 #		docker push $(NAME)/ubuntu-perl-dev
@@ -216,6 +238,7 @@ clean: clean_untagged
 		rm -rf ubuntu_python_base_image
 		rm -rf phusion_python_dev_image
 		rm -rf ubuntu_python_dev_image
+		rm -rf ubuntu_python_falcon_image
 		rm -rf ubuntu_golang_base_image
 		rm -rf ubuntu_perl_base_image
 		rm -rf ubuntu_perl_dev_image

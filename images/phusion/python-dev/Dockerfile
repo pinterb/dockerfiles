@@ -1,10 +1,10 @@
 # pinterb/phusion-python-dev
 #
-# VERSION     0.0.7
+# VERSION     0.0.9
 #
-# CREATED ON  2014-08-12T05:31:13CDT
+# CREATED ON  2014-08-16T16:35:49CDT
 
-FROM pinterb/phusion-python:0.0.7
+FROM pinterb/phusion-python:0.0.9
 
 MAINTAINER Brad Pinter brad.pinter@gmail.com
 

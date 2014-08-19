@@ -1,8 +1,8 @@
 # pinterb/phusion-base
 #
-# VERSION     0.0.7
+# VERSION     0.0.9
 #
-# CREATED ON  2014-08-12T05:31:13CDT
+# CREATED ON  2014-08-16T16:35:49CDT
 
 FROM phusion/passenger-customizable:0.9.11
 

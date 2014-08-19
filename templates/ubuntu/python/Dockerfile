@@ -20,6 +20,9 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get install -y \
  python3 python3-setuptools python3-pip python3-all-dev
 
+### install autoremove
+RUN pip install pip-autoremove
+
 
 ### make debian interactive...
 RUN env --unset=DEBIAN_FRONTEND

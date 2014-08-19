@@ -1,10 +1,10 @@
 # pinterb/ubuntu-python
 #
-# VERSION     0.0.7
+# VERSION     0.0.9
 #
-# CREATED ON  2014-08-12T05:31:13CDT
+# CREATED ON  2014-08-19T08:11:29CDT
 
-FROM pinterb/ubuntu-base:0.0.7
+FROM pinterb/ubuntu-base:0.0.9
 
 MAINTAINER Brad Pinter brad.pinter@gmail.com
 
@@ -19,6 +19,9 @@ ENV DEBIAN_FRONTEND noninteractive
 ### install python3
 RUN apt-get install -y \
  python3 python3-setuptools python3-pip python3-all-dev
+
+### install autoremove
+RUN pip install pip-autoremove
 
 
 ### make debian interactive...
