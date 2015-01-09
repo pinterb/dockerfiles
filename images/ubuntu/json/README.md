@@ -1,6 +1,7 @@
 # pinterb/json 
 
-[`pinterb/json`](https://index.docker.io/u/pinterb/json) is a [docker](https://docker.io) base image that bundles the following:   
+[`pinterb/json`](https://index.docker.io/u/pinterb/json) is a [docker](https://docker.io) base image that bundles the following:  
+ 
 * **[Jsonnet](http://google.github.io/jsonnet/doc/index.html):** A domain specific configuration language that helps you define JSON data.    
 * **[esjon](https://github.com/Shopify/ejson):** A utility for managing a collection of secrets in source control.            
 * **[jq](http://stedolan.github.io/jq/):** A lightweight and flexible command-line JSON processor.            
@@ -15,6 +16,6 @@ This is a base image.  It designed to be extended.
 
 ## Misc. Info 
 * Latest version: 0.0.10
-* Built on: 2015-01-09T14:31:17CST
+* Built on: 2015-01-09T14:40:22CST
 * Base image: ubuntu:14.04
 
