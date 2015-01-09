@@ -1,4 +1,4 @@
-VERSION = 0.0.9
+VERSION = 0.0.10
 NAME = pinterb
 CREATE_DATE := $(shell date +%FT%T%Z)
 PERL_VERSION = 5.20.0 
@@ -15,12 +15,12 @@ PERL_VERSION = 5.20.0
 				build_golang test_golang
 
 all: build_all
-build_all: build_base build_python build_golang build_perl
-build_base: build_phusion_base build_ubuntu_base
+build_all: build_base build_python build_golang build_perl build_json
+build_base: build_ubuntu_base
 
 build_python: build_python_base build_python_dev build_python_falcon
-build_python_base: build_phusion_python_base build_ubuntu_python_base
-build_python_dev: build_phusion_python_dev build_ubuntu_python_dev
+build_python_base: build_ubuntu_python_base
+build_python_dev: build_ubuntu_python_dev
 build_python_falcon: build_ubuntu_python_falcon
 
 build_golang: build_golang_base
@@ -30,6 +30,9 @@ build_perl: build_perl_base build_perl_dev build_perl_mojo
 build_perl_base: build_ubuntu_perl_base
 build_perl_dev: build_ubuntu_perl_dev
 build_perl_mojo: build_ubuntu_perl_mojo
+
+build_json: build_json_base
+build_json_base: build_ubuntu_json_base
 
 
 ## Base Images
@@ -187,36 +190,51 @@ build_ubuntu_perl_mojo: prep_ubuntu_perl_mojo
 		docker build --rm -t $(NAME)/ubuntu-perl-mojo:$(VERSION) ubuntu_perl_mojo_image
 		cp ubuntu_perl_mojo_image/Dockerfile images/ubuntu/perl-mojo/
 
+## JSON Images
+prep_ubuntu_json_base:
+		rm -rf ubuntu_json_base_image
+		cp -pR templates/ubuntu/json ubuntu_json_base_image
+		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/json/g' ubuntu_json_base_image/Dockerfile
+		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/json/g' ubuntu_json_base_image/README.md
+		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_json_base_image/Dockerfile
+		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_json_base_image/README.md
+		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/ubuntu:14.04/g' ubuntu_json_base_image/Dockerfile
+		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/ubuntu:14.04/g' ubuntu_json_base_image/README.md
+		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_json_base_image/Dockerfile
+		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_json_base_image/README.md
 
-
-
-
+build_ubuntu_json_base: prep_ubuntu_json_base
+		docker build --rm -t $(NAME)/json:$(VERSION) ubuntu_json_base_image
+		cp ubuntu_json_base_image/Dockerfile images/ubuntu/json/
+		cp ubuntu_json_base_image/README.md images/ubuntu/json/
 
 tag_latest:
-		docker tag $(NAME)/phusion-base:$(VERSION) $(NAME)/phusion-base:latest
+#		docker tag $(NAME)/phusion-base:$(VERSION) $(NAME)/phusion-base:latest
 		docker tag $(NAME)/ubuntu-base:$(VERSION) $(NAME)/ubuntu-base:latest
-		docker tag $(NAME)/phusion-python:$(VERSION) $(NAME)/phusion-python:latest
+#		docker tag $(NAME)/phusion-python:$(VERSION) $(NAME)/phusion-python:latest
 		docker tag $(NAME)/ubuntu-python:$(VERSION) $(NAME)/ubuntu-python:latest
-		docker tag $(NAME)/phusion-python-dev:$(VERSION) $(NAME)/phusion-python-dev:latest
+#		docker tag $(NAME)/phusion-python-dev:$(VERSION) $(NAME)/phusion-python-dev:latest
 		docker tag $(NAME)/ubuntu-python-dev:$(VERSION) $(NAME)/ubuntu-python-dev:latest
 		docker tag $(NAME)/ubuntu-python-falcon:$(VERSION) $(NAME)/ubuntu-python-falcon:latest
 		docker tag $(NAME)/ubuntu-golang:$(VERSION) $(NAME)/ubuntu-golang:latest
 		docker tag $(NAME)/ubuntu-perl:$(VERSION) $(NAME)/ubuntu-perl:latest
 		docker tag $(NAME)/ubuntu-perl-dev:$(VERSION) $(NAME)/ubuntu-perl-dev:latest
 		docker tag $(NAME)/ubuntu-perl-mojo:$(VERSION) $(NAME)/ubuntu-perl-mojo:latest
+		docker tag $(NAME)/json:$(VERSION) $(NAME)/json:latest
 
 release: tag_latest
-		@if ! docker images $(NAME)/phusion-base | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/phusion-base version $(VERSION) is not yet built. Please run 'make build'"; false; fi
+#		@if ! docker images $(NAME)/phusion-base | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/phusion-base version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ubuntu-base | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-base version $(VERSION) is not yet built. Please run 'make build'"; false; fi
-		@if ! docker images $(NAME)/phusion-python | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/phusion-python version $(VERSION) is not yet built. Please run 'make build'"; false; fi
+#		@if ! docker images $(NAME)/phusion-python | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/phusion-python version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ubuntu-python | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-python version $(VERSION) is not yet built. Please run 'make build'"; false; fi
-		@if ! docker images $(NAME)/phusion-python-dev | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/phusion-python-dev version $(VERSION) is not yet built. Please run 'make build'"; false; fi
+#		@if ! docker images $(NAME)/phusion-python-dev | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/phusion-python-dev version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ubuntu-python-dev | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-python-dev version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ubuntu-python-falcon | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-python-falcon version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ubuntu-golang | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-golang version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ubuntu-perl | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-perl version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ubuntu-perl-dev | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-perl-dev version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ubuntu-perl-mojo | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-perl-mojo version $(VERSION) is not yet built. Please run 'make build'"; false; fi
+		@if ! docker images $(NAME)/json | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/json $(VERSION) is not yet built. Please run 'make build'"; false; fi
 # Right now, these images are "trusted builds" on hub.docker.com.  So you can not perform a docker push"
 #		docker push $(NAME)/phusion-base
 #		docker push $(NAME)/ubuntu-base
@@ -229,6 +247,7 @@ release: tag_latest
 #		docker push $(NAME)/ubuntu-perl
 #		docker push $(NAME)/ubuntu-perl-dev
 #		docker push $(NAME)/ubuntu-perl-mojo
+#		docker push $(NAME)/json
 		@echo "*** Don't forget to create a tag. git tag rel-$(VERSION) && git push origin rel-$(VERSION)"
 
 clean: clean_untagged
@@ -243,6 +262,7 @@ clean: clean_untagged
 		rm -rf ubuntu_perl_base_image
 		rm -rf ubuntu_perl_dev_image
 		rm -rf ubuntu_perl_mojo_image
+		rm -rf ubuntu_json_base_image 
 
 clean_untagged:
 		for i in `docker ps --no-trunc -a -q`;do docker rm $$i;done

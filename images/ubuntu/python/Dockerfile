@@ -1,10 +1,10 @@
 # pinterb/ubuntu-python
 #
-# VERSION     0.0.9
+# VERSION     0.0.10
 #
-# CREATED ON  2014-08-19T08:11:29CDT
+# CREATED ON  2015-01-09T13:19:27CST
 
-FROM pinterb/ubuntu-base:0.0.9
+FROM pinterb/ubuntu-base:0.0.10
 
 MAINTAINER Brad Pinter brad.pinter@gmail.com
 
