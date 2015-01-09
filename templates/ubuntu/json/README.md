@@ -5,6 +5,7 @@
 * **[Jsonnet](http://google.github.io/jsonnet/doc/index.html):** A domain specific configuration language that helps you define JSON data.    
 * **[esjon](https://github.com/Shopify/ejson):** A utility for managing a collection of secrets in source control.            
 * **[jq](http://stedolan.github.io/jq/):** A lightweight and flexible command-line JSON processor.            
+* **[jsonlint](http://manpages.ubuntu.com/manpages/trusty/man1/jsonlint.1.html):** A JSON syntax validator and formatter tool.            
 * **[golang](http://golang.org):** The latest version of [golang](http://golang.org) installed from [golang.org](http://golang.org/doc/install/).          
 
 ## Notes

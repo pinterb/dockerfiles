@@ -2,14 +2,14 @@
 #
 # VERSION     0.0.10
 #
-# CREATED ON  2015-01-09T14:58:58CST
+# CREATED ON  2015-01-09T16:36:00CST
 
 FROM ubuntu:14.04
 
 ENV DEBIAN_FRONTEND noninteractive
 
 # Let's start with some basic stuff.
-RUN buildDeps='gcc libc6-dev g++ dpkg-dev libssl-dev make dh-autoreconf'; \
+RUN buildDeps='gcc libc6-dev g++ dpkg-dev libssl-dev make dh-autoreconf libmodule-install-perl '; \
     set -x && \
     apt-get update -qq && apt-get install -y --no-install-recommends \
     $buildDeps \
@@ -50,6 +50,18 @@ ADD https://github.com/Shopify/ejson/releases/download/$EJSON_VERSION/ejson_$EJS
 RUN dpkg -i /tmp/ejson.deb && \
     mkdir -p $EJSON_KEYDIR && \
     rm /tmp/ejson.deb
+
+## Install Catmandu
+## http://librecat.org/index.html
+#RUN catmandudDeps='libmodule-install-perl libyaz4-dev libwrap0-dev libxml2-dev zlib1g-dev libexpat1-dev libxslt1-dev'; \
+#    apt-get install -y --no-install-recommends \
+#    $catmandudDeps \
+#    zlib1g \
+#    perl-doc && \
+#    yes | cpan YAML && \
+#    yes | cpan App::cpanminus && \
+#    /usr/local/bin/cpanm Task::Catmandu && \
+#    apt-get purge -y --auto-remove $catmandudDeps
 
 # Done installing, cleanup!
 RUN buildDeps='gcc libc6-dev g++ dpkg-dev libssl-dev make dh-autoreconf'; \
