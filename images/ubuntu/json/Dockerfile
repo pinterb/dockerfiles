@@ -2,7 +2,7 @@
 #
 # VERSION     0.0.10
 #
-# CREATED ON  2015-01-09T14:40:22CST
+# CREATED ON  2015-01-09T14:58:58CST
 
 FROM ubuntu:14.04
 
@@ -48,7 +48,8 @@ ENV EJSON_VERSION 1.0.0
 ENV EJSON_KEYDIR /opt/ejson/keys
 ADD https://github.com/Shopify/ejson/releases/download/$EJSON_VERSION/ejson_$EJSON_VERSION_amd64.deb /tmp/ejson.deb
 RUN dpkg -i /tmp/ejson.deb && \
-    mkdir -p $EJSON_KEYDIR 
+    mkdir -p $EJSON_KEYDIR && \
+    rm /tmp/ejson.deb
 
 # Done installing, cleanup!
 RUN buildDeps='gcc libc6-dev g++ dpkg-dev libssl-dev make dh-autoreconf'; \
