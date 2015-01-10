@@ -18,12 +18,6 @@ RUN buildDeps='gcc libc6-dev g++ dpkg-dev libssl-dev make dh-autoreconf'; \
     vim \
     python-demjson
 
-# Install Go
-ENV GO_VERSION 1.4
-RUN curl https://storage.googleapis.com/golang/go$GO_VERSION.linux-amd64.tar.gz | tar -C /usr/local -zx
-ENV GOROOT /usr/local/go
-ENV PATH /usr/local/go/bin:$PATH
-
 # Install Jsonnet 
 # http://google.github.io/jsonnet/doc/index.html 
 ENV JSONNET_VERSION 0.6.0-beta 

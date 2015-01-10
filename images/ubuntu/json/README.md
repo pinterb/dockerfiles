@@ -6,17 +6,12 @@
 * **[esjon](https://github.com/Shopify/ejson):** A utility for managing a collection of secrets in source control.            
 * **[jq](http://stedolan.github.io/jq/):** A lightweight and flexible command-line JSON processor.            
 * **[jsonlint](http://manpages.ubuntu.com/manpages/trusty/man1/jsonlint.1.html):** A JSON syntax validator and formatter tool.            
-* **[golang](http://golang.org):** The latest version of [golang](http://golang.org) installed from [golang.org](http://golang.org/doc/install/).          
-
-## Notes
-`GOROOT` is set to `/usr/local/go`   
-`GOPATH` is ***NOT*** set. (If extending this image, you may want to set it.)    
 
 ## Usage 
 This is a base image.  It designed to be extended.
 
 ## Misc. Info 
 * Latest version: 0.0.10
-* Built on: 2015-01-10T11:17:45CST
+* Built on: 2015-01-10T13:11:27CST
 * Base image: ubuntu:14.04
 
