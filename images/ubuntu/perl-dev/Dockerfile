@@ -1,10 +1,10 @@
 # pinterb/ubuntu-perl-dev
 #
-# VERSION     0.0.10
+# VERSION     0.0.11
 #
-# CREATED ON  2015-02-03T14:37:36CST
+# CREATED ON  2015-02-03T16:34:04CST
 
-FROM pinterb/ubuntu-perl:0.0.10
+FROM pinterb/ubuntu-perl:0.0.11
 
 MAINTAINER Brad Pinter brad.pinter@gmail.com
 
