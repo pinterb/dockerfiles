@@ -4,9 +4,7 @@ CREATE_DATE := $(shell date +%FT%T%Z)
 PERL_VERSION = 5.20.0 
 
 .PHONY: all build_all tag_latest release clean clean_untagged \
-				prep_phusion_base test_phusion_base build_phusion_base \
 				prep_ubuntu_base test_ubuntu_base build_ubuntu_base \
-				prep_phusion_golang test_phusion_golang build_phusion_golang \
 				prep_ubuntu_golang test_ubuntu_golang build_ubuntu_golang \
 				build_python test_python \
 				build_ansible test_ansible \
@@ -36,21 +34,6 @@ build_json_base: build_ubuntu_json_base
 
 
 ## Base Images
-prep_phusion_base:
-		rm -rf phusion_base_image
-		cp -pR templates/phusion/base phusion_base_image
-		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/phusion-base/g' phusion_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' phusion_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/phusion\/passenger-customizable:0.9.11/g' phusion_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' phusion_base_image/Dockerfile
-
-test_phusion_base: prep_phusion_base
-		phusion_base_image/tests/verify.sh --force --image=$(NAME)/phusion-base-sspectest ; /usr/bin/test "$$?" -eq 0
-
-build_phusion_base: test_phusion_base
-		docker build --rm -t $(NAME)/phusion-base:$(VERSION) phusion_base_image
-		cp phusion_base_image/Dockerfile images/phusion/base/
-
 prep_ubuntu_base:
 		rm -rf ubuntu_base_image
 		cp -pR templates/ubuntu/base ubuntu_base_image
@@ -65,21 +48,6 @@ build_ubuntu_base: prep_ubuntu_base
 
 
 ## Python Images
-prep_phusion_python_base:
-		rm -rf phusion_python_base_image
-		cp -pR templates/phusion/python phusion_python_base_image
-		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/phusion-python/g' phusion_python_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' phusion_python_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/phusion-base:$(VERSION)/g' phusion_python_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' phusion_python_base_image/Dockerfile
-
-test_phusion_python_base: prep_phusion_python_base
-		phusion_python_base_image/tests/verify.sh --force --image=$(NAME)/phusion-python-sspectest ; /usr/bin/test "$$?" -eq 0
-
-build_phusion_python_base: test_phusion_python_base
-		docker build --rm -t $(NAME)/phusion-python:$(VERSION) phusion_python_base_image
-		cp phusion_python_base_image/Dockerfile images/phusion/python/
-
 prep_ubuntu_python_base:
 		rm -rf ubuntu_python_base_image
 		cp -pR templates/ubuntu/python ubuntu_python_base_image
@@ -91,21 +59,6 @@ prep_ubuntu_python_base:
 build_ubuntu_python_base: prep_ubuntu_python_base
 		docker build --rm -t $(NAME)/ubuntu-python:$(VERSION) ubuntu_python_base_image
 		cp ubuntu_python_base_image/Dockerfile images/ubuntu/python/
-
-prep_phusion_python_dev:
-		rm -rf phusion_python_dev_image
-		cp -pR templates/phusion/python-dev phusion_python_dev_image
-		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/phusion-python-dev/g' phusion_python_dev_image/Dockerfile
-		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' phusion_python_dev_image/Dockerfile
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/phusion-python:$(VERSION)/g' phusion_python_dev_image/Dockerfile
-		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' phusion_python_dev_image/Dockerfile
-
-test_phusion_python_dev: prep_phusion_python_dev
-		phusion_python_dev_image/tests/verify.sh --force --image=$(NAME)/phusion-python-dev-sspectest ; /usr/bin/test "$$?" -eq 0
-
-build_phusion_python_dev: test_phusion_python_dev
-		docker build --rm -t $(NAME)/phusion-python-dev:$(VERSION) phusion_python_dev_image
-		cp phusion_python_dev_image/Dockerfile images/phusion/python-dev/
 
 prep_ubuntu_python_dev:
 		rm -rf ubuntu_python_dev_image
@@ -209,11 +162,8 @@ build_ubuntu_json_base: prep_ubuntu_json_base
 		cp ubuntu_json_base_image/README.md images/ubuntu/json/
 
 tag_latest:
-#		docker tag $(NAME)/phusion-base:$(VERSION) $(NAME)/phusion-base:latest
 		docker tag $(NAME)/ubuntu-base:$(VERSION) $(NAME)/ubuntu-base:latest
-#		docker tag $(NAME)/phusion-python:$(VERSION) $(NAME)/phusion-python:latest
 		docker tag $(NAME)/ubuntu-python:$(VERSION) $(NAME)/ubuntu-python:latest
-#		docker tag $(NAME)/phusion-python-dev:$(VERSION) $(NAME)/phusion-python-dev:latest
 		docker tag $(NAME)/ubuntu-python-dev:$(VERSION) $(NAME)/ubuntu-python-dev:latest
 		docker tag $(NAME)/ubuntu-python-falcon:$(VERSION) $(NAME)/ubuntu-python-falcon:latest
 		docker tag $(NAME)/ubuntu-golang:$(VERSION) $(NAME)/ubuntu-golang:latest
@@ -223,11 +173,8 @@ tag_latest:
 		docker tag $(NAME)/json:$(VERSION) $(NAME)/json:latest
 
 release: tag_latest
-#		@if ! docker images $(NAME)/phusion-base | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/phusion-base version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ubuntu-base | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-base version $(VERSION) is not yet built. Please run 'make build'"; false; fi
-#		@if ! docker images $(NAME)/phusion-python | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/phusion-python version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ubuntu-python | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-python version $(VERSION) is not yet built. Please run 'make build'"; false; fi
-#		@if ! docker images $(NAME)/phusion-python-dev | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/phusion-python-dev version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ubuntu-python-dev | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-python-dev version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ubuntu-python-falcon | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-python-falcon version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ubuntu-golang | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-golang version $(VERSION) is not yet built. Please run 'make build'"; false; fi
@@ -236,11 +183,8 @@ release: tag_latest
 		@if ! docker images $(NAME)/ubuntu-perl-mojo | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-perl-mojo version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/json | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/json $(VERSION) is not yet built. Please run 'make build'"; false; fi
 # Right now, these images are "trusted builds" on hub.docker.com.  So you can not perform a docker push"
-#		docker push $(NAME)/phusion-base
 #		docker push $(NAME)/ubuntu-base
-#		docker push $(NAME)/phusion-python
 #		docker push $(NAME)/ubuntu-python
-#		docker push $(NAME)/phusion-python-dev
 #		docker push $(NAME)/ubuntu-python-dev
 #		docker push $(NAME)/ubuntu-python-falcon
 #		docker push $(NAME)/ubuntu-golang
@@ -251,11 +195,8 @@ release: tag_latest
 		@echo "*** Don't forget to create a tag. git tag rel-$(VERSION) && git push origin rel-$(VERSION)"
 
 clean: clean_untagged
-		rm -rf phusion_base_image
 		rm -rf ubuntu_base_image
-		rm -rf phusion_python_base_image
 		rm -rf ubuntu_python_base_image
-		rm -rf phusion_python_dev_image
 		rm -rf ubuntu_python_dev_image
 		rm -rf ubuntu_python_falcon_image
 		rm -rf ubuntu_golang_base_image

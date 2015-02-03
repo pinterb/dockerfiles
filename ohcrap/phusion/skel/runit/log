@@ -1,5 +1,0 @@
-#!/bin/sh
-set -e
-
-# exec chpst -ulog svlogd -tt /var/log/ntpd/
-exec svlogd -tt /var/log/ntpd/

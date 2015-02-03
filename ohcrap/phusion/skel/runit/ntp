@@ -1,4 +1,0 @@
-#!/bin/sh
-set -e
-
-exec chpst -u ntp /usr/sbin/ntpd -n -g

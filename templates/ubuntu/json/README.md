@@ -8,7 +8,7 @@
 * **[jsonlint](http://manpages.ubuntu.com/manpages/trusty/man1/jsonlint.1.html):** A JSON syntax validator and formatter tool.            
 
 ## Usage 
-This is a base image.  It designed to be extended.
+This is a base image. It designed to be extended.
 
 ## Misc. Info 
 * Latest version: ###-->ZZZ_VERSION<--###

@@ -11,22 +11,29 @@ RUN buildDeps='gcc libc6-dev g++ dpkg-dev libssl-dev make dh-autoreconf'; \
     sudo \
     apt-transport-https \
     ca-certificates \
-    curl \ 
+    curl \
     wget \
     mercurial \
     git \
     vim \
+    zip \
+    unzip \
+    rsync \
+    tree \
+    less \
+    xclip \
+    ssh \
     python-demjson
 
 # Install Jsonnet 
 # http://google.github.io/jsonnet/doc/index.html 
-ENV JSONNET_VERSION 0.6.0-beta 
+ENV JSONNET_VERSION 0.6.0-beta
 RUN git clone https://github.com/google/jsonnet.git /opt/jsonnet && \
-    cd /opt/jsonnet && make 
+    cd /opt/jsonnet && make
 ENV PATH $PATH:/opt/jsonnet
 
 # Install jq
-# http://stedolan.github.io/jq/ 
+# http://stedolan.github.io/jq/
 ENV JQ_VERSION 1.4
 RUN cd /usr/local/bin && wget http://stedolan.github.io/jq/download/linux64/jq && chmod +x jq
 
@@ -40,7 +47,7 @@ RUN dpkg -i /tmp/ejson.deb && \
     rm /tmp/ejson.deb
 
 # Done installing, cleanup!
-RUN buildDeps='gcc libc6-dev g++ dpkg-dev libssl-dev make dh-autoreconf'; \
+RUN buildDeps='gcc libc6-dev g++ dpkg-dev libssl-dev dh-autoreconf'; \
     apt-get purge -y --auto-remove $buildDeps
 
 RUN env --unset=DEBIAN_FRONTEND
