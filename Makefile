@@ -221,7 +221,7 @@ release: tag_latest
 #		docker push $(NAME)/ubuntu-perl-dev
 #		docker push $(NAME)/ubuntu-perl-mojo
 #		docker push $(NAME)/json
-		@echo "*** Don't forget to create a tag. git tag rel-$(VERSION) && git push origin rel-$(VERSION)"
+		@echo "*** Don't forget to create a tag. git tag -d rel-$(VERSION); git push origin :refs/tags/rel-$(VERSION); git tag rel-$(VERSION) && git push origin rel-$(VERSION)"
 
 clean: clean_untagged
 		rm -rf ubuntu_base_image
