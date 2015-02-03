@@ -6,7 +6,7 @@
 
 ## Usage 
 This image can easily be extended.  But to run your Ansible playbooks:
-```sh
+````
 docker run --rm -it ###-->ZZZ_IMAGE<--###:###-->ZZZ_VERSION<--### ansible --version
 ````
 
