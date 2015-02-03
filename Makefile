@@ -1,7 +1,9 @@
-VERSION = 0.0.10
+VERSION = 0.0.11
+PREV_VERSION = 0.0.10
 NAME = pinterb
 CREATE_DATE := $(shell date +%FT%T%Z)
 PERL_VERSION = 5.20.0 
+ANSIBLE_VERSION = 1.9 (devel 019f74dced) 
 
 .PHONY: all build_all tag_latest release clean clean_untagged \
 				prep_ubuntu_base test_ubuntu_base build_ubuntu_base \
@@ -31,6 +33,9 @@ build_perl_mojo: build_ubuntu_perl_mojo
 
 build_json: build_json_base
 build_json_base: build_ubuntu_json_base
+
+build_ansible: build_ansible_base
+build_ansible_base: build_ubuntu_ansible_base
 
 
 ## Base Images
@@ -161,6 +166,28 @@ build_ubuntu_json_base: prep_ubuntu_json_base
 		cp ubuntu_json_base_image/Dockerfile images/ubuntu/json/
 		cp ubuntu_json_base_image/README.md images/ubuntu/json/
 
+## Ansible Images
+prep_ubuntu_ansible_base:
+		rm -rf ubuntu_ansible_base_image
+		cp -pR templates/ubuntu/ansible ubuntu_ansible_base_image
+		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/ansible/g' ubuntu_ansible_base_image/Dockerfile
+		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/ansible/g' ubuntu_ansible_base_image/README.md
+		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_ansible_base_image/Dockerfile
+		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_ansible_base_image/README.md
+		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/json:$(PREV_VERSION)/g' ubuntu_ansible_base_image/Dockerfile
+		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/json:$(PREV_VERSION)/g' ubuntu_ansible_base_image/README.md
+		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_ansible_base_image/Dockerfile
+		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_ansible_base_image/README.md
+		sed -i 's/###-->ZZZ_ANSIBLE_VERSION<--###/$(ANSIBLE_VERSION)/g' ubuntu_ansible_base_image/Dockerfile
+		sed -i 's/###-->ZZZ_ANSIBLE_VERSION<--###/$(ANSIBLE_VERSION)/g' ubuntu_ansible_base_image/README.md
+
+build_ubuntu_ansible_base: prep_ubuntu_ansible_base
+		docker build --rm -t $(NAME)/ansible:$(VERSION) ubuntu_ansible_base_image
+		cp ubuntu_ansible_base_image/Dockerfile images/ubuntu/ansible/
+		cp ubuntu_ansible_base_image/README.md images/ubuntu/ansible/
+		cp ubuntu_ansible_base_image/ansible.cfg images/ubuntu/ansible/
+
+
 tag_latest:
 		docker tag $(NAME)/ubuntu-base:$(VERSION) $(NAME)/ubuntu-base:latest
 		docker tag $(NAME)/ubuntu-python:$(VERSION) $(NAME)/ubuntu-python:latest
@@ -171,6 +198,7 @@ tag_latest:
 		docker tag $(NAME)/ubuntu-perl-dev:$(VERSION) $(NAME)/ubuntu-perl-dev:latest
 		docker tag $(NAME)/ubuntu-perl-mojo:$(VERSION) $(NAME)/ubuntu-perl-mojo:latest
 		docker tag $(NAME)/json:$(VERSION) $(NAME)/json:latest
+		docker tag $(NAME)/ansible:$(VERSION) $(NAME)/ansible:latest
 
 release: tag_latest
 		@if ! docker images $(NAME)/ubuntu-base | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-base version $(VERSION) is not yet built. Please run 'make build'"; false; fi
@@ -182,6 +210,7 @@ release: tag_latest
 		@if ! docker images $(NAME)/ubuntu-perl-dev | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-perl-dev version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ubuntu-perl-mojo | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-perl-mojo version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/json | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/json $(VERSION) is not yet built. Please run 'make build'"; false; fi
+		@if ! docker images $(NAME)/ansible | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ansible $(VERSION) is not yet built. Please run 'make build'"; false; fi
 # Right now, these images are "trusted builds" on hub.docker.com.  So you can not perform a docker push"
 #		docker push $(NAME)/ubuntu-base
 #		docker push $(NAME)/ubuntu-python
@@ -204,6 +233,7 @@ clean: clean_untagged
 		rm -rf ubuntu_perl_dev_image
 		rm -rf ubuntu_perl_mojo_image
 		rm -rf ubuntu_json_base_image 
+		rm -rf ubuntu_ansible_base_image 
 
 clean_untagged:
 		for i in `docker ps --no-trunc -a -q`;do docker rm $$i;done
