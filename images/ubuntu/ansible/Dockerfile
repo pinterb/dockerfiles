@@ -21,7 +21,7 @@ RUN locale-gen en_US.UTF-8 && \
 
 
 ### Install Ansible 
-ENV ANSIBLE_VERSION 1.9 (devel 019f74dced) 
+ENV ANSIBLE_VERSION 1.9 (devel 8f06ba2bc1) 
 
 RUN mkdir /etc/ansible/ && echo '[local]\nlocalhost\n' > /etc/ansible/hosts
 RUN mkdir /opt/ansible/

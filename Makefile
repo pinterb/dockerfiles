@@ -3,7 +3,7 @@ PREV_VERSION = 0.0.10
 NAME = pinterb
 CREATE_DATE := $(shell date +%FT%T%Z)
 PERL_VERSION = 5.20.0 
-ANSIBLE_VERSION = 1.9 (devel 019f74dced) 
+ANSIBLE_VERSION = 1.9 (devel 8f06ba2bc1) 
 
 .PHONY: all build_all tag_latest release clean clean_untagged \
 				prep_ubuntu_base test_ubuntu_base build_ubuntu_base \
