@@ -227,6 +227,7 @@ prep_ubuntu_swaggereditor_base:
 
 build_ubuntu_swaggereditor_base: prep_ubuntu_swaggereditor_base
 		docker build --rm -t $(NAME)/swagger-editor:$(VERSION) ubuntu_swaggereditor_base_image
+		rm -rf images/ubuntu/swagger-editor
 		cp -R ubuntu_swaggereditor_base_image images/ubuntu/swagger-editor
 
 tag_latest:
