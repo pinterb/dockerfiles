@@ -15,7 +15,7 @@ ANSIBLE_VERSION = 1.9 (devel 8f06ba2bc1)
 				build_golang test_golang
 
 all: build_all
-build_all: build_base build_python build_golang build_perl build_json
+build_all: build_base build_python build_golang build_perl build_json build_ansible build_swaggerui build_swaggereditor
 build_base: build_ubuntu_base
 
 build_python: build_python_base build_python_dev build_python_falcon
@@ -230,18 +230,18 @@ build_ubuntu_swaggereditor_base: prep_ubuntu_swaggereditor_base
 		cp -R ubuntu_swaggereditor_base_image images/ubuntu/swagger-editor
 
 tag_latest:
-		docker tag $(NAME)/ubuntu-base:$(VERSION) $(NAME)/ubuntu-base:latest
-		docker tag $(NAME)/ubuntu-python:$(VERSION) $(NAME)/ubuntu-python:latest
-		docker tag $(NAME)/ubuntu-python-dev:$(VERSION) $(NAME)/ubuntu-python-dev:latest
-		docker tag $(NAME)/ubuntu-python-falcon:$(VERSION) $(NAME)/ubuntu-python-falcon:latest
-		docker tag $(NAME)/ubuntu-golang:$(VERSION) $(NAME)/ubuntu-golang:latest
-		docker tag $(NAME)/ubuntu-perl:$(VERSION) $(NAME)/ubuntu-perl:latest
-		docker tag $(NAME)/ubuntu-perl-dev:$(VERSION) $(NAME)/ubuntu-perl-dev:latest
-		docker tag $(NAME)/ubuntu-perl-mojo:$(VERSION) $(NAME)/ubuntu-perl-mojo:latest
-		docker tag $(NAME)/json:$(VERSION) $(NAME)/json:latest
-		docker tag $(NAME)/ansible:$(VERSION) $(NAME)/ansible:latest
-		docker tag $(NAME)/swagger-ui:$(VERSION) $(NAME)/swagger-ui:latest
-		docker tag $(NAME)/swagger-editor:$(VERSION) $(NAME)/swagger-editor:latest
+		docker tag -f $(NAME)/ubuntu-base:$(VERSION) $(NAME)/ubuntu-base:latest
+		docker tag -f $(NAME)/ubuntu-python:$(VERSION) $(NAME)/ubuntu-python:latest
+		docker tag -f $(NAME)/ubuntu-python-dev:$(VERSION) $(NAME)/ubuntu-python-dev:latest
+		docker tag -f $(NAME)/ubuntu-python-falcon:$(VERSION) $(NAME)/ubuntu-python-falcon:latest
+		docker tag -f $(NAME)/ubuntu-golang:$(VERSION) $(NAME)/ubuntu-golang:latest
+		docker tag -f $(NAME)/ubuntu-perl:$(VERSION) $(NAME)/ubuntu-perl:latest
+		docker tag -f $(NAME)/ubuntu-perl-dev:$(VERSION) $(NAME)/ubuntu-perl-dev:latest
+		docker tag -f $(NAME)/ubuntu-perl-mojo:$(VERSION) $(NAME)/ubuntu-perl-mojo:latest
+		docker tag -f $(NAME)/json:$(VERSION) $(NAME)/json:latest
+		docker tag -f $(NAME)/ansible:$(VERSION) $(NAME)/ansible:latest
+		docker tag -f $(NAME)/swagger-ui:$(VERSION) $(NAME)/swagger-ui:latest
+		docker tag -f $(NAME)/swagger-editor:$(VERSION) $(NAME)/swagger-editor:latest
 
 release: tag_latest
 		@if ! docker images $(NAME)/ubuntu-base | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-base version $(VERSION) is not yet built. Please run 'make build'"; false; fi

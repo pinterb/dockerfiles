@@ -1,4 +1,4 @@
-FROM pinterb/json:0.0.10
+FROM pinterb/json:0.0.11
 
 ENV DEBIAN_FRONTEND noninteractive
 
