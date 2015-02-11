@@ -1,8 +1,8 @@
 # pinterb/ubuntu-base
 #
-# VERSION     0.0.11
+# VERSION     0.0.12
 #
-# CREATED ON  2015-02-03T16:49:53CST
+# CREATED ON  2015-02-11T14:58:28UTC
 
 FROM ubuntu:14.04
 
