@@ -40,6 +40,9 @@ build_ansible_base: build_ubuntu_ansible_base
 build_swaggerui: build_swaggerui_base
 build_swaggerui_base: build_ubuntu_swaggerui_base
 
+build_swaggereditor: build_swaggereditor_base
+build_swaggereditor_base: build_ubuntu_swaggereditor_base
+
 
 ## Base Images
 prep_ubuntu_base:
@@ -208,6 +211,24 @@ build_ubuntu_swaggerui_base: prep_ubuntu_swaggerui_base
 		cp ubuntu_swaggerui_base_image/Dockerfile images/ubuntu/swagger-ui/
 		cp ubuntu_swaggerui_base_image/README.md images/ubuntu/swagger-ui/
 
+## Swagger-Editor Image
+prep_ubuntu_swaggereditor_base:
+		rm -rf ubuntu_swaggereditor_base_image
+		git clone https://github.com/pinterb/swagger-editor ubuntu_swaggereditor_base_image
+		rm -rf ubuntu_swaggereditor_base_image/.git
+		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/swagger-ui/g' ubuntu_swaggereditor_base_image/Dockerfile
+		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/swagger-ui/g' ubuntu_swaggereditor_base_image/README.md
+		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_swaggereditor_base_image/Dockerfile
+		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_swaggereditor_base_image/README.md
+		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/json:$(PREV_VERSION)/g' ubuntu_swaggereditor_base_image/Dockerfile
+		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/json:$(PREV_VERSION)/g' ubuntu_swaggereditor_base_image/README.md
+		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_swaggereditor_base_image/Dockerfile
+		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_swaggereditor_base_image/README.md
+
+build_ubuntu_swaggereditor_base: prep_ubuntu_swaggereditor_base
+		docker build --rm -t $(NAME)/swagger-editor:$(VERSION) ubuntu_swaggereditor_base_image
+		cp -R ubuntu_swaggereditor_base_image images/ubuntu/swagger-editor
+
 tag_latest:
 		docker tag $(NAME)/ubuntu-base:$(VERSION) $(NAME)/ubuntu-base:latest
 		docker tag $(NAME)/ubuntu-python:$(VERSION) $(NAME)/ubuntu-python:latest
@@ -220,6 +241,7 @@ tag_latest:
 		docker tag $(NAME)/json:$(VERSION) $(NAME)/json:latest
 		docker tag $(NAME)/ansible:$(VERSION) $(NAME)/ansible:latest
 		docker tag $(NAME)/swagger-ui:$(VERSION) $(NAME)/swagger-ui:latest
+		docker tag $(NAME)/swagger-editor:$(VERSION) $(NAME)/swagger-editor:latest
 
 release: tag_latest
 		@if ! docker images $(NAME)/ubuntu-base | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ubuntu-base version $(VERSION) is not yet built. Please run 'make build'"; false; fi
@@ -233,6 +255,7 @@ release: tag_latest
 		@if ! docker images $(NAME)/json | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/json $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ansible | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ansible $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/swagger-ui | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/swagger-ui $(VERSION) is not yet built. Please run 'make build'"; false; fi
+		@if ! docker images $(NAME)/swagger-editor | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/swagger-editor $(VERSION) is not yet built. Please run 'make build'"; false; fi
 # Right now, these images are "trusted builds" on hub.docker.com.  So you can not perform a docker push"
 #		docker push $(NAME)/ubuntu-base
 #		docker push $(NAME)/ubuntu-python
@@ -257,6 +280,7 @@ clean: clean_untagged
 		rm -rf ubuntu_json_base_image 
 		rm -rf ubuntu_ansible_base_image 
 		rm -rf ubuntu_swaggerui_base_image
+		rm -rf ubuntu_swaggereditor_base_image
 
 clean_untagged:
 		for i in `docker ps --no-trunc -a -q`;do docker rm $$i;done

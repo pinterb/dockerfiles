@@ -1,0 +1,42 @@
+@import "../colors";
+@import "../fonts";
+
+.preview.pane {
+  .sw-font;
+
+  .dirty-message {
+    background: #FFFF6E;
+    padding: .3em;
+  }
+
+  .section-header {
+    a {
+      cursor: pointer;
+      color: @gray-dk;
+
+      &:hover {
+        text-decoration: none;
+        border-bottom: 1px dotted silver;
+      }
+    }
+
+    .on-hover {
+      display: none;
+      font-size: 14px;
+    }
+
+    &:hover .on-hover {
+      display: inline-block;
+    }
+  }
+
+  .section-content {
+    margin-left: 10px;
+    list-style: none;
+    padding-left: 0;
+  }
+
+  .definition-title {
+    color: @gray-dk;
+  }
+}

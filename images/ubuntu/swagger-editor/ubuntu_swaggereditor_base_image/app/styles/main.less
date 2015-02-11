@@ -1,0 +1,64 @@
+@splitter-width: 4px;
+
+@import (less) "../bower_components/bootstrap/less/bootstrap.less";
+@import (less) "../bower_components/json-formatter/dist/json-formatter.css";
+@import (less) "../bower_components/json-schema-view/dist/json-schema-view.css";
+@import (less) "../bower_components/angular-ui-layout/ui-layout.css";
+@import "fonts";
+@import "buttons";
+@import "components";
+@import "markdown";
+@import "print";
+
+html, body {
+  height: 100%;
+  font-family: sans-serif;
+}
+
+
+/*
+  Layout
+*/
+main {
+  position: fixed;
+  top: 35px;
+  bottom: 0;
+  right: 0;
+  left: 0;
+
+  .ui-splitbar {
+    // TODO: design review the color
+    background: #5E696B;
+  }
+
+  .pane.editor {
+    >div, .editor-wrapper {
+      height: 100%;
+    }
+  }
+
+  &.preview-wrapper, .preview-wrapper {
+    overflow: auto;
+    margin: .5em 1em;
+  }
+}
+
+/*
+ * Docs only mode
+*/
+body.docs-only {
+  main {
+    top: 0;
+    overflow: auto;
+  }
+  .main-header {
+    display: none;
+  }
+}
+
+/*
+ Reset
+*/
+a {
+  cursor: pointer;
+}

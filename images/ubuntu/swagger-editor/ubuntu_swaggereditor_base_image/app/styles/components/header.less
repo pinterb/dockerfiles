@@ -1,0 +1,57 @@
+@import "../colors";
+
+.main-header {
+  background: @header-bg;
+  position: fixed;
+  width: 100%;
+  height: 35px;
+  z-index: 5;
+}
+
+a.logo {
+  background-image: url("../images/swagger-sprite.png");
+  background-repeat: no-repeat;
+  background-position: 0 -25px;
+  background-size: 25px;
+  height: 25px;
+  margin: 4px;
+  display: inline-block;
+  width: 25px;
+  float: left;
+}
+
+.menu-bar {
+  float: left;
+}
+
+.status-bar {
+  float: right;
+  padding: 5px;
+  //TODO: Everything is hardcoded. revisit
+  .status {
+    text-align: right;
+    color: darken(@gray-lt, 25%);
+
+    .icon {
+      width: 21px;
+      height: 18px;
+      vertical-align: sub;
+      display: none;
+    }
+    .sw-font;
+
+    &.success {
+      color: darken(@gray-lt, 25%);
+    }
+    &.error {
+      .icon {
+        display: inline-block;
+        background-image: url("../images/warning.svg");
+      }
+      background-repeat: no-repeat;
+      background-position: 0px 5px;
+      padding-right: 1em;
+      color: @sw-error-header;
+    }
+  }
+}

@@ -1,0 +1,45 @@
+@import "../colors";
+@import "../fonts";
+
+.schema-model {
+  margin-left: 14px;
+  border-radius: none;
+
+  &.hidden {
+    display: none;
+  }
+
+  >header {
+
+    span, a {
+      padding: .2em;
+      white-space: pre;
+      display: none;
+
+      &.pipe {
+      color: darken(@gray-lt, 10%);
+      }
+
+
+      &.active {
+        display: inline-block;
+        font-weight: 700;
+      }
+
+
+      &:hover {
+        background: rgba(255,255,255,0.5);
+        cursor: pointer;
+      }
+    }
+  }
+
+  >section {
+
+    &.json, &.model {
+      font-size: 14px;
+      padding: 0.4em;
+    }
+  }
+}
+

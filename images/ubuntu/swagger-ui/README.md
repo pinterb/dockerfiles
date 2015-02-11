@@ -12,6 +12,6 @@ docker run --rm -it -v ${PWD}:/swagger-data -p 8080:80 pinterb/swagger-ui:0.0.12
 
 ## Misc. Info 
 * Latest version: 0.0.12
-* Built on: 2015-02-10T19:50:10UTC
+* Built on: 2015-02-11T14:06:37UTC
 * Base image: pinterb/json:0.0.11
 
