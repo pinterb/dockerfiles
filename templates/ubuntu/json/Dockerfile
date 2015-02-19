@@ -7,6 +7,7 @@ RUN buildDeps='gcc libc6-dev g++ dpkg-dev libssl-dev make dh-autoreconf'; \
     set -x && \
     apt-get update -qq && apt-get install -y --no-install-recommends \
     $buildDeps \
+    locales \
     adduser \
     sudo \
     apt-transport-https \
@@ -23,6 +24,7 @@ RUN buildDeps='gcc libc6-dev g++ dpkg-dev libssl-dev make dh-autoreconf'; \
     less \
     xclip \
     ssh \
+    python \
     python-demjson
 
 # Install Jsonnet 

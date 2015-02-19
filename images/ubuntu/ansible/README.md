@@ -7,11 +7,11 @@
 ## Usage 
 This image can easily be extended.  But to run your Ansible playbooks:
 ````
-docker run --rm -it pinterb/ansible:0.0.12 ansible --version
+docker run --rm -it pinterb/ansible:0.0.13 ansible --version
 ````
 
 ## Misc. Info 
-* Latest version: 0.0.12
-* Built on: 2015-02-11T17:18:35UTC
-* Base image: pinterb/json:0.0.11
+* Latest version: 0.0.13
+* Built on: 2015-02-19T17:10:12UTC
+* Base image: pinterb/ubuntu-python:0.0.13
 

@@ -1,5 +1,5 @@
-VERSION = 0.0.12
-PREV_VERSION = 0.0.11
+VERSION = 0.0.13
+PREV_VERSION = 0.0.12
 NAME = pinterb
 CREATE_DATE := $(shell date +%FT%T%Z)
 PERL_VERSION = 5.20.0 
@@ -64,7 +64,7 @@ prep_ubuntu_python_base:
 		cp -pR templates/ubuntu/python ubuntu_python_base_image
 		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/ubuntu-python/g' ubuntu_python_base_image/Dockerfile
 		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_python_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/ubuntu-base:$(VERSION)/g' ubuntu_python_base_image/Dockerfile
+		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/json:$(VERSION)/g' ubuntu_python_base_image/Dockerfile
 		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_python_base_image/Dockerfile
 
 build_ubuntu_python_base: prep_ubuntu_python_base
@@ -180,8 +180,8 @@ prep_ubuntu_ansible_base:
 		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/ansible/g' ubuntu_ansible_base_image/README.md
 		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_ansible_base_image/Dockerfile
 		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_ansible_base_image/README.md
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/json:$(PREV_VERSION)/g' ubuntu_ansible_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/json:$(PREV_VERSION)/g' ubuntu_ansible_base_image/README.md
+		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/ubuntu-python:$(VERSION)/g' ubuntu_ansible_base_image/Dockerfile
+		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/ubuntu-python:$(VERSION)/g' ubuntu_ansible_base_image/README.md
 		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_ansible_base_image/Dockerfile
 		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_ansible_base_image/README.md
 		sed -i 's/###-->ZZZ_ANSIBLE_VERSION<--###/$(ANSIBLE_VERSION)/g' ubuntu_ansible_base_image/Dockerfile
@@ -201,8 +201,8 @@ prep_ubuntu_swaggerui_base:
 		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/swagger-ui/g' ubuntu_swaggerui_base_image/README.md
 		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_swaggerui_base_image/Dockerfile
 		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_swaggerui_base_image/README.md
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/json:$(PREV_VERSION)/g' ubuntu_swaggerui_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/json:$(PREV_VERSION)/g' ubuntu_swaggerui_base_image/README.md
+		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/json:$(VERSION)/g' ubuntu_swaggerui_base_image/Dockerfile
+		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/json:$(VERSION)/g' ubuntu_swaggerui_base_image/README.md
 		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_swaggerui_base_image/Dockerfile
 		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_swaggerui_base_image/README.md
 
@@ -220,8 +220,8 @@ prep_ubuntu_swaggereditor_base:
 		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/swagger-ui/g' ubuntu_swaggereditor_base_image/README.md
 		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_swaggereditor_base_image/Dockerfile
 		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_swaggereditor_base_image/README.md
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/json:$(PREV_VERSION)/g' ubuntu_swaggereditor_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/json:$(PREV_VERSION)/g' ubuntu_swaggereditor_base_image/README.md
+		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/json:$(VERSION)/g' ubuntu_swaggereditor_base_image/Dockerfile
+		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/json:$(VERSION)/g' ubuntu_swaggereditor_base_image/README.md
 		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_swaggereditor_base_image/Dockerfile
 		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_swaggereditor_base_image/README.md
 

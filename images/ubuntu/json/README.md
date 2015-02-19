@@ -11,7 +11,7 @@
 This is a base image. It designed to be extended.
 
 ## Misc. Info 
-* Latest version: 0.0.12
-* Built on: 2015-02-11T14:58:28UTC
+* Latest version: 0.0.13
+* Built on: 2015-02-19T16:52:36UTC
 * Base image: ubuntu:14.04
 
