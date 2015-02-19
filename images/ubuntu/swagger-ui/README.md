@@ -7,11 +7,11 @@
 ## Usage 
 This image can easily be extended.  But to run your Ansible playbooks:
 ````
-docker run --rm -it -v ${PWD}:/swagger-data -p 8080:80 pinterb/swagger-ui:0.0.12
+docker run --rm -it -v ${PWD}:/swagger-data -p 8080:80 pinterb/swagger-ui:0.0.13
 ````
 
 ## Misc. Info 
-* Latest version: 0.0.12
-* Built on: 2015-02-11T14:06:37UTC
-* Base image: pinterb/json:0.0.11
+* Latest version: 0.0.13
+* Built on: 2015-02-19T17:29:52UTC
+* Base image: pinterb/json:0.0.13
 
