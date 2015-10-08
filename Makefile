@@ -1,234 +1,52 @@
-VERSION = 0.0.13
-PREV_VERSION = 0.0.12
+#dockerfiles NEW!!
+VERSION = 0.0.14
+PREV_VERSION = 0.0.13
 NAME = pinterb
+
 CREATE_DATE := $(shell date +%FT%T%Z)
-PERL_VERSION = 5.20.0 
-ANSIBLE_VERSION = 1.9 (devel 8f06ba2bc1) 
+MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
+CURRENT_DIR := $(shell dirname $(MKFILE_PATH))
+DOCKER_BIN := $(shell which docker)
 
-.PHONY: all build_all tag_latest release clean clean_untagged \
-				prep_ubuntu_base test_ubuntu_base build_ubuntu_base \
-				prep_ubuntu_golang test_ubuntu_golang build_ubuntu_golang \
-				build_python test_python \
-				build_ansible test_ansible \
-				build_jvm test_jvm \
-				build_graven test_graven \
-				build_golang test_golang
+all: build
 
-all: build_all
-build_all: build_base build_python build_golang build_perl build_json build_ansible build_swaggerui build_swaggereditor
-build_base: build_ubuntu_base
+check.env:
+ifndef DOCKER_BIN
+   $(error The docker command is not found. Verify that Docker is installed and accessible)
+endif
 
-build_python: build_python_base build_python_dev build_python_falcon
-build_python_base: build_ubuntu_python_base
-build_python_dev: build_ubuntu_python_dev
-build_python_falcon: build_ubuntu_python_falcon
+alpine: 
+	@echo " "
+	@echo " "
+	@echo "Building 'base/alpine' image..."
+	@echo " "
+	$(DOCKER_BIN) build -t $(NAME)/base:alpine $(CURRENT_DIR)/base/alpine
 
-build_golang: build_golang_base
-build_golang_base: build_ubuntu_golang_base
+ubuntu: 
+	@echo " "
+	@echo " "
+	@echo "Building 'base/ubuntu' image..."
+	@echo " "
+	$(DOCKER_BIN) build -t $(NAME)/base:ubuntu $(CURRENT_DIR)/base/ubuntu
 
-build_perl: build_perl_base build_perl_dev build_perl_mojo
-build_perl_base: build_ubuntu_perl_base
-build_perl_dev: build_ubuntu_perl_dev
-build_perl_mojo: build_ubuntu_perl_mojo
+debian: 
+	@echo " "
+	@echo " "
+	@echo "Building 'base/debian' image..."
+	@echo " "
+	$(DOCKER_BIN) build -t $(NAME)/base:debian $(CURRENT_DIR)/base/debian
 
-build_json: build_json_base
-build_json_base: build_ubuntu_json_base
+centos: 
+	@echo " "
+	@echo " "
+	@echo "Building 'base/centos' image..."
+	@echo " "
+	$(DOCKER_BIN) build -t $(NAME)/base:centos $(CURRENT_DIR)/base/centos
 
-build_ansible: build_ansible_base
-build_ansible_base: build_ubuntu_ansible_base
+base: alpine ubuntu debian centos
 
-build_swaggerui: build_swaggerui_base
-build_swaggerui_base: build_ubuntu_swaggerui_base
+build: base
 
-build_swaggereditor: build_swaggereditor_base
-build_swaggereditor_base: build_ubuntu_swaggereditor_base
-
-
-## Base Images
-prep_ubuntu_base:
-		rm -rf ubuntu_base_image
-		cp -pR templates/ubuntu/base ubuntu_base_image
-		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/ubuntu-base/g' ubuntu_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/ubuntu:14.04/g' ubuntu_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_base_image/Dockerfile
-
-build_ubuntu_base: prep_ubuntu_base
-		docker build --rm -t $(NAME)/ubuntu-base:$(VERSION) ubuntu_base_image
-		cp ubuntu_base_image/Dockerfile images/ubuntu/base/
-
-
-## Python Images
-prep_ubuntu_python_base:
-		rm -rf ubuntu_python_base_image
-		cp -pR templates/ubuntu/python ubuntu_python_base_image
-		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/ubuntu-python/g' ubuntu_python_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_python_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/json:$(VERSION)/g' ubuntu_python_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_python_base_image/Dockerfile
-
-build_ubuntu_python_base: prep_ubuntu_python_base
-		docker build --rm -t $(NAME)/ubuntu-python:$(VERSION) ubuntu_python_base_image
-		cp ubuntu_python_base_image/Dockerfile images/ubuntu/python/
-
-prep_ubuntu_python_dev:
-		rm -rf ubuntu_python_dev_image
-		cp -pR templates/ubuntu/python-dev ubuntu_python_dev_image
-		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/ubuntu-python-dev/g' ubuntu_python_dev_image/Dockerfile
-		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_python_dev_image/Dockerfile
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/ubuntu-python:$(VERSION)/g' ubuntu_python_dev_image/Dockerfile
-		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_python_dev_image/Dockerfile
-
-build_ubuntu_python_dev: prep_ubuntu_python_dev
-		docker build --rm -t $(NAME)/ubuntu-python-dev:$(VERSION) ubuntu_python_dev_image
-		cp ubuntu_python_dev_image/Dockerfile images/ubuntu/python-dev/
-
-
-
-prep_ubuntu_python_falcon:
-		rm -rf ubuntu_python_falcon_image
-		cp -pR templates/ubuntu/python-falcon ubuntu_python_falcon_image
-		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/ubuntu-python-falcon/g' ubuntu_python_falcon_image/Dockerfile
-		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_python_falcon_image/Dockerfile
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/ubuntu-python:$(VERSION)/g' ubuntu_python_falcon_image/Dockerfile
-		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_python_falcon_image/Dockerfile
-
-build_ubuntu_python_falcon: prep_ubuntu_python_falcon
-		docker build --rm -t $(NAME)/ubuntu-python-falcon:$(VERSION) ubuntu_python_falcon_image
-		cp ubuntu_python_falcon_image/Dockerfile images/ubuntu/python-falcon/
-
-
-
-
-
-
-## Golang Images
-prep_ubuntu_golang_base:
-		rm -rf ubuntu_golang_base_image
-		cp -pR templates/ubuntu/golang ubuntu_golang_base_image
-		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/ubuntu-golang/g' ubuntu_golang_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_golang_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/ubuntu-base:$(VERSION)/g' ubuntu_golang_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_golang_base_image/Dockerfile
-
-build_ubuntu_golang_base: prep_ubuntu_golang_base
-		docker build --rm -t $(NAME)/ubuntu-golang:$(VERSION) ubuntu_golang_base_image
-		cp ubuntu_golang_base_image/Dockerfile images/ubuntu/golang/
-
-
-## Perl Images
-prep_ubuntu_perl_base:
-		rm -rf ubuntu_perl_base_image
-		cp -pR templates/ubuntu/perl ubuntu_perl_base_image
-		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/ubuntu-perl/g' ubuntu_perl_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_perl_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/ubuntu-base:$(VERSION)/g' ubuntu_perl_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_perl_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_PERL_VERSION<--###/$(PERL_VERSION)/g' ubuntu_perl_base_image/Dockerfile
-
-build_ubuntu_perl_base: prep_ubuntu_perl_base
-		docker build --rm -t $(NAME)/ubuntu-perl:$(VERSION) ubuntu_perl_base_image
-		cp ubuntu_perl_base_image/Dockerfile images/ubuntu/perl/
-
-prep_ubuntu_perl_dev:
-		rm -rf ubuntu_perl_dev_image
-		cp -pR templates/ubuntu/perl-dev ubuntu_perl_dev_image
-		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/ubuntu-perl-dev/g' ubuntu_perl_dev_image/Dockerfile
-		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_perl_dev_image/Dockerfile
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/ubuntu-perl:$(VERSION)/g' ubuntu_perl_dev_image/Dockerfile
-		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_perl_dev_image/Dockerfile
-
-build_ubuntu_perl_dev: prep_ubuntu_perl_dev
-		docker build --rm -t $(NAME)/ubuntu-perl-dev:$(VERSION) ubuntu_perl_dev_image
-		cp ubuntu_perl_dev_image/Dockerfile images/ubuntu/perl-dev/
-
-prep_ubuntu_perl_mojo:
-		rm -rf ubuntu_perl_mojo_image
-		cp -pR templates/ubuntu/perl-mojo ubuntu_perl_mojo_image
-		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/ubuntu-perl-mojo/g' ubuntu_perl_mojo_image/Dockerfile
-		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_perl_mojo_image/Dockerfile
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/ubuntu-perl:$(VERSION)/g' ubuntu_perl_mojo_image/Dockerfile
-		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_perl_mojo_image/Dockerfile
-
-build_ubuntu_perl_mojo: prep_ubuntu_perl_mojo
-		docker build --rm -t $(NAME)/ubuntu-perl-mojo:$(VERSION) ubuntu_perl_mojo_image
-		cp ubuntu_perl_mojo_image/Dockerfile images/ubuntu/perl-mojo/
-
-## JSON Images
-prep_ubuntu_json_base:
-		rm -rf ubuntu_json_base_image
-		cp -pR templates/ubuntu/json ubuntu_json_base_image
-		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/json/g' ubuntu_json_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/json/g' ubuntu_json_base_image/README.md
-		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_json_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_json_base_image/README.md
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/ubuntu:14.04/g' ubuntu_json_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/ubuntu:14.04/g' ubuntu_json_base_image/README.md
-		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_json_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_json_base_image/README.md
-
-build_ubuntu_json_base: prep_ubuntu_json_base
-		docker build --rm -t $(NAME)/json:$(VERSION) ubuntu_json_base_image
-		cp ubuntu_json_base_image/Dockerfile images/ubuntu/json/
-		cp ubuntu_json_base_image/README.md images/ubuntu/json/
-
-## Ansible Images
-prep_ubuntu_ansible_base:
-		rm -rf ubuntu_ansible_base_image
-		cp -pR templates/ubuntu/ansible ubuntu_ansible_base_image
-		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/ansible/g' ubuntu_ansible_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/ansible/g' ubuntu_ansible_base_image/README.md
-		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_ansible_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_ansible_base_image/README.md
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/ubuntu-python:$(VERSION)/g' ubuntu_ansible_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/ubuntu-python:$(VERSION)/g' ubuntu_ansible_base_image/README.md
-		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_ansible_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_ansible_base_image/README.md
-		sed -i 's/###-->ZZZ_ANSIBLE_VERSION<--###/$(ANSIBLE_VERSION)/g' ubuntu_ansible_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_ANSIBLE_VERSION<--###/$(ANSIBLE_VERSION)/g' ubuntu_ansible_base_image/README.md
-
-build_ubuntu_ansible_base: prep_ubuntu_ansible_base
-		docker build --rm -t $(NAME)/ansible:$(VERSION) ubuntu_ansible_base_image
-		cp ubuntu_ansible_base_image/Dockerfile images/ubuntu/ansible/
-		cp ubuntu_ansible_base_image/README.md images/ubuntu/ansible/
-		cp ubuntu_ansible_base_image/ansible.cfg images/ubuntu/ansible/
-
-## Swagger-UI Image
-prep_ubuntu_swaggerui_base:
-		rm -rf ubuntu_swaggerui_base_image
-		cp -pR templates/ubuntu/swagger-ui ubuntu_swaggerui_base_image
-		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/swagger-ui/g' ubuntu_swaggerui_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/swagger-ui/g' ubuntu_swaggerui_base_image/README.md
-		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_swaggerui_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_swaggerui_base_image/README.md
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/json:$(VERSION)/g' ubuntu_swaggerui_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/json:$(VERSION)/g' ubuntu_swaggerui_base_image/README.md
-		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_swaggerui_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_swaggerui_base_image/README.md
-
-build_ubuntu_swaggerui_base: prep_ubuntu_swaggerui_base
-		docker build --rm -t $(NAME)/swagger-ui:$(VERSION) ubuntu_swaggerui_base_image
-		cp ubuntu_swaggerui_base_image/Dockerfile images/ubuntu/swagger-ui/
-		cp ubuntu_swaggerui_base_image/README.md images/ubuntu/swagger-ui/
-
-## Swagger-Editor Image
-prep_ubuntu_swaggereditor_base:
-		rm -rf ubuntu_swaggereditor_base_image
-		git clone https://github.com/pinterb/swagger-editor ubuntu_swaggereditor_base_image
-		rm -rf ubuntu_swaggereditor_base_image/.git
-		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/swagger-ui/g' ubuntu_swaggereditor_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/swagger-ui/g' ubuntu_swaggereditor_base_image/README.md
-		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_swaggereditor_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' ubuntu_swaggereditor_base_image/README.md
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/json:$(VERSION)/g' ubuntu_swaggereditor_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/json:$(VERSION)/g' ubuntu_swaggereditor_base_image/README.md
-		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_swaggereditor_base_image/Dockerfile
-		sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' ubuntu_swaggereditor_base_image/README.md
-
-build_ubuntu_swaggereditor_base: prep_ubuntu_swaggereditor_base
-		docker build --rm -t $(NAME)/swagger-editor:$(VERSION) ubuntu_swaggereditor_base_image
-		rm -rf images/ubuntu/swagger-editor
-		cp -R ubuntu_swaggereditor_base_image images/ubuntu/swagger-editor
 
 tag_latest:
 		docker tag -f $(NAME)/ubuntu-base:$(VERSION) $(NAME)/ubuntu-base:latest
@@ -268,6 +86,15 @@ release: tag_latest
 #		docker push $(NAME)/ubuntu-perl-mojo
 #		docker push $(NAME)/json
 		@echo "*** Don't forget to create a tag. git tag -d rel-$(VERSION); git push origin :refs/tags/rel-$(VERSION); git tag rel-$(VERSION) && git push origin rel-$(VERSION)"
+
+release_base: 
+		@if ! docker images $(NAME)/base | awk '{ print $$2 }' | grep -q -F alpine; then echo "$(NAME)/base:alpine is not yet built. Please run 'make build'"; false; fi
+		@if ! docker images $(NAME)/base | awk '{ print $$2 }' | grep -q -F ubuntu; then echo "$(NAME)/base:ubuntu is not yet built. Please run 'make build'"; false; fi
+		@if ! docker images $(NAME)/base | awk '{ print $$2 }' | grep -q -F debian; then echo "$(NAME)/base:debian is not yet built. Please run 'make build'"; false; fi
+		@if ! docker images $(NAME)/base | awk '{ print $$2 }' | grep -q -F centos; then echo "$(NAME)/base:centos is not yet built. Please run 'make build'"; false; fi
+		docker push $(NAME)/base
+#		@echo "*** Don't forget to create a tag. git tag -d rel-$(VERSION); git push origin :refs/tags/rel-$(VERSION); git tag rel-$(VERSION) && git push origin rel-$(VERSION)"
+
 
 clean: clean_untagged
 		rm -rf ubuntu_base_image
