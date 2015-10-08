@@ -16,3 +16,4 @@ deployment:
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - make release_base
+      - make tag_gh

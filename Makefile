@@ -1,6 +1,5 @@
 #dockerfiles NEW!!
 VERSION = 0.0.14
-PREV_VERSION = 0.0.13
 NAME = pinterb
 
 CREATE_DATE := $(shell date +%FT%T%Z)
@@ -93,9 +92,11 @@ release_base:
 		@if ! docker images $(NAME)/base | awk '{ print $$2 }' | grep -q -F debian; then echo "$(NAME)/base:debian is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/base | awk '{ print $$2 }' | grep -q -F centos; then echo "$(NAME)/base:centos is not yet built. Please run 'make build'"; false; fi
 		docker push $(NAME)/base
-#		@echo "*** Don't forget to create a tag. git tag -d rel-$(VERSION); git push origin :refs/tags/rel-$(VERSION); git tag rel-$(VERSION) && git push origin rel-$(VERSION)"
 
 
+tag_gh:
+		git tag -d rel-$(VERSION); git push origin :refs/tags/rel-$(VERSION); git tag rel-$(VERSION) && git push origin rel-$(VERSION)
+		
 clean: clean_untagged
 		rm -rf ubuntu_base_image
 		rm -rf ubuntu_python_base_image
