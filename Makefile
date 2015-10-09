@@ -7,13 +7,16 @@ MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 CURRENT_DIR := $(shell dirname $(MKFILE_PATH))
 DOCKER_BIN := $(shell which docker)
 
-all: build
+all: build test
 
 .PHONY: check.env
 check.env:
 ifndef DOCKER_BIN
    $(error The docker command is not found. Verify that Docker is installed and accessible)
 endif
+
+
+### Base images
 
 .PHONY: alpine
 alpine:
@@ -54,6 +57,29 @@ base: alpine ubuntu debian centos
 	@echo "Base images have been built."
 	@echo " "
 
+.PHONY: base_test
+base_test:
+	@if ! $(DOCKER_BIN) run $(NAME)/base:ubuntu /bin/sh -c 'cat /etc/*-release' | grep -q -F Ubuntu; then false; fi
+	@if ! $(DOCKER_BIN) run $(NAME)/base:debian /bin/sh -c 'cat /etc/*-release' | grep -q -F Debian; then false; fi
+	@if ! $(DOCKER_BIN) run $(NAME)/base:centos /bin/sh -c 'cat /etc/*-release' | grep -q -F CentOS; then false; fi
+	@if ! $(DOCKER_BIN) run $(NAME)/base:alpine /bin/sh -c 'cat /etc/*-release' | grep -q -F Alpine; then false; fi
+	@echo " "
+	@echo " "
+	@echo "Base tests have completed."
+	@echo " "
+
+
+.PHONY: base_rm
+base_rm:
+	@if docker images $(NAME)/base | awk '{ print $$2 }' | grep -q -F alpine; then $(DOCKER_BIN) rmi $(NAME)/base:alpine; fi
+	@if docker images $(NAME)/base | awk '{ print $$2 }' | grep -q -F ubuntu; then $(DOCKER_BIN) rmi $(NAME)/base:ubuntu; fi
+	@if docker images $(NAME)/base | awk '{ print $$2 }' | grep -q -F centos; then $(DOCKER_BIN) rmi $(NAME)/base:centos; fi
+	@if docker images $(NAME)/base | awk '{ print $$2 }' | grep -q -F debian; then $(DOCKER_BIN) rmi $(NAME)/base:debian; fi
+
+
+
+### Misc images
+
 .PHONY: mush
 mush:
 	@echo " "
@@ -62,11 +88,8 @@ mush:
 	@echo " "
 	$(DOCKER_BIN) build --rm -t $(NAME)/mush $(CURRENT_DIR)/mush
 
-#		-e AZURE_SUBSCRIPTION=$(AZURE_SUBSCRIPTION_ID) \
-.PHONY: .mush.run
-mush.run:
-	@echo " "
-	@echo " "
+.PHONY: mush_test
+mush_test: 
 	@echo "Testing 'mush' image..."
 	@echo " "
 	cat $(CURRENT_DIR)/mush/terraform.tfvars.tmpl | $(DOCKER_BIN) run -i \
@@ -78,10 +101,8 @@ mush.run:
 		-e AZURE_REGION="West US"  \
 		-e DOMAIN_NAME="example.com" \
 		$(NAME)/mush > $(CURRENT_DIR)/mush/terraform.tfvars
+	@if ! cat $(CURRENT_DIR)/mush/terraform.tfvars | grep -q -F example.com; then echo "mush/terraform.tfvars was not rendered with the expected results."; false; fi
 
-.PHONY: .mush.test
-mush_test: mush.run
-	@echo " "
 
 
 .PHONY: jq
@@ -92,6 +113,14 @@ jq:
 	@echo " "
 	$(DOCKER_BIN) build --rm -t $(NAME)/jq $(CURRENT_DIR)/jq
 
+.PHONY: jq_test
+jq_test: 
+	@echo "Testing 'jq' image..."
+	@echo " "
+	@if ! $(DOCKER_BIN) run $(NAME)/jq | grep -q -F "jq is a tool for processing JSON inputs"; then echo "$(NAME)/jq doesn't appear to run as expected."; false; fi
+
+
+
 .PHONY: misc
 misc: mush jq
 	@echo " "
@@ -100,14 +129,17 @@ misc: mush jq
 	@echo " "
 
 .PHONY: misc_test
-misc_test: mush_test
+misc_test: jq_test mush_test
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous tests have completed."
 	@echo " "
 
-.PHONY: build
-build: base misc
+.PHONY: misc_rm
+misc_rm:
+	@if docker images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/jq; fi
+	@if docker images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/mush; fi
+
 
 
 .PHONY: build
@@ -117,16 +149,15 @@ build: base misc
 	@echo "All done with builds."
 	@echo " "
 
+
+
 .PHONY: test 
-test: misc_test
+test: base_test misc_test
 	@echo " "
 	@echo " "
 	@echo "All done with tests."
 	@echo " "
 
-.PHONY: release_base
-release_base: 
-		@if ! docker images $(NAME)/base | awk '{ print $$2 }' | grep -q -F alpine; then echo "$(NAME)/base:alpine is not yet built. Please run 'make build'"; false; fi
 
 
 .PHONY: release_base
@@ -140,20 +171,11 @@ release_base:
 .PHONY: tag_gh
 tag_gh:
 		git tag -d rel-$(VERSION); git push origin :refs/tags/rel-$(VERSION); git tag rel-$(VERSION) && git push origin rel-$(VERSION)
+
 		
 .PHONY: clean
-clean: clean_untagged
-		rm -rf ubuntu_python_base_image
-		rm -rf ubuntu_python_dev_image
-		rm -rf ubuntu_python_falcon_image
-		rm -rf ubuntu_golang_base_image
-		rm -rf ubuntu_perl_base_image
-		rm -rf ubuntu_perl_dev_image
-		rm -rf ubuntu_perl_mojo_image
-		rm -rf ubuntu_json_base_image 
-		rm -rf ubuntu_ansible_base_image 
-		rm -rf ubuntu_swaggerui_base_image
-		rm -rf ubuntu_swaggereditor_base_image
+clean: clean_untagged misc_rm base_rm clean_untagged
+		rm -rf $(CURRENT_DIR)/mush/terraform.tfvars
 
 .PHONY: clean_untagged
 clean_untagged:

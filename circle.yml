@@ -5,10 +5,11 @@ machine:
 dependencies:
   pre:
     - make check.env
+    - make build
 
 test:
   override:
-    - make build
+    - make test 
 
 deployment:
   hub:
