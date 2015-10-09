@@ -20,7 +20,8 @@ dnsimple_token = "{{DNSIMPLE_API_TOKEN}}"
 dnsimple_email = "{{DNSIMPLE_EMAIL_ADDR}}"
 ```
 
-I keep my secrets is a separate location. The sourceable file contains something like the following:
+
+I keep my secrets is a separate location. The sourceable file contains something like the following:  
 
 ```sh
 # RSA Fingerprint
@@ -42,7 +43,8 @@ export VM_USER="clouduser"
 export VM_PASS="cloudpass"
 ```
 
-Next, I run my mush container to render my terraform.tfvars.  
+
+Next, I run my mush container to render my terraform.tfvars:     
 
 ```sh
 cat $(TEMPLATES_DIR)/terraform.tfvars.tmpl |  docker run -i \
@@ -55,6 +57,7 @@ cat $(TEMPLATES_DIR)/terraform.tfvars.tmpl |  docker run -i \
 	-e DOMAIN_NAME="example.com" \
 	pinterb/mush > $(BUILD_DIR)/terraform.tfvars
 ```
+
 
 The rendered output would be:
 ```sh
