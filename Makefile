@@ -62,6 +62,28 @@ mush:
 	@echo " "
 	$(DOCKER_BIN) build --rm -t $(NAME)/mush $(CURRENT_DIR)/mush
 
+#		-e AZURE_SUBSCRIPTION=$(AZURE_SUBSCRIPTION_ID) \
+.PHONY: .mush.run
+mush.run:
+	@echo " "
+	@echo " "
+	@echo "Testing 'mush' image..."
+	@echo " "
+	cat $(CURRENT_DIR)/mush/terraform.tfvars.tmpl | $(DOCKER_BIN) run -i \
+		-v $(CURRENT_DIR)/mush/extras:/home/dev/.extra \
+		-v $(CURRENT_DIR)/mush:/home/dev/.ssh \
+		-e MUSH_EXTRA=/home/dev/.extra \
+		-e AZURE_SETTINGS_FILE=/home/dev/.azure.settings \
+		-e AZURE_CERT=/home/dev/.azure.cer \
+		-e AZURE_REGION="West US"  \
+		-e DOMAIN_NAME="example.com" \
+		$(NAME)/mush > $(CURRENT_DIR)/mush/terraform.tfvars
+
+.PHONY: .mush.test
+mush_test: mush.run
+	@echo " "
+
+
 .PHONY: jq
 jq:
 	@echo " "
@@ -77,12 +99,35 @@ misc: mush jq
 	@echo "Miscellaneous images have been built."
 	@echo " "
 
+.PHONY: misc_test
+misc_test: mush_test
+	@echo " "
+	@echo " "
+	@echo "Miscellaneous tests have completed."
+	@echo " "
+
+.PHONY: build
+build: base misc
+
+
 .PHONY: build
 build: base misc
 	@echo " "
 	@echo " "
 	@echo "All done with builds."
 	@echo " "
+
+.PHONY: test 
+test: misc_test
+	@echo " "
+	@echo " "
+	@echo "All done with tests."
+	@echo " "
+
+.PHONY: release_base
+release_base: 
+		@if ! docker images $(NAME)/base | awk '{ print $$2 }' | grep -q -F alpine; then echo "$(NAME)/base:alpine is not yet built. Please run 'make build'"; false; fi
+
 
 .PHONY: release_base
 release_base: 

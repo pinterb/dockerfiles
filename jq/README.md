@@ -4,7 +4,7 @@ This image executes [jq][1]. It's based on an alpine image and clocks in at a he
 Usage
 -----
 ```sh
-curl 'https://api.github.com/repos/stedolan/jq/commits?per_page=5' | docker run -i pinterb/jq '.'
+curl 'https://api.github.com/repos/stedolan/jq/commits' | docker run -i pinterb/jq:latest '.'
 ```
 
 [1]: https://stedolan.github.io/jq/

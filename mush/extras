@@ -1,0 +1,17 @@
+# RSA Fingerprint
+export SSH_FINGERPRINT=$(ssh-keygen -lf ~/.ssh/dummy.pub | awk '{print $2}')
+
+# DNSimple API
+export DNSIMPLE_EMAIL_ADDR="bart.simpson@foxtv.io"
+export DNSIMPLE_API_TOKEN="82Y0nQu238vtrYYMsab1"
+
+# Azure Credentials
+export AZURE_SETTINGS="$HOME/.cloudcreds/azure/Pay-As-You-Go-7-01-2010-credentials.publishsettings"
+export AZURE_SUBSCRIPTION_ID="7g301c1-n912-7nq7-c238-951x3639-py4ik"
+export AZURE_SUBSCRIPTION_THUMBPRINT="5561314766618YWUI39D91YN48QA612PNC"
+export AZURE_CERTIFICATE="$HOME/.secrets/azure/azure.cer"
+export AZURE_SUBSCRIPTION_EXP="2019-01-01"
+
+# Default Cloud User Credentials
+export VM_USER="clouduser"
+export VM_PASS="cloudpass"

@@ -6,7 +6,7 @@ ENV JQ_VERSION 1.5
 
 # Install jq
 # http://stedolan.github.io/jq/
-RUN curl -o /usr/local/bin/jq -L https://github.com/stedolan/jq/releases/download/jq-$JQ_VERSION/jq-linux64  && \
+RUN curl -o /usr/local/bin/jq -L https://github.com/stedolan/jq/releases/download/jq-$JQ_VERSION/jq-linux64 && \
   chmod +x /usr/local/bin/jq
 
 VOLUME ["/data"]
