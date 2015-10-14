@@ -1,6 +1,6 @@
-# pinterb/mush  
+# ###-->ZZZ_IMAGE<--###  
 
-[`pinterb/mush`][1] is a [docker][2] image that bundles the following:  
+[`###-->ZZZ_IMAGE<--###`][1] is a [docker][2] image that bundles the following:  
 * **[mush][3]:** Mustache templates for bash  
 
 ## Usage  
@@ -56,7 +56,7 @@ cat $(TEMPLATES_DIR)/terraform.tfvars.tmpl |  docker run -i \
 	-e AZURE_CERT=/home/dev/.azure.cer \
 	-e AZURE_REGION="West US"  \
 	-e DOMAIN_NAME="example.com" \
-	pinterb/mush:0.0.14 > $(BUILD_DIR)/terraform.tfvars
+	###-->ZZZ_IMAGE<--###:###-->ZZZ_VERSION<--### > $(BUILD_DIR)/terraform.tfvars
 ```
 
 
@@ -77,12 +77,12 @@ dnsimple_email = "bart.simpson@foxtv.io"
 
 
 ## Misc. Info 
-* Latest version: 0.0.14   
-* Built on: 2015-10-14T13:11:53EDT   
-* Base image: pinterb/base:alpine   
+* Latest version: ###-->ZZZ_VERSION<--###   
+* Built on: ###-->ZZZ_DATE<--###   
+* Base image: ###-->ZZZ_BASE_IMAGE<--###   
 
 
-[1]: https://hub.docker.com/r/pinterb/mush/   
+[1]: https://hub.docker.com/r/###-->ZZZ_IMAGE<--###/   
 [2]: https://docker.com 
 [3]: https://github.com/pinterb/mush
 [4]: https://terraform.io/ 

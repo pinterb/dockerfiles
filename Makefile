@@ -97,6 +97,11 @@ mush:
 	@echo "Building 'mush' image..."
 	@echo " "
 	$(DOCKER_BIN) build --rm -t $(NAME)/mush $(CURRENT_DIR)/mush
+	cp -pR $(CURRENT_DIR)/templates/mush/README.md $(CURRENT_DIR)/mush/README.md
+	sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/mush/g' $(CURRENT_DIR)/mush/README.md
+	sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' $(CURRENT_DIR)/mush/README.md
+	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/pinterb\/base:alpine/g' $(CURRENT_DIR)/mush/README.md
+	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/mush/README.md
 
 .PHONY: mush_test
 mush_test: 
