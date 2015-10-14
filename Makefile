@@ -80,6 +80,16 @@ base_rm:
 
 ### Misc images
 
+.PHONY: ansible 
+ansible:
+	@echo " "
+	@echo " "
+	@echo "Building 'ansible' image..."
+	@echo " "
+	$(DOCKER_BIN) build -t $(NAME)/ansible $(CURRENT_DIR)/ansible
+
+
+
 .PHONY: mush
 mush:
 	@echo " "
@@ -111,7 +121,19 @@ jq:
 	@echo " "
 	@echo "Building 'jq' image..."
 	@echo " "
-	$(DOCKER_BIN) build --rm -t $(NAME)/jq $(CURRENT_DIR)/jq
+	$(DOCKER_BIN) build --rm -t $(NAME)/jq:$(VERSION) $(CURRENT_DIR)/jq
+	cp -pR $(CURRENT_DIR)/templates/jq/README.md $(CURRENT_DIR)/jq/README.md
+	sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/jq/g' $(CURRENT_DIR)/jq/README.md
+	sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' $(CURRENT_DIR)/jq/README.md
+	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/pinterb\/base:alpine/g' $(CURRENT_DIR)/jq/README.md
+	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/jq/README.md
+
+.PHONY: jq_test
+jq_test: 
+	@echo "Testing 'jq' image..."
+	@echo " "
+	@if ! $(DOCKER_BIN) run $(NAME)/jq | grep -q -F "jq is a tool for processing JSON inputs"; then echo "$(NAME)/jq doesn't appear to run as expected."; false; fi
+
 
 .PHONY: jq_test
 jq_test: 
@@ -122,7 +144,7 @@ jq_test:
 
 
 .PHONY: misc
-misc: mush jq
+misc: mush jq ansible
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous images have been built."
@@ -139,6 +161,7 @@ misc_test: jq_test mush_test
 misc_rm:
 	@if docker images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/jq; fi
 	@if docker images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/mush; fi
+	@if docker images $(NAME)/ansible | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/ansible; fi
 
 
 
@@ -160,6 +183,7 @@ test: base_test misc_test
 
 
 
+# Push updates to Docker's registry
 .PHONY: release_base
 release_base: 
 		@if ! docker images $(NAME)/base | awk '{ print $$2 }' | grep -q -F alpine; then echo "$(NAME)/base:alpine is not yet built. Please run 'make build'"; false; fi
@@ -168,11 +192,24 @@ release_base:
 		@if ! docker images $(NAME)/base | awk '{ print $$2 }' | grep -q -F centos; then echo "$(NAME)/base:centos is not yet built. Please run 'make build'"; false; fi
 		docker push $(NAME)/base
 
+.PHONY: tag_latest
+tag_latest:
+		docker tag -f $(NAME)/jq:$(VERSION) $(NAME)/jq:latest
+
+.PHONY: release
+release: release_base tag_latest
+		@if ! docker images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/jq version $(VERSION) is not yet built. Please run 'make build'"; false; fi
+
+
+
+# Tag current version as a release on GitHub
 .PHONY: tag_gh
 tag_gh:
 		git tag -d rel-$(VERSION); git push origin :refs/tags/rel-$(VERSION); git tag rel-$(VERSION) && git push origin rel-$(VERSION)
 
-		
+
+
+# Clean-up the cruft 
 .PHONY: clean
 clean: clean_untagged misc_rm base_rm clean_untagged
 		rm -rf $(CURRENT_DIR)/mush/terraform.tfvars
