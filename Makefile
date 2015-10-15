@@ -86,7 +86,28 @@ ansible:
 	@echo " "
 	@echo "Building 'ansible' image..."
 	@echo " "
-	$(DOCKER_BIN) build -t $(NAME)/ansible $(CURRENT_DIR)/ansible
+	$(DOCKER_BIN) build --rm -t $(NAME)/ansible:$(VERSION) $(CURRENT_DIR)/ansible
+	cp -pR $(CURRENT_DIR)/templates/ansible/README.md $(CURRENT_DIR)/ansible/README.md
+	sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/ansible/g' $(CURRENT_DIR)/ansible/README.md
+	sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' $(CURRENT_DIR)/ansible/README.md
+	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/pinterb\/base:alpine/g' $(CURRENT_DIR)/ansible/README.md
+	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/ansible/README.md
+	sed -i 's/###-->ZZZ_ANSIBLE_VERSION<--###/v2.0.0-0.3.beta1/g' $(CURRENT_DIR)/ansible/README.md
+
+.PHONY: ansible_test
+ansible_test: 
+	@echo "Testing 'ansible' image..."
+	@echo " "
+	@if ! $(DOCKER_BIN) run -it \
+		-v $(CURRENT_DIR)/ansible:/ansible:rw \
+		--entrypoint="/opt/ansible/bin/ansible" \
+		$(NAME)/ansible:$(VERSION) --version | \
+		grep -q -F "ansible 2.0.0" ; then echo "$(NAME)/ansible:$(VERSION) - ansible command failed."; false; fi
+	@if ! $(DOCKER_BIN) run -it \
+		-v $(CURRENT_DIR)/ansible:/ansible:rw \
+		--entrypoint="/opt/ansible/bin/ansible-playbook" \
+		$(NAME)/ansible:$(VERSION) --version | \
+		grep -q -F "ansible-playbook 2.0.0" ; then echo "$(NAME)/ansible:$(VERSION) - ansible-playbook command failed."; false; fi
 
 
 
@@ -96,7 +117,7 @@ mush:
 	@echo " "
 	@echo "Building 'mush' image..."
 	@echo " "
-	$(DOCKER_BIN) build --rm -t $(NAME)/mush $(CURRENT_DIR)/mush
+	$(DOCKER_BIN) build --rm -t $(NAME)/mush:$(VERSION) $(CURRENT_DIR)/mush
 	cp -pR $(CURRENT_DIR)/templates/mush/README.md $(CURRENT_DIR)/mush/README.md
 	sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/mush/g' $(CURRENT_DIR)/mush/README.md
 	sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' $(CURRENT_DIR)/mush/README.md
@@ -115,7 +136,7 @@ mush_test:
 		-e AZURE_CERT=/home/dev/.azure.cer \
 		-e AZURE_REGION="West US"  \
 		-e DOMAIN_NAME="example.com" \
-		$(NAME)/mush > $(CURRENT_DIR)/mush/terraform.tfvars
+		$(NAME)/mush:$(VERSION) > $(CURRENT_DIR)/mush/terraform.tfvars
 	@if ! cat $(CURRENT_DIR)/mush/terraform.tfvars | grep -q -F example.com; then echo "mush/terraform.tfvars was not rendered with the expected results."; false; fi
 
 
@@ -140,13 +161,6 @@ jq_test:
 	@if ! $(DOCKER_BIN) run $(NAME)/jq | grep -q -F "jq is a tool for processing JSON inputs"; then echo "$(NAME)/jq doesn't appear to run as expected."; false; fi
 
 
-.PHONY: jq_test
-jq_test: 
-	@echo "Testing 'jq' image..."
-	@echo " "
-	@if ! $(DOCKER_BIN) run $(NAME)/jq | grep -q -F "jq is a tool for processing JSON inputs"; then echo "$(NAME)/jq doesn't appear to run as expected."; false; fi
-
-
 
 .PHONY: misc
 misc: mush jq ansible
@@ -156,7 +170,7 @@ misc: mush jq ansible
 	@echo " "
 
 .PHONY: misc_test
-misc_test: jq_test mush_test
+misc_test: jq_test mush_test ansible_test
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous tests have completed."
@@ -165,8 +179,11 @@ misc_test: jq_test mush_test
 .PHONY: misc_rm
 misc_rm:
 	@if docker images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/jq; fi
+	@if docker images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F $(VERSION); then $(DOCKER_BIN) rmi -f $(NAME)/jq:$(VERSION); fi
 	@if docker images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/mush; fi
+	@if docker images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F $(VERSION); then $(DOCKER_BIN) rmi -f $(NAME)/mush:$(VERSION); fi
 	@if docker images $(NAME)/ansible | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/ansible; fi
+	@if docker images $(NAME)/ansible | awk '{ print $$2 }' | grep -q -F $(VERSION); then $(DOCKER_BIN) rmi -f $(NAME)/ansible:$(VERSION); fi
 
 
 
@@ -200,10 +217,17 @@ release_base:
 .PHONY: tag_latest
 tag_latest:
 		docker tag -f $(NAME)/jq:$(VERSION) $(NAME)/jq:latest
+		docker tag -f $(NAME)/mush:$(VERSION) $(NAME)/mush:latest
+		docker tag -f $(NAME)/ansible:$(VERSION) $(NAME)/ansible:latest
 
 .PHONY: release
 release: release_base tag_latest
 		@if ! docker images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/jq version $(VERSION) is not yet built. Please run 'make build'"; false; fi
+		@if ! docker images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/mush version $(VERSION) is not yet built. Please run 'make build'"; false; fi
+		@if ! docker images $(NAME)/ansible | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ansible version $(VERSION) is not yet built. Please run 'make build'"; false; fi
+		docker push $(NAME)/jq
+		docker push $(NAME)/mush
+		docker push $(NAME)/ansible
 
 
 

@@ -2,10 +2,6 @@ FROM pinterb/base:alpine
 
 MAINTAINER Brad Pinter <brad.pinter@gmail.com>
 
-#    g++ \
-#    perl \
-#    python-dev \
-#    yaml-dev \
 RUN apk add --update \
   g++ \
   perl \
@@ -29,7 +25,6 @@ RUN apk add --update \
   docker-py==1.2.2
 
 # Install Ansible
-#ENV ANSIBLE_TAG "v1.9.3-1"
 ENV ANSIBLE_TAG "v2.0.0-0.3.beta1"
 ENV ANSIBLE_GIT_REPO http://github.com/ansible/ansible.git
 
@@ -42,9 +37,7 @@ RUN git submodule update --init
 
 ENV PATH /opt/ansible/bin:/bin:/usr/bin:/sbin:/usr/sbin
 ENV PYTHONPATH /opt/ansible/lib
-## the clustering module isn't in v1.9.x release yet. So add v2 extras to ANSIBLE_LIBRARY
-#ENV ANSIBLE_LIBRARY /opt/ansible/lib/ansible/modules/core:/opt/ansible/v2/ansible/modules/extras
-ENV ANSIBLE_LIBRARY /opt/ansible/lib/ansible
+ENV ANSIBLE_LIBRARY /opt/ansible/lib/ansible/modules/core:/opt/ansible/lib/ansible/modules/extras
 
 # keep galaxy installs to a few as possible
 RUN ansible-galaxy install \
