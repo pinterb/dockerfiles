@@ -1,7 +1,7 @@
 # pinterb/terraform  
 
 [`pinterb/terraform`][1] is a [docker][2] image that bundles the following:  
-* **[Terraform v0.6.3][3]:** A tool for building, changing, and versioning infrastructure safely and efficiently. Terraform can manage existing and popular service providers as well as custom in-house solutions.  
+* **[Terraform v0.6.4][3]:** A tool for building, changing, and versioning infrastructure safely and efficiently. Terraform can manage existing and popular service providers as well as custom in-house solutions.  
 
 ## Details
 * The container runs as "dev" user (i.e. UID 1000). *Please keep this in mind as you mount volumes!* 
