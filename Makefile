@@ -12,6 +12,9 @@ TERRAFORM_IMAGES = 0.5.3 \
 	0.6.3 \
 	0.6.4
 
+PACKER_IMAGES = 0.7.5 \
+	0.8.6
+
 
 all: build test
 
@@ -117,20 +120,6 @@ ansible_test:
 
 
 
-.PHONY: terraform_1
-terraform_1:
-	@echo " "
-	@echo " "
-	@echo "Building '$@' image..."
-	@echo " "
-	$(DOCKER_BIN) build --rm -t $(NAME)/$@:$(VERSION) $(CURRENT_DIR)/$@
-	cp -pR $(CURRENT_DIR)/templates/$@/README.md $(CURRENT_DIR)/$@/README.md
-	sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/$@/g' $(CURRENT_DIR)/$@/README.md
-	sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' $(CURRENT_DIR)/$@/README.md
-	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/base:alpine/g' $(CURRENT_DIR)/$@/README.md
-	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/$@/README.md
-	sed -i 's/###-->ZZZ_TERRAFORM_VERSION<--###/v0.6.3/g' $(CURRENT_DIR)/$@/README.md
-
 .PHONY: terraform 
 terraform:
 	@for tf_ver in $(TERRAFORM_IMAGES); \
@@ -146,15 +135,6 @@ terraform:
 	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
 	sed -i "s/###-->ZZZ_TERRAFORM_VERSION<--###/$$tf_ver/g" $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
 	done
-
-.PHONY: terraform_test_1
-terraform_test_1: 
-	@echo "Testing 'terraform' image..."
-	@echo " "
-	@if ! $(DOCKER_BIN) run -it \
-		-v $(CURRENT_DIR)/terraform:/data:rw \
-		$(NAME)/terraform:$(VERSION) version | \
-		grep -q -F "Terraform v0.6.3" ; then echo "$(NAME)/terraform:$(VERSION) - terraform version command failed."; false; fi
 
 .PHONY: terraform_test
 terraform_test: 
@@ -175,6 +155,45 @@ terraform_rm:
 	echo "Removing '$$tf_ver terraform' image..." ; \
 	echo " " ; \
 	if $(DOCKER_BIN) images $(NAME)/terraform | awk '{ print $$2 }' | grep -q -F $$tf_ver; then $(DOCKER_BIN) rmi -f $(NAME)/terraform:$$tf_ver; fi ; \
+	done
+
+
+
+.PHONY: packer 
+packer:
+	@for img_ver in $(PACKER_IMAGES); \
+	do \
+	echo " " ; \
+	echo " " ; \
+	echo "Building '$$img_ver $@' image..." ; \
+	$(DOCKER_BIN) build --rm -t $(NAME)/$@:$$img_ver $(CURRENT_DIR)/$@/$$img_ver ; \
+	cp -pR $(CURRENT_DIR)/templates/$@/README.md $(CURRENT_DIR)/$@/$$img_ver/README.md ; \
+	sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/$@/g' $(CURRENT_DIR)/$@/$$img_ver/README.md ; \
+	sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' $(CURRENT_DIR)/$@/$$img_ver/README.md ; \
+	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/base:alpine/g' $(CURRENT_DIR)/$@/$$img_ver/README.md ; \
+	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/$@/$$img_ver/README.md ; \
+	sed -i "s/###-->ZZZ_PACKER_VERSION<--###/$$img_ver/g" $(CURRENT_DIR)/$@/$$img_ver/README.md ; \
+	done
+
+.PHONY: packer_test
+packer_test: 
+	@for img_ver in $(PACKER_IMAGES); \
+	do \
+	echo "Testing '$$img_ver packer' image..." ; \
+	echo " " ; \
+	if ! $(DOCKER_BIN) run -it \
+		-v $(CURRENT_DIR)/packer/$$img_ver:/data:rw \
+		$(NAME)/packer:$$img_ver version | \
+		grep -q -F "Packer v$$img_ver" ; then echo "$(NAME)/packer:$$img_ver - packer version command failed."; false; fi ; \
+	done
+
+.PHONY: packer_rm
+packer_rm: 
+	@for img_ver in $(PACKER_IMAGES); \
+	do \
+	echo "Removing '$$img_ver packer' image..." ; \
+	echo " " ; \
+	if $(DOCKER_BIN) images $(NAME)/packer | awk '{ print $$2 }' | grep -q -F $$img_ver; then $(DOCKER_BIN) rmi -f $(NAME)/packer:$$img_ver; fi ; \
 	done
 
 
@@ -231,21 +250,21 @@ jq_test:
 
 
 .PHONY: misc
-misc: mush jq ansible terraform
+misc: mush jq ansible terraform packer
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous images have been built."
 	@echo " "
 
 .PHONY: misc_test
-misc_test: jq_test mush_test ansible_test terraform_test
+misc_test: jq_test mush_test ansible_test terraform_test packer_test
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous tests have completed."
 	@echo " "
 
 .PHONY: misc_rm
-misc_rm: terraform_rm
+misc_rm: terraform_rm packer_rm
 	@if $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/jq; fi
 	@if $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F $(VERSION); then $(DOCKER_BIN) rmi -f $(NAME)/jq:$(VERSION); fi
 	@if $(DOCKER_BIN) images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/mush; fi
@@ -288,19 +307,18 @@ tag_latest:
 	$(DOCKER_BIN) tag -f $(NAME)/mush:$(VERSION) $(NAME)/mush:latest
 	$(DOCKER_BIN) tag -f $(NAME)/ansible:$(VERSION) $(NAME)/ansible:latest
 
-#	@if ! $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/jq version $(VERSION) is not yet built. Please run 'make build'"; false; fi
-#	@if ! $(DOCKER_BIN) images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/mush version $(VERSION) is not yet built. Please run 'make build'"; false; fi
-#	@if ! $(DOCKER_BIN) images $(NAME)/ansible | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ansible version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 .PHONY: release
 release: release_base tag_latest
 	@if ! $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/jq version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/mush version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/ansible | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ansible version $(VERSION) is not yet built. Please run 'make build'"; false; fi
-	@if ! $(DOCKER_BIN) images $(NAME)/terraform | awk '{ print $$2 }' | grep -q -F 0.6.4 ; then echo "$(NAME)/terraform version 0.6.3 is not yet built. Please run 'make build'"; false; fi
+	@if ! $(DOCKER_BIN) images $(NAME)/terraform | awk '{ print $$2 }' | grep -q -F 0.6.4 ; then echo "$(NAME)/terraform version 0.6.4 is not yet built. Please run 'make build'"; false; fi
+	@if ! $(DOCKER_BIN) images $(NAME)/packer | awk '{ print $$2 }' | grep -q -F 0.6.4 ; then echo "$(NAME)/packer version 0.8.6 is not yet built. Please run 'make build'"; false; fi
 	$(DOCKER_BIN) push $(NAME)/jq
 	$(DOCKER_BIN) push $(NAME)/mush
 	$(DOCKER_BIN) push $(NAME)/ansible
 	$(DOCKER_BIN) push $(NAME)/terraform
+	$(DOCKER_BIN) push $(NAME)/packer
 
 
 

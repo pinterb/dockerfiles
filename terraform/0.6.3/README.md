@@ -21,13 +21,13 @@ docker run -it --rm \
 	-v $(SSH_DIR):/home/dev/.ssh \
 	-v $(CURRENT_DIR):/state:rw \
 	-v $(PROVISION_CONFIG_DIR):/data:rw \
-	pinterb/terraform:0.0.14 apply --var-file=/state/terraform.tfvars -state=/state/terraform.tfstate /data   
+	pinterb/terraform:0.6.3 apply --var-file=/state/terraform.tfvars -state=/state/terraform.tfstate /data   
 		
 ````
 
 ## Misc. Info 
-* Latest version: 0.0.14   
-* Built on: 2015-10-15T15:23:29EDT   
+* Latest version: 0.6.4   
+* Built on: 2015-10-15T16:54:35EDT   
 * Base image: pinterb/base:alpine   
 
 

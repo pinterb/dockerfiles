@@ -1,7 +1,8 @@
 # ###-->ZZZ_IMAGE<--###  
 
 [`###-->ZZZ_IMAGE<--###`][1] is a [docker][2] image that bundles the following:  
-* **[Terraform v###-->ZZZ_TERRAFORM_VERSION<--###][3]:** A tool for building, changing, and versioning infrastructure safely and efficiently. Terraform can manage existing and popular service providers as well as custom in-house solutions.  
+* **[Packer v###-->ZZZ_PACKER_VERSION<--###][3]:** An open source tool for creating identical machine images for multiple platforms from a single source configuration.  
+* **[packer-azure][4]:** An Azure plugin for Packer to enable Microsoft Azure users to build custom images given an Azure image.    
 
 ## Details
 * The container runs as "dev" user (i.e. UID 1000). *Please keep this in mind as you mount volumes!* 
@@ -14,23 +15,24 @@
 * /home/dev is $HOME  
 
 ## Usage 
-This image can easily be extended.  But to run Terraform:
+This image can easily be extended.  But to run Packer:
 
 ````
 docker run -it --rm \
 	-v $(SSH_DIR):/home/dev/.ssh \
 	-v $(CURRENT_DIR):/state:rw \
 	-v $(PROVISION_CONFIG_DIR):/data:rw \
-	###-->ZZZ_IMAGE<--###:###-->ZZZ_TERRAFORM_VERSION<--### apply --var-file=/state/terraform.tfvars -state=/state/terraform.tfstate /data   
+	###-->ZZZ_IMAGE<--###:###-->ZZZ_PACKER_VERSION<--### version   
 		
 ````
 
 ## Misc. Info 
-* Latest version: 0.6.4   
+* Latest version: 0.8.6   
 * Built on: ###-->ZZZ_DATE<--###   
 * Base image: ###-->ZZZ_BASE_IMAGE<--###   
 
 
 [1]: https://hub.docker.com/r/###-->ZZZ_IMAGE<--###/   
 [2]: https://docker.com 
-[3]: https://terraform.io/  
+[3]: https://packer.io/  
+[4]: https://github.com/MSOpenTech/packer-azure  

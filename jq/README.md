@@ -11,7 +11,7 @@ curl 'https://api.github.com/repos/stedolan/jq/commits' | docker run -i pinterb/
 
 ## Misc. Info 
 * Latest version: 0.0.14   
-* Built on: 2015-10-15T14:46:18EDT   
+* Built on: 2015-10-15T16:54:35EDT   
 * Base image: pinterb/base:alpine   
 
 
