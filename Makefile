@@ -111,6 +111,31 @@ ansible_test:
 
 
 
+.PHONY: terraform 
+terraform:
+	@echo " "
+	@echo " "
+	@echo "Building '$@' image..."
+	@echo " "
+	$(DOCKER_BIN) build --rm -t $(NAME)/$@:$(VERSION) $(CURRENT_DIR)/$@
+	cp -pR $(CURRENT_DIR)/templates/$@/README.md $(CURRENT_DIR)/$@/README.md
+	sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/$@/g' $(CURRENT_DIR)/$@/README.md
+	sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' $(CURRENT_DIR)/$@/README.md
+	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/base:alpine/g' $(CURRENT_DIR)/$@/README.md
+	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/$@/README.md
+	sed -i 's/###-->ZZZ_TERRAFORM_VERSION<--###/v0.6.3/g' $(CURRENT_DIR)/$@/README.md
+
+.PHONY: terraform_test
+terraform_test: 
+	@echo "Testing 'terraform' image..."
+	@echo " "
+	@if ! $(DOCKER_BIN) run -it \
+		-v $(CURRENT_DIR)/terraform:/data:rw \
+		$(NAME)/terraform:$(VERSION) version | \
+		grep -q -F "Terraform v0.6.3" ; then echo "$(NAME)/terraform:$(VERSION) - terraform version command failed."; false; fi
+
+
+
 .PHONY: mush
 mush:
 	@echo " "
@@ -163,14 +188,14 @@ jq_test:
 
 
 .PHONY: misc
-misc: mush jq ansible
+misc: mush jq ansible terraform
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous images have been built."
 	@echo " "
 
 .PHONY: misc_test
-misc_test: jq_test mush_test ansible_test
+misc_test: jq_test mush_test ansible_test terraform_test
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous tests have completed."
@@ -184,6 +209,8 @@ misc_rm:
 	@if docker images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F $(VERSION); then $(DOCKER_BIN) rmi -f $(NAME)/mush:$(VERSION); fi
 	@if docker images $(NAME)/ansible | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/ansible; fi
 	@if docker images $(NAME)/ansible | awk '{ print $$2 }' | grep -q -F $(VERSION); then $(DOCKER_BIN) rmi -f $(NAME)/ansible:$(VERSION); fi
+	@if docker images $(NAME)/terraform | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/terraform; fi
+	@if docker images $(NAME)/terraform | awk '{ print $$2 }' | grep -q -F $(VERSION); then $(DOCKER_BIN) rmi -f $(NAME)/terraform:$(VERSION); fi
 
 
 
@@ -219,15 +246,18 @@ tag_latest:
 		docker tag -f $(NAME)/jq:$(VERSION) $(NAME)/jq:latest
 		docker tag -f $(NAME)/mush:$(VERSION) $(NAME)/mush:latest
 		docker tag -f $(NAME)/ansible:$(VERSION) $(NAME)/ansible:latest
+		docker tag -f $(NAME)/terraform:$(VERSION) $(NAME)/terraform:latest
 
 .PHONY: release
 release: release_base tag_latest
 		@if ! docker images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/jq version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/mush version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		@if ! docker images $(NAME)/ansible | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ansible version $(VERSION) is not yet built. Please run 'make build'"; false; fi
+		@if ! docker images $(NAME)/terraform | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/terraform version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 		docker push $(NAME)/jq
 		docker push $(NAME)/mush
 		docker push $(NAME)/ansible
+		docker push $(NAME)/terraform
 
 
 
