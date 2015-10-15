@@ -225,7 +225,7 @@ jq:
 jq_test: 
 	@echo "Testing 'jq' image..."
 	@echo " "
-	@if ! $(DOCKER_BIN) run $(NAME)/jq | grep -q -F "jq is a tool for processing JSON inputs"; then echo "$(NAME)/jq doesn't appear to run as expected."; false; fi
+	@if ! $(DOCKER_BIN) run $(NAME)/jq:$(VERSION) | grep -q -F "jq is a tool for processing JSON inputs"; then echo "$(NAME)/jq doesn't appear to run as expected."; false; fi
 
 
 
