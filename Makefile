@@ -10,7 +10,8 @@ DOCKER_BIN := $(shell which docker)
 TERRAFORM_IMAGES = 0.5.3 \
 	0.6.2 \
 	0.6.3 \
-	0.6.4
+	0.6.4 \
+	0.6.6
 
 PACKER_IMAGES = 0.7.5 \
 	0.8.6
