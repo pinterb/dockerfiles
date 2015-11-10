@@ -12,6 +12,7 @@
   - /home/dev/.ssh
 * /data is your default workdir.   
 * /home/dev is $HOME  
+* /opt/jdk is $JAVA_HOME  
 
 ## Usage 
 This image can easily be extended.  But to run jdk commands:

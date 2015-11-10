@@ -12,6 +12,7 @@
   - /home/dev/.ssh
 * /data is your default workdir.   
 * /home/dev is $HOME  
+* /opt/jdk is $JAVA_HOME  
 
 ## Usage 
 This image can easily be extended.  But to run jdk commands:
@@ -26,7 +27,7 @@ docker run -it --rm \
 
 ## Misc. Info 
 * Latest version: 8u66  
-* Built on: 2015-11-10T15:51:32EST   
+* Built on: 2015-11-10T15:56:36EST   
 * Base image: pinterb/base:alpine   
 
 
