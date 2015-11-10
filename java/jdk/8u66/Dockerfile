@@ -7,7 +7,6 @@ ENV JAVA_VERSION_MINOR 66
 ENV JAVA_VERSION_BUILD 17
 ENV JAVA_PACKAGE       jdk
 
-#http://download.oracle.com/otn-pub/java/jdk/8u66-b17/jdk-8u66-linux-x64.tar.gz
 RUN apk update && \
     apk add --update wget ca-certificates tar && \
     apk add --update bash openssh-client sudo && \
@@ -71,5 +70,3 @@ ENV HOME /home/dev
 USER dev
 WORKDIR /data
 
-#ENTRYPOINT ["/bin/terraform"]
-#CMD ["--help"]
