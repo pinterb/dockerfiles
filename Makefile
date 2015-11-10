@@ -16,6 +16,8 @@ TERRAFORM_IMAGES = 0.5.3 \
 PACKER_IMAGES = 0.7.5 \
 	0.8.6
 
+JDK_IMAGES = 8u66
+
 
 all: build test
 
@@ -250,22 +252,61 @@ jq_test:
 
 
 
+.PHONY: jdk 
+jdk:
+	@for jdk_ver in $(JDK_IMAGES); \
+	do \
+	echo " " ; \
+	echo " " ; \
+	echo "Building '$$jdk_ver $@' image..." ; \
+	$(DOCKER_BIN) build --rm -t $(NAME)/$@:$$jdk_ver $(CURRENT_DIR)/java/$@/$$jdk_ver ; \
+	cp -pR $(CURRENT_DIR)/templates/java/$@/README.md $(CURRENT_DIR)/java/$@/$$jdk_ver/README.md ; \
+	sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/$@/g' $(CURRENT_DIR)/java/$@/$$jdk_ver/README.md ; \
+	sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' $(CURRENT_DIR)/java/$@/$$jdk_ver/README.md ; \
+	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/base:alpine/g' $(CURRENT_DIR)/java/$@/$$jdk_ver/README.md ; \
+	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/java/$@/$$jdk_ver/README.md ; \
+	sed -i "s/###-->ZZZ_JDK_VERSION<--###/$$jdk_ver/g" $(CURRENT_DIR)/java/$@/$$jdk_ver/README.md ; \
+	done
+
+.PHONY: jdk_test
+jdk_test: 
+	@for jdk_ver in $(JDK_IMAGES); \
+	do \
+	echo "Testing '$$jdk_ver terraform' image..." ; \
+	echo " " ; \
+	if ! $(DOCKER_BIN) run -it \
+		-v $(CURRENT_DIR)/java/jdk/$$jdk_ver:/data:rw \
+		$(NAME)/jdk:$$jdk_ver java -version | \
+		grep -q -F "java version" ; then echo "$(NAME)/jdk:$$jdk_ver - java version command failed."; false; fi ; \
+	done
+
+.PHONY: jdk_rm
+jdk_rm: 
+	@for jdk_ver in $(JDK_IMAGES); \
+	do \
+	echo "Removing '$$jdk_ver jdk' image..." ; \
+	echo " " ; \
+	if $(DOCKER_BIN) images $(NAME)/jdk | awk '{ print $$2 }' | grep -q -F $$jdk_ver; then $(DOCKER_BIN) rmi -f $(NAME)/jdk:$$tf_ver; fi ; \
+	done
+
+
+
 .PHONY: misc
-misc: mush jq ansible terraform packer
+misc: mush jq ansible terraform packer jdk
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous images have been built."
 	@echo " "
 
 .PHONY: misc_test
-misc_test: jq_test mush_test ansible_test terraform_test packer_test
+misc_test: jq_test mush_test ansible_test terraform_test packer_test jdk_test
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous tests have completed."
 	@echo " "
 
 .PHONY: misc_rm
-misc_rm: terraform_rm packer_rm
+misc_rm: terraform_rm packer_rm jdk_rm
 	@if $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/jq; fi
 	@if $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F $(VERSION); then $(DOCKER_BIN) rmi -f $(NAME)/jq:$(VERSION); fi
 	@if $(DOCKER_BIN) images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/mush; fi
@@ -307,19 +348,22 @@ tag_latest:
 	$(DOCKER_BIN) tag -f $(NAME)/jq:$(VERSION) $(NAME)/jq:latest
 	$(DOCKER_BIN) tag -f $(NAME)/mush:$(VERSION) $(NAME)/mush:latest
 	$(DOCKER_BIN) tag -f $(NAME)/ansible:$(VERSION) $(NAME)/ansible:latest
+	$(DOCKER_BIN) tag -f $(NAME)/terraform:0.6.6 $(NAME)/ansible:latest
 
 .PHONY: release
 release: release_base tag_latest
 	@if ! $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/jq version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/mush version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/ansible | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ansible version $(VERSION) is not yet built. Please run 'make build'"; false; fi
-	@if ! $(DOCKER_BIN) images $(NAME)/terraform | awk '{ print $$2 }' | grep -q -F 0.6.4 ; then echo "$(NAME)/terraform version 0.6.4 is not yet built. Please run 'make build'"; false; fi
+	@if ! $(DOCKER_BIN) images $(NAME)/terraform | awk '{ print $$2 }' | grep -q -F 0.6.6 ; then echo "$(NAME)/terraform version 0.6.6 is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/packer | awk '{ print $$2 }' | grep -q -F 0.8.6 ; then echo "$(NAME)/packer version 0.8.6 is not yet built. Please run 'make build'"; false; fi
+	@if ! $(DOCKER_BIN) images $(NAME)/jdk | awk '{ print $$2 }' | grep -q -F 8u66 ; then echo "$(NAME)/terraform version 8u66 is not yet built. Please run 'make build'"; false; fi
 	$(DOCKER_BIN) push $(NAME)/jq
 	$(DOCKER_BIN) push $(NAME)/mush
 	$(DOCKER_BIN) push $(NAME)/ansible
 	$(DOCKER_BIN) push $(NAME)/terraform
 	$(DOCKER_BIN) push $(NAME)/packer
+	$(DOCKER_BIN) push $(NAME)/jdk
 
 
 
