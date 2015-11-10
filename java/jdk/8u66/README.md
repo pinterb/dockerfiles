@@ -14,19 +14,19 @@
 * /home/dev is $HOME  
 
 ## Usage 
-This image can easily be extended.  But to run Terraform:
+This image can easily be extended.  But to run jdk commands:
 
 ````
 docker run -it --rm \
 	-v $(SSH_DIR):/home/dev/.ssh \
 	-v $(PWD):/data:rw \
-	pinterb/jdk:8u66 java version
+	pinterb/jdk:8u66 java -version
 		
 ````
 
 ## Misc. Info 
 * Latest version: 8u66  
-* Built on: 2015-11-10T14:09:53EST   
+* Built on: 2015-11-10T15:51:32EST   
 * Base image: pinterb/base:alpine   
 
 

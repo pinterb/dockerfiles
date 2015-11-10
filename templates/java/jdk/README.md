@@ -14,7 +14,7 @@
 * /home/dev is $HOME  
 
 ## Usage 
-This image can easily be extended.  But to run Terraform:
+This image can easily be extended.  But to run jdk commands:
 
 ````
 docker run -it --rm \
