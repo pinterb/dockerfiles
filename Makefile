@@ -286,7 +286,7 @@ jdk_rm:
 	do \
 	echo "Removing '$$jdk_ver jdk' image..." ; \
 	echo " " ; \
-	if $(DOCKER_BIN) images $(NAME)/jdk | awk '{ print $$2 }' | grep -q -F $$jdk_ver; then $(DOCKER_BIN) rmi -f $(NAME)/jdk:$$tf_ver; fi ; \
+	if $(DOCKER_BIN) images $(NAME)/jdk | awk '{ print $$2 }' | grep -q -F $$jdk_ver; then $(DOCKER_BIN) rmi -f $(NAME)/jdk:$$jdk_ver; fi ; \
 	done
 
 
