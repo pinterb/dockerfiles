@@ -25,7 +25,7 @@ RUN apk add --update \
   docker-py==1.2.2
 
 # Install Ansible
-ENV ANSIBLE_TAG "v2.0.0-0.3.beta1"
+ENV ANSIBLE_TAG "v2.0.0-0.4.beta2"
 ENV ANSIBLE_GIT_REPO http://github.com/ansible/ansible.git
 
 RUN mkdir -p /etc/ansible/roles /opt && \

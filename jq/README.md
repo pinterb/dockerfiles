@@ -5,13 +5,13 @@
 
 ## Usage  
 ````
-curl 'https://api.github.com/repos/stedolan/jq/commits' | docker run -i pinterb/jq:0.0.14 '.'  
+curl 'https://api.github.com/repos/stedolan/jq/commits' | docker run -i pinterb/jq:0.0.15 '.'  
     
 ````
 
 ## Misc. Info 
-* Latest version: 0.0.14   
-* Built on: 2015-10-19T17:16:26EDT   
+* Latest version: 0.0.15   
+* Built on: 2015-11-13T10:15:25EST   
 * Base image: pinterb/base:alpine   
 
 

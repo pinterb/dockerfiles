@@ -1,5 +1,4 @@
-#dockerfiles NEW!!
-VERSION = 0.0.14
+VERSION = 0.0.15
 NAME = pinterb
 
 CREATE_DATE := $(shell date +%FT%T%Z)
