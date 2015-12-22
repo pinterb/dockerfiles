@@ -292,6 +292,36 @@ jdk_rm:
 
 
 
+.PHONY: dot 
+dot:
+	@echo " "
+	@echo " "
+	@echo "Building 'dot' image..."
+	@echo " "
+	$(DOCKER_BIN) build --rm -t $(NAME)/dot:$(VERSION) $(CURRENT_DIR)/dot
+	cp -pR $(CURRENT_DIR)/templates/dot/README.md $(CURRENT_DIR)/dot/README.md
+	sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/dot/g' $(CURRENT_DIR)/dot/README.md
+	sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' $(CURRENT_DIR)/dot/README.md
+	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/pinterb\/base:alpine/g' $(CURRENT_DIR)/dot/README.md
+	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/dot/README.md
+
+.PHONY: dot_test
+dot_test: 
+	@echo "Testing 'dot' image..."
+	@echo " "
+	cat $(CURRENT_DIR)/mush/terraform.tfvars.tmpl | $(DOCKER_BIN) run -i \
+		-v $(CURRENT_DIR)/graphviz/extras:/home/dev/.extra \
+		-v $(CURRENT_DIR)/graphviz:/home/dev/.ssh \
+		-e MUSH_EXTRA=/home/dev/.extra \
+		-e AZURE_SETTINGS_FILE=/home/dev/.azure.settings \
+		-e AZURE_CERT=/home/dev/.azure.cer \
+		-e AZURE_REGION="West US"  \
+		-e DOMAIN_NAME="example.com" \
+		$(NAME)/graphviz:$(VERSION) > $(CURRENT_DIR)/graphviz/terraform.tfvars
+	@if ! cat $(CURRENT_DIR)/graphviz/terraform.tfvars | grep -q -F example.com; then echo "graphviz/terraform.tfvars was not rendered with the expected results."; false; fi
+
+
+
 .PHONY: misc
 misc: mush jq ansible terraform packer jdk
 	@echo " "
