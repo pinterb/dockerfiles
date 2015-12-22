@@ -43,5 +43,5 @@ ENV HOME /home/dev
 USER dev
 WORKDIR /data
 
-#ENTRYPOINT ["/bin/terraform"]
-#CMD ["--help"]
+ENTRYPOINT ["/bin/terraform"]
+CMD ["--help"]

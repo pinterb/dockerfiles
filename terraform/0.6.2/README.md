@@ -27,7 +27,7 @@ docker run -it --rm \
 
 ## Misc. Info 
 * Latest version: 0.6.8 
-* Built on: 2015-12-22T15:55:30EST   
+* Built on: 2015-12-22T17:12:58EST   
 * Base image: pinterb/base:alpine   
 
 
