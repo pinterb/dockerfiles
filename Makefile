@@ -105,7 +105,7 @@ ansible:
 	sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' $(CURRENT_DIR)/ansible/README.md
 	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/pinterb\/base:alpine/g' $(CURRENT_DIR)/ansible/README.md
 	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/ansible/README.md
-	sed -i 's/###-->ZZZ_ANSIBLE_VERSION<--###/v2.0.0-0.3.beta1/g' $(CURRENT_DIR)/ansible/README.md
+	sed -i 's/###-->ZZZ_ANSIBLE_VERSION<--###/v2.0.0-0.8.rc3/g' $(CURRENT_DIR)/ansible/README.md
 
 .PHONY: ansible_test
 ansible_test: 

@@ -25,15 +25,15 @@ RUN apk add --update \
   docker-py==1.2.2
 
 # Install Ansible
-ENV ANSIBLE_TAG "v2.0.0-0.4.beta2"
+ENV ANSIBLE_TAG "2.0.0-0.8.rc3"
 ENV ANSIBLE_GIT_REPO http://github.com/ansible/ansible.git
 
 RUN mkdir -p /etc/ansible/roles /opt && \
   touch /etc/ansible/hosts.NOT.USED
 
-RUN git clone --branch $ANSIBLE_TAG --depth 1 $ANSIBLE_GIT_REPO /opt/ansible
+RUN git clone --branch v$ANSIBLE_TAG --depth 1 $ANSIBLE_GIT_REPO /opt/ansible
 WORKDIR /opt/ansible
-RUN git submodule update --init
+RUN git submodule update --init --recursive
 
 ENV PATH /opt/ansible/bin:/bin:/usr/bin:/sbin:/usr/sbin
 ENV PYTHONPATH /opt/ansible/lib
@@ -77,6 +77,8 @@ VOLUME ["/data", "/ops", "/state", "/ansible", "/home/dev/.ssh"]
 
 ENV HOME /home/dev
 USER dev
+COPY ansible.cfg $HOME/.ansible.cfg
 WORKDIR /ansible
 
-CMD ["/bin/bash"]
+ENTRYPOINT ["/opt/ansible/bin/ansible-playbook"]
+CMD ["--help"]
