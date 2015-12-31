@@ -232,6 +232,31 @@ mush_test:
 
 
 
+.PHONY: jinja2 
+jinja2:
+	@echo " "
+	@echo " "
+	@echo "Building 'jinja2' image..."
+	@echo " "
+	$(DOCKER_BIN) build --rm -t $(NAME)/jinja2:$(VERSION) $(CURRENT_DIR)/jinja2
+	cp -pR $(CURRENT_DIR)/templates/jinja2/README.md $(CURRENT_DIR)/jinja2/README.md
+	sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/jinja2/g' $(CURRENT_DIR)/jinja2/README.md
+	sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' $(CURRENT_DIR)/jinja2/README.md
+	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/pinterb\/base:alpine/g' $(CURRENT_DIR)/jinja2/README.md
+	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/jinja2/README.md
+
+.PHONY: jinja2_test
+jinja2_test: 
+	@echo "Testing 'jinja2' image..."
+	@echo " "
+	$(DOCKER_BIN) run -i \
+		-v $(CURRENT_DIR)/jinja2:/data \
+		-e TEMPLATE=some.json.j2 \
+		$(NAME)/jinja2:$(VERSION) datacenter='msp' acl_ttl='30m' > $(CURRENT_DIR)/jinja2/some.json
+	@if ! cat $(CURRENT_DIR)/jinja2/some.json | grep -q -F '"datacenter": "msp"'; then echo "jinja2/some.json was not rendered with the expected results."; false; fi
+
+
+
 .PHONY: jq
 jq:
 	@echo " "
@@ -323,14 +348,14 @@ dot_test:
 
 
 .PHONY: misc
-misc: mush jq ansible terraform packer jdk
+misc: mush jq ansible terraform packer jdk jinja2
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous images have been built."
 	@echo " "
 
 .PHONY: misc_test
-misc_test: jq_test mush_test ansible_test terraform_test packer_test jdk_test
+misc_test: jq_test mush_test ansible_test terraform_test packer_test jdk_test jinja2_test
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous tests have completed."
@@ -344,6 +369,8 @@ misc_rm: terraform_rm packer_rm jdk_rm
 	@if $(DOCKER_BIN) images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F $(VERSION); then $(DOCKER_BIN) rmi -f $(NAME)/mush:$(VERSION); fi
 	@if $(DOCKER_BIN) images $(NAME)/ansible | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/ansible; fi
 	@if $(DOCKER_BIN) images $(NAME)/ansible | awk '{ print $$2 }' | grep -q -F $(VERSION); then $(DOCKER_BIN) rmi -f $(NAME)/ansible:$(VERSION); fi
+	@if $(DOCKER_BIN) images $(NAME)/jinja2 | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/jinja2; fi
+	@if $(DOCKER_BIN) images $(NAME)/jinja2 | awk '{ print $$2 }' | grep -q -F $(VERSION); then $(DOCKER_BIN) rmi -f $(NAME)/jinja2:$(VERSION); fi
 
 
 
@@ -378,6 +405,7 @@ release_base:
 tag_latest:
 	$(DOCKER_BIN) tag -f $(NAME)/jq:$(VERSION) $(NAME)/jq:latest
 	$(DOCKER_BIN) tag -f $(NAME)/mush:$(VERSION) $(NAME)/mush:latest
+	$(DOCKER_BIN) tag -f $(NAME)/jinja2:$(VERSION) $(NAME)/jinja2:latest
 	$(DOCKER_BIN) tag -f $(NAME)/ansible:$(VERSION) $(NAME)/ansible:latest
 	$(DOCKER_BIN) tag -f $(NAME)/terraform:0.6.8 $(NAME)/terraform:latest
 	$(DOCKER_BIN) tag -f $(NAME)/jdk:8u66 $(NAME)/jdk:latest
@@ -386,12 +414,13 @@ tag_latest:
 release: release_base tag_latest
 	@if ! $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/jq version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/mush version $(VERSION) is not yet built. Please run 'make build'"; false; fi
+	@if ! $(DOCKER_BIN) images $(NAME)/jinja2 | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/jinja2 version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/ansible | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ansible version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/terraform | awk '{ print $$2 }' | grep -q -F 0.6.8 ; then echo "$(NAME)/terraform version 0.6.8 is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/packer | awk '{ print $$2 }' | grep -q -F 0.8.6 ; then echo "$(NAME)/packer version 0.8.6 is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/jdk | awk '{ print $$2 }' | grep -q -F 8u66 ; then echo "$(NAME)/jdk version 8u66 is not yet built. Please run 'make build'"; false; fi
 	$(DOCKER_BIN) push $(NAME)/jq
-	$(DOCKER_BIN) push $(NAME)/mush
+	$(DOCKER_BIN) push $(NAME)/jinja2
 	$(DOCKER_BIN) push $(NAME)/ansible
 	$(DOCKER_BIN) push $(NAME)/terraform
 	$(DOCKER_BIN) push $(NAME)/packer
@@ -410,6 +439,7 @@ tag_gh:
 .PHONY: clean
 clean: clean_untagged misc_rm base_rm clean_untagged
 		rm -rf $(CURRENT_DIR)/mush/terraform.tfvars
+		rm -rf $(CURRENT_DIR)/jinja2/some.json
 
 .PHONY: clean_untagged
 clean_untagged:
