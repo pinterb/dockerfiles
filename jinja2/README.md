@@ -45,7 +45,7 @@ The key things to remember are:
 
 ## Misc. Info 
 * Latest version: 0.0.15   
-* Built on: 2015-12-31T12:27:26EST   
+* Built on: 2016-01-08T16:40:47EST   
 * Base image: pinterb/base:alpine ([dockerfile][6])  
 * [Dockerfile][7]
 

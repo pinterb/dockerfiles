@@ -1,7 +1,7 @@
 # pinterb/terraform  
 
 [`pinterb/terraform`][1] is a [docker][2] image that bundles the following:  
-* **[Terraform v0.6.2][3]:** A tool for building, changing, and versioning infrastructure safely and efficiently. Terraform can manage existing and popular service providers as well as custom in-house solutions.  
+* **[Terraform v0.6.9][3]:** A tool for building, changing, and versioning infrastructure safely and efficiently. Terraform can manage existing and popular service providers as well as custom in-house solutions.  
 
 ## Details
 * The container runs as "dev" user (i.e. UID 1000). *Please keep this in mind as you mount volumes!* 
@@ -21,7 +21,7 @@ docker run -it --rm \
 	-v $(SSH_DIR):/home/dev/.ssh \
 	-v $(CURRENT_DIR):/state:rw \
 	-v $(PROVISION_CONFIG_DIR):/data:rw \
-	pinterb/terraform:0.6.2 apply --var-file=/state/terraform.tfvars -state=/state/terraform.tfstate /data   
+	pinterb/terraform:0.6.9 apply --var-file=/state/terraform.tfvars -state=/state/terraform.tfstate /data   
 		
 ````
 
