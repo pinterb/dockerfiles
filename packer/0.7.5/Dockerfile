@@ -31,14 +31,14 @@ RUN ssh-keygen -t rsa -N '' -f /home/dev/.ssh/dummy_rsa && \
 # Create a shared data volume
 # We need to create an empty file, otherwise the volume will
 # belong to root.
-RUN mkdir /data/ /ops/ /state/
-RUN touch /data/.extra /ops/.extra /state/.extra
+RUN mkdir /data/ /ansible/ /state/
+RUN touch /data/.extra /ansible/.extra /state/.extra
 RUN chown -R dev:dev /data
-RUN chown -R dev:dev /ops
+RUN chown -R dev:dev /ansible
 RUN chown -R dev:dev /state
 
 ## Expose some volumes
-VOLUME ["/data", "/ops", "/state", "/home/dev/.ssh"]
+VOLUME ["/data", "/ansible", "/state", "/home/dev/.ssh"]
 
 ENV HOME /home/dev
 USER dev

@@ -4,8 +4,6 @@ MAINTAINER Brad Pinter <brad.pinter@gmail.com>
 
 RUN apk add --update \
   g++ \
-  perl \
-  git \
   python-dev \
   python \
   sshpass \
@@ -14,42 +12,13 @@ RUN apk add --update \
   py-pip && \
   pip install --upgrade pip && \
   pip install \
-  paramiko \
-  python-keyczar \
-  PyYAML \
-  Jinja2 \
-  httplib2 \
-  urllib3 \
-  simplejson \
-  python-consul \
-  docker-py==1.2.2
-
-# Install Ansible
-ENV ANSIBLE_TAG "2.0.0-0.8.rc3"
-ENV ANSIBLE_GIT_REPO http://github.com/ansible/ansible.git
-
-RUN mkdir -p /etc/ansible/roles /opt && \
-  touch /etc/ansible/hosts.NOT.USED
-
-RUN git clone --branch v$ANSIBLE_TAG --depth 1 $ANSIBLE_GIT_REPO /opt/ansible
-WORKDIR /opt/ansible
-RUN git submodule update --init --recursive
-
-ENV PATH /opt/ansible/bin:/bin:/usr/bin:/sbin:/usr/sbin
-ENV PYTHONPATH /opt/ansible/lib
-ENV ANSIBLE_LIBRARY /opt/ansible/lib/ansible/modules/core:/opt/ansible/lib/ansible/modules/extras
-
-# keep galaxy installs to a few as possible
-RUN ansible-galaxy install \
-  geerlingguy.ntp
+  ansible-lint==2.3.1
 
 ## Cleanup
-RUN apk del \
+RUN apk del --purge \
+  g++ \
   python-dev \
-  perl \
-  git \
-  make \
-  g++ && \
+  make && \
   rm -rf /var/cache/apk/*
 
 RUN addgroup dev && \
@@ -77,8 +46,8 @@ VOLUME ["/data", "/ops", "/state", "/ansible", "/home/dev/.ssh"]
 
 ENV HOME /home/dev
 USER dev
-COPY ansible.cfg $HOME/.ansible.cfg
+#COPY ansible.cfg $HOME/.ansible.cfg
 WORKDIR /ansible
 
-ENTRYPOINT ["/opt/ansible/bin/ansible-playbook"]
+ENTRYPOINT ["/usr/bin/ansible-lint"]
 CMD ["--help"]

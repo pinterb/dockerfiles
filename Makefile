@@ -6,6 +6,7 @@ MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 CURRENT_DIR := $(shell dirname $(MKFILE_PATH))
 DOCKER_BIN := $(shell which docker)
 
+TERRAFORM_CURRENT_VERSION = 0.6.9
 TERRAFORM_IMAGES = 0.5.3 \
 	0.6.2 \
 	0.6.3 \
@@ -15,8 +16,16 @@ TERRAFORM_IMAGES = 0.5.3 \
 	0.6.8 \
 	0.6.9
 
+PACKER_CURRENT_VERSION = 0.8.6
 PACKER_IMAGES = 0.7.5 \
 	0.8.6
+
+ANSIBLE_CURRENT_VERSION = 2.0.0.2
+ANSIBLE_IMAGES = 1.9.4 \
+	2.0.0.2
+
+ANSIBLE_LINT_CURRENT_VERSION = 2.3.1
+ANSIBLE_LINT_IMAGES = 2.3.1 
 
 JDK_IMAGES = 8u66
 
@@ -96,32 +105,91 @@ base_rm:
 
 .PHONY: ansible 
 ansible:
-	@echo " "
-	@echo " "
-	@echo "Building 'ansible' image..."
-	@echo " "
-	$(DOCKER_BIN) build --rm -t $(NAME)/ansible:$(VERSION) $(CURRENT_DIR)/ansible
-	cp -pR $(CURRENT_DIR)/templates/ansible/README.md $(CURRENT_DIR)/ansible/README.md
-	sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/ansible/g' $(CURRENT_DIR)/ansible/README.md
-	sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' $(CURRENT_DIR)/ansible/README.md
-	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/pinterb\/base:alpine/g' $(CURRENT_DIR)/ansible/README.md
-	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/ansible/README.md
-	sed -i 's/###-->ZZZ_ANSIBLE_VERSION<--###/v2.0.0-0.8.rc3/g' $(CURRENT_DIR)/ansible/README.md
+	@for tf_ver in $(ANSIBLE_IMAGES); \
+	do \
+	echo " " ; \
+	echo " " ; \
+	echo " " ; \
+	echo "Building '$$tf_ver $@' image..." ; \
+	echo " " ; \
+	$(DOCKER_BIN) build --rm -t $(NAME)/$@:$$tf_ver $(CURRENT_DIR)/$@/$$tf_ver ; \
+	cp -pR $(CURRENT_DIR)/templates/$@/README.md $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/$@/g' $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/base:alpine/g' $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	sed -i "s/###-->ZZZ_CURRENT_VERSION<--###/$(ANSIBLE_CURRENT_VERSION)/g" $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	sed -i "s/###-->ZZZ_VERSION<--###/$$tf_ver/g" $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	sed -i "s/###-->ZZZ_ANSIBLE_VERSION<--###/$$tf_ver/g" $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	done
 
 .PHONY: ansible_test
 ansible_test: 
-	@echo "Testing 'ansible' image..."
-	@echo " "
-	@if ! $(DOCKER_BIN) run -it \
+	@for tf_ver in $(ANSIBLE_IMAGES); \
+	do \
+	echo "Testing '$$tf_ver ansible' image..." ; \
+	echo " " ; \
+	if ! $(DOCKER_BIN) run -it \
 		-v $(CURRENT_DIR)/ansible:/ansible:rw \
 		--entrypoint="/opt/ansible/bin/ansible" \
-		$(NAME)/ansible:$(VERSION) --version | \
-		grep -q -F "ansible 2.0.0" ; then echo "$(NAME)/ansible:$(VERSION) - ansible command failed."; false; fi
-	@if ! $(DOCKER_BIN) run -it \
+		$(NAME)/ansible:$$tf_ver --version | \
+		grep -q -F "ansible $$tf_ver" ; then echo "$(NAME)/ansible:$$tf_ver - ansible command failed."; false; fi; \
+	if ! $(DOCKER_BIN) run -it \
 		-v $(CURRENT_DIR)/ansible:/ansible:rw \
 		--entrypoint="/opt/ansible/bin/ansible-playbook" \
-		$(NAME)/ansible:$(VERSION) --version | \
-		grep -q -F "ansible-playbook 2.0.0" ; then echo "$(NAME)/ansible:$(VERSION) - ansible-playbook command failed."; false; fi
+		$(NAME)/ansible:$$tf_ver --version | \
+		grep -q -F "ansible-playbook $$tf_ver" ; then echo "$(NAME)/ansible:$$tf_ver - ansible-playbook command failed."; false; fi; \
+	done
+
+.PHONY: ansible_rm
+ansible_rm: 
+	@for tf_ver in $(ANSIBLE_IMAGES); \
+	do \
+	echo "Removing '$$tf_ver ansible' image..." ; \
+	echo " " ; \
+	if $(DOCKER_BIN) images $(NAME)/ansible | awk '{ print $$2 }' | grep -q -F $$tf_ver; then $(DOCKER_BIN) rmi -f $(NAME)/ansible:$$tf_ver; fi ; \
+	done
+
+	
+
+.PHONY: ansible-lint 
+ansible-lint:
+	@for tf_ver in $(ANSIBLE_LINT_IMAGES); \
+	do \
+	echo " " ; \
+	echo " " ; \
+	echo " " ; \
+	echo "Building '$$tf_ver $@' image..." ; \
+	echo " " ; \
+	$(DOCKER_BIN) build --rm -t $(NAME)/$@:$$tf_ver $(CURRENT_DIR)/$@/$$tf_ver ; \
+	cp -pR $(CURRENT_DIR)/templates/$@/README.md $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/$@/g' $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/base:alpine/g' $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	sed -i "s/###-->ZZZ_CURRENT_VERSION<--###/$(ANSIBLE_LINT_CURRENT_VERSION)/g" $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	sed -i "s/###-->ZZZ_VERSION<--###/$$tf_ver/g" $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	sed -i "s/###-->ZZZ_ANSIBLE_LINT_VERSION<--###/$$tf_ver/g" $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	done
+
+.PHONY: ansible-lint_test
+ansible-lint_test: 
+	@for tf_ver in $(ANSIBLE_LINT_IMAGES); \
+	do \
+	echo "Testing '$$tf_ver ansible' image..." ; \
+	echo " " ; \
+	if ! $(DOCKER_BIN) run -it \
+		-v $(CURRENT_DIR)/ansible:/ansible:rw \
+		$(NAME)/ansible-lint:$$tf_ver --version | \
+		grep -q -F "ansible-lint $$tf_ver" ; then echo "$(NAME)/ansible-lint:$$tf_ver - ansible-lint command failed."; false; fi; \
+	done
+
+.PHONY: ansible-lint_rm
+ansible-lint_rm: 
+	@for tf_ver in $(ANSIBLE_LINT_IMAGES); \
+	do \
+	echo "Removing '$$tf_ver ansible' image..." ; \
+	echo " " ; \
+	if $(DOCKER_BIN) images $(NAME)/ansible-lint | awk '{ print $$2 }' | grep -q -F $$tf_ver; then $(DOCKER_BIN) rmi -f $(NAME)/ansible:$$tf_ver; fi ; \
+	done
 
 
 
@@ -132,6 +200,7 @@ terraform:
 	echo " " ; \
 	echo " " ; \
 	echo "Building '$$tf_ver $@' image..." ; \
+	echo " " ; \
 	$(DOCKER_BIN) build --rm -t $(NAME)/$@:$$tf_ver $(CURRENT_DIR)/$@/$$tf_ver ; \
 	cp -pR $(CURRENT_DIR)/templates/$@/README.md $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
 	sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/$@/g' $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
@@ -139,6 +208,7 @@ terraform:
 	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/base:alpine/g' $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
 	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
 	sed -i "s/###-->ZZZ_TERRAFORM_VERSION<--###/$$tf_ver/g" $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	sed -i "s/###-->ZZZ_CURRENT_VERSION<--###/$(TERRAFORM_CURRENT_VERSION)/g" $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
 	done
 
 .PHONY: terraform_test
@@ -178,6 +248,7 @@ packer:
 	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/base:alpine/g' $(CURRENT_DIR)/$@/$$img_ver/README.md ; \
 	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/$@/$$img_ver/README.md ; \
 	sed -i "s/###-->ZZZ_PACKER_VERSION<--###/$$img_ver/g" $(CURRENT_DIR)/$@/$$img_ver/README.md ; \
+	sed -i "s/###-->ZZZ_CURRENT_VERSION<--###/$(PACKER_CURRENT_VERSION)/g" $(CURRENT_DIR)/$@/$$img_ver/README.md ; \
 	done
 
 .PHONY: packer_test
@@ -349,7 +420,7 @@ dot_test:
 
 
 .PHONY: misc
-misc: mush jq ansible terraform packer jdk jinja2
+misc: mush jq ansible terraform packer jdk jinja2 ansible-lint
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous images have been built."
@@ -363,13 +434,11 @@ misc_test: jq_test mush_test ansible_test terraform_test packer_test jdk_test ji
 	@echo " "
 
 .PHONY: misc_rm
-misc_rm: terraform_rm packer_rm jdk_rm
+misc_rm: terraform_rm packer_rm jdk_rm ansible_rm ansible-lint_rm
 	@if $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/jq; fi
 	@if $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F $(VERSION); then $(DOCKER_BIN) rmi -f $(NAME)/jq:$(VERSION); fi
 	@if $(DOCKER_BIN) images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/mush; fi
 	@if $(DOCKER_BIN) images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F $(VERSION); then $(DOCKER_BIN) rmi -f $(NAME)/mush:$(VERSION); fi
-	@if $(DOCKER_BIN) images $(NAME)/ansible | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/ansible; fi
-	@if $(DOCKER_BIN) images $(NAME)/ansible | awk '{ print $$2 }' | grep -q -F $(VERSION); then $(DOCKER_BIN) rmi -f $(NAME)/ansible:$(VERSION); fi
 	@if $(DOCKER_BIN) images $(NAME)/jinja2 | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/jinja2; fi
 	@if $(DOCKER_BIN) images $(NAME)/jinja2 | awk '{ print $$2 }' | grep -q -F $(VERSION); then $(DOCKER_BIN) rmi -f $(NAME)/jinja2:$(VERSION); fi
 
@@ -407,8 +476,10 @@ tag_latest:
 	$(DOCKER_BIN) tag -f $(NAME)/jq:$(VERSION) $(NAME)/jq:latest
 	$(DOCKER_BIN) tag -f $(NAME)/mush:$(VERSION) $(NAME)/mush:latest
 	$(DOCKER_BIN) tag -f $(NAME)/jinja2:$(VERSION) $(NAME)/jinja2:latest
-	$(DOCKER_BIN) tag -f $(NAME)/ansible:$(VERSION) $(NAME)/ansible:latest
-	$(DOCKER_BIN) tag -f $(NAME)/terraform:0.6.8 $(NAME)/terraform:latest
+	$(DOCKER_BIN) tag -f $(NAME)/ansible:$(ANSIBLE_CURRENT_VERSION) $(NAME)/ansible:latest
+	$(DOCKER_BIN) tag -f $(NAME)/ansible-lint:$(ANSIBLE_LINT_CURRENT_VERSION) $(NAME)/ansible-lint:latest
+	$(DOCKER_BIN) tag -f $(NAME)/terraform:$(TERRAFORM_CURRENT_VERSION) $(NAME)/terraform:latest
+	$(DOCKER_BIN) tag -f $(NAME)/packer:$(PACKER_CURRENT_VERSION) $(NAME)/packer:latest
 	$(DOCKER_BIN) tag -f $(NAME)/jdk:8u66 $(NAME)/jdk:latest
 
 .PHONY: release
@@ -416,13 +487,15 @@ release: release_base tag_latest
 	@if ! $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/jq version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/mush version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/jinja2 | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/jinja2 version $(VERSION) is not yet built. Please run 'make build'"; false; fi
-	@if ! $(DOCKER_BIN) images $(NAME)/ansible | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/ansible version $(VERSION) is not yet built. Please run 'make build'"; false; fi
-	@if ! $(DOCKER_BIN) images $(NAME)/terraform | awk '{ print $$2 }' | grep -q -F 0.6.8 ; then echo "$(NAME)/terraform version 0.6.8 is not yet built. Please run 'make build'"; false; fi
-	@if ! $(DOCKER_BIN) images $(NAME)/packer | awk '{ print $$2 }' | grep -q -F 0.8.6 ; then echo "$(NAME)/packer version 0.8.6 is not yet built. Please run 'make build'"; false; fi
+	@if ! $(DOCKER_BIN) images $(NAME)/ansible | awk '{ print $$2 }' | grep -q -F $(ANSIBLE_CURRENT_VERSION); then echo "$(NAME)/ansible version $(ANSIBLE_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
+	@if ! $(DOCKER_BIN) images $(NAME)/ansible-lint | awk '{ print $$2 }' | grep -q -F $(ANSIBLE_LINT_CURRENT_VERSION); then echo "$(NAME)/ansible-lint version $(ANSIBLE_LINT_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
+	@if ! $(DOCKER_BIN) images $(NAME)/terraform | awk '{ print $$2 }' | grep -q -F 0.6.8 ; then echo "$(NAME)/terraform version $(TERRAFORM_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
+	@if ! $(DOCKER_BIN) images $(NAME)/packer | awk '{ print $$2 }' | grep -q -F 0.8.6 ; then echo "$(NAME)/packer version $(PACKER_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/jdk | awk '{ print $$2 }' | grep -q -F 8u66 ; then echo "$(NAME)/jdk version 8u66 is not yet built. Please run 'make build'"; false; fi
 	$(DOCKER_BIN) push $(NAME)/jq
 	$(DOCKER_BIN) push $(NAME)/jinja2
 	$(DOCKER_BIN) push $(NAME)/ansible
+	$(DOCKER_BIN) push $(NAME)/ansible-lint
 	$(DOCKER_BIN) push $(NAME)/terraform
 	$(DOCKER_BIN) push $(NAME)/packer
 	$(DOCKER_BIN) push $(NAME)/jdk

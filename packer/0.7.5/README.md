@@ -8,7 +8,7 @@
 * The container runs as "dev" user (i.e. UID 1000). *Please keep this in mind as you mount volumes!* 
 * The following volumes exist (and are owned by dev):  
   - /data
-  - /ops
+  - /ansible (Hint: use this with the [ansible provisioner][5] by mounting your Ansible playbooks here)
   - /state
   - /home/dev/.ssh
 * /data is your default workdir.   
@@ -22,17 +22,19 @@ docker run -it --rm \
 	-v $(SSH_DIR):/home/dev/.ssh \
 	-v $(CURRENT_DIR):/state:rw \
 	-v $(PROVISION_CONFIG_DIR):/data:rw \
+	-v $(ANSIBLE_PLAYBOOK_DIR):/ansible:rw \
 	pinterb/packer:0.7.5 version   
 		
 ````
 
 ## Misc. Info 
 * Latest version: 0.8.6   
-* Built on: 2016-01-08T16:40:47EST   
-* Base image: pinterb/base:alpine   
+* Built on: 2016-01-15T14:13:09EST  
+* Base image: pinterb/base:alpine  
 
 
 [1]: https://hub.docker.com/r/pinterb/packer/   
 [2]: https://docker.com 
 [3]: https://packer.io/  
-[4]: https://github.com/MSOpenTech/packer-azure  
+[4]: https://github.com/MSOpenTech/packer-azure
+[5]: https://packer.io/docs/provisioners/ansible-local.html

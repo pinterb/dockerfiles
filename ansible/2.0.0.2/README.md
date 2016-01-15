@@ -1,7 +1,7 @@
-# ###-->ZZZ_IMAGE<--###  
+# pinterb/ansible  
 
-[`###-->ZZZ_IMAGE<--###`][1] is a [docker][2] image that bundles the following:  
-* **[Ansible ###-->ZZZ_ANSIBLE_VERSION<--###][3]:** A radically simple IT automation system. It handles configuration-management, application deployment, cloud provisioning, ad-hoc task-execution, and multinode orchestration - including trivializing things like zero downtime rolling updates with load balancers. Ansible is written in [Python](https://www.python.org/).    
+[`pinterb/ansible`][1] is a [docker][2] image that bundles the following:  
+* **[Ansible 2.0.0.2][3]:** A radically simple IT automation system. It handles configuration-management, application deployment, cloud provisioning, ad-hoc task-execution, and multinode orchestration - including trivializing things like zero downtime rolling updates with load balancers. Ansible is written in [Python](https://www.python.org/).    
 
 ## Details
 * The container runs as "dev" user (i.e. UID 1000). *Please keep this in mind as you mount volumes!* 
@@ -23,17 +23,17 @@ docker run -it --rm \
 	-v $(SSH_DIR):/home/dev/.ssh \
 	-v $(CURRENT_DIR):/state:rw \
 	-v $(PLAYBOOK_DIR):/ansible:rw \
-	###-->ZZZ_IMAGE<--###:###-->ZZZ_VERSION<--### site.yml
+	pinterb/ansible:2.0.0.2 site.yml
 		
 ````
 
 ## Misc. Info 
-* Latest version: ###-->ZZZ_CURRENT_VERSION<--###   
-* Built on: ###-->ZZZ_DATE<--###   
-* Base image: ###-->ZZZ_BASE_IMAGE<--### ([dockerfile][6])  
+* Latest version: 2.0.0.2   
+* Built on: 2016-01-15T14:13:09EST   
+* Base image: pinterb/base:alpine ([dockerfile][6])  
 * [Dockerfile][7]
 
-[1]: https://hub.docker.com/r/###-->ZZZ_IMAGE<--###/   
+[1]: https://hub.docker.com/r/pinterb/ansible/   
 [2]: https://docker.com 
 [3]: http://www.ansible.com/home  
 [4]: https://galaxy.ansible.com/list#/roles/464    

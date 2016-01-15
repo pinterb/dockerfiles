@@ -26,7 +26,7 @@ docker run -it --rm \
 ````
 
 ## Misc. Info 
-* Latest version: 0.6.9
+* Latest version: ###-->ZZZ_CURRENT_VERSION<--###  
 * Built on: ###-->ZZZ_DATE<--###   
 * Base image: ###-->ZZZ_BASE_IMAGE<--###   
 

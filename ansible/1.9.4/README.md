@@ -1,8 +1,7 @@
 # pinterb/ansible  
 
 [`pinterb/ansible`][1] is a [docker][2] image that bundles the following:  
-* **[Ansible v2.0.0-0.8.rc3][3]:** A radically simple IT automation system. It handles configuration-management, application deployment, cloud provisioning, ad-hoc task-execution, and multinode orchestration - including trivializing things like zero downtime rolling updates with load balancers. Ansible is written in [Python](https://www.python.org/).    
-* **[geerlingguy.ntp][4]:** An ansible-galaxy role written by [Jeff Geerling][5].  This role installs and configures NTP.  
+* **[Ansible 1.9.4][3]:** A radically simple IT automation system. It handles configuration-management, application deployment, cloud provisioning, ad-hoc task-execution, and multinode orchestration - including trivializing things like zero downtime rolling updates with load balancers. Ansible is written in [Python](https://www.python.org/).    
 
 ## Details
 * The container runs as "dev" user (i.e. UID 1000). *Please keep this in mind as you mount volumes!* 
@@ -24,13 +23,13 @@ docker run -it --rm \
 	-v $(SSH_DIR):/home/dev/.ssh \
 	-v $(CURRENT_DIR):/state:rw \
 	-v $(PLAYBOOK_DIR):/ansible:rw \
-	pinterb/ansible:0.0.15 site.yml
+	pinterb/ansible:1.9.4 site.yml
 		
 ````
 
 ## Misc. Info 
-* Latest version: 0.0.15   
-* Built on: 2016-01-08T16:40:47EST   
+* Latest version: 2.0.0.2   
+* Built on: 2016-01-15T14:13:09EST   
 * Base image: pinterb/base:alpine ([dockerfile][6])  
 * [Dockerfile][7]
 
