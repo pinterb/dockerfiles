@@ -188,7 +188,7 @@ ansible-lint_rm:
 	do \
 	echo "Removing '$$tf_ver ansible' image..." ; \
 	echo " " ; \
-	if $(DOCKER_BIN) images $(NAME)/ansible-lint | awk '{ print $$2 }' | grep -q -F $$tf_ver; then $(DOCKER_BIN) rmi -f $(NAME)/ansible:$$tf_ver; fi ; \
+	if $(DOCKER_BIN) images $(NAME)/ansible-lint | awk '{ print $$2 }' | grep -q -F $$tf_ver; then $(DOCKER_BIN) rmi -f $(NAME)/ansible-lint:$$tf_ver; fi ; \
 	done
 
 
