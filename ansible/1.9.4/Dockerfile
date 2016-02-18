@@ -22,7 +22,8 @@ RUN apk add --update \
   urllib3 \
   simplejson \
   python-consul \
-  docker-py==1.2.2
+  docker-py==1.2.2 \
+  netaddr 
 
 # Install Ansible
 ENV ANSIBLE_TAG "1.9.4-1"
