@@ -2,7 +2,7 @@ FROM pinterb/base:alpine
 
 MAINTAINER Brad Pinter <brad.pinter@gmail.com>
 
-ENV TERRAFORM_VERSION 0.6.6
+ENV TERRAFORM_VERSION 0.6.11
 
 RUN apk update && \
     apk add --update wget ca-certificates unzip && \

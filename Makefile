@@ -6,7 +6,7 @@ MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 CURRENT_DIR := $(shell dirname $(MKFILE_PATH))
 DOCKER_BIN := $(shell which docker)
 
-TERRAFORM_CURRENT_VERSION = 0.6.9
+TERRAFORM_CURRENT_VERSION = 0.6.11
 TERRAFORM_IMAGES = 0.5.3 \
 	0.6.2 \
 	0.6.3 \
@@ -14,7 +14,8 @@ TERRAFORM_IMAGES = 0.5.3 \
 	0.6.6 \
 	0.6.7 \
 	0.6.8 \
-	0.6.9
+	0.6.9 \
+	0.6.11
 
 PACKER_CURRENT_VERSION = 0.8.6
 PACKER_IMAGES = 0.7.5 \

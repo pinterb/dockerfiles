@@ -11,7 +11,7 @@ RUN apk update && \
     apk add --allow-untrusted glibc-2.21-r2.apk && \
     wget -q -O /terraform.zip "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" && \
     unzip /terraform.zip -d /bin && \
-    apk del --purge wget ca-certificates unzip && \
+    apk del --purge curl wget ca-certificates unzip && \
     rm -rf /var/cache/apk/* glibc-2.21-r2.apk /terraform.zip
 
 ENV PATH /terraform:$PATH
