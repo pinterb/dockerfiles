@@ -3,16 +3,18 @@ FROM pinterb/base:alpine
 MAINTAINER Brad Pinter <brad.pinter@gmail.com>
 
 ENV TERRAFORM_VERSION 0.6.11
+ENV GLIBC_PKG_VERSION 2.23-r1
 
-RUN apk update && \
-    apk add --update wget ca-certificates unzip && \
-    apk add --update bash openssh-client sudo graphviz && \
-    wget -q "https://circle-artifacts.com/gh/andyshinn/alpine-pkg-glibc/6/artifacts/0/home/ubuntu/alpine-pkg-glibc/packages/x86_64/glibc-2.21-r2.apk" && \
-    apk add --allow-untrusted glibc-2.21-r2.apk && \
-    wget -q -O /terraform.zip "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" && \
-    unzip /terraform.zip -d /bin && \
-    apk del --purge curl wget ca-certificates unzip && \
-    rm -rf /var/cache/apk/* glibc-2.21-r2.apk /terraform.zip
+RUN apk add --no-cache --update-cache ca-certificates unzip bash sudo openssh-client graphviz && \
+  curl -Lo /etc/apk/keys/andyshinn.rsa.pub "https://github.com/andyshinn/alpine-pkg-glibc/releases/download/${GLIBC_PKG_VERSION}/andyshinn.rsa.pub" && \
+  curl -Lo glibc-${GLIBC_PKG_VERSION}.apk "https://github.com/andyshinn/alpine-pkg-glibc/releases/download/${GLIBC_PKG_VERSION}/glibc-${GLIBC_PKG_VERSION}.apk" && \
+  curl -Lo glibc-bin-${GLIBC_PKG_VERSION}.apk "https://github.com/andyshinn/alpine-pkg-glibc/releases/download/${GLIBC_PKG_VERSION}/glibc-bin-${GLIBC_PKG_VERSION}.apk" && \
+  curl -Lo glibc-i18n-${GLIBC_PKG_VERSION}.apk "https://github.com/andyshinn/alpine-pkg-glibc/releases/download/${GLIBC_PKG_VERSION}/glibc-i18n-${GLIBC_PKG_VERSION}.apk" && \
+  apk add glibc-${GLIBC_PKG_VERSION}.apk glibc-bin-${GLIBC_PKG_VERSION}.apk glibc-i18n-${GLIBC_PKG_VERSION}.apk && \
+  curl -Lo /terraform.zip "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" && \
+  unzip /terraform.zip -d /bin && \
+  apk del --purge curl ca-certificates unzip && \
+  rm -rf /var/cache/apk/* glibc-2.21-r2.apk /terraform.zip
 
 ENV PATH /terraform:$PATH
 
