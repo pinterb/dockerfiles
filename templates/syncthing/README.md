@@ -13,7 +13,7 @@
   - /home/dev/.ssh
 * /data is your default workdir.   
 * /home/dev is $HOME  
-* ***NOTE:*** If you are not using an existing config.xml, syncthing will create a config for you.  This default syncthing behavior.  
+* ***NOTE:*** If you are not using an existing config.xml, Syncthing will create a config for you.  This is default Syncthing behavior.  
 
 ## Usage 
 This image can easily be extended.  But to run Syncthing:
@@ -26,7 +26,6 @@ docker run -it --rm \
 	-v $(PROVISION_DATA_DIR):/data:rw \
 	-p 8384:8384 \
 	-p 22000:22000 \
-	-p 8080:8080 \
 	###-->ZZZ_IMAGE<--###:###-->ZZZ_SYNCTHING_VERSION<--### -home /config -gui-address=https://0.0.0.0:8384 -no-browser    
 		
 ````
