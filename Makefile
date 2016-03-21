@@ -7,14 +7,7 @@ CURRENT_DIR := $(shell dirname $(MKFILE_PATH))
 DOCKER_BIN := $(shell which docker)
 
 TERRAFORM_CURRENT_VERSION = 0.6.11
-TERRAFORM_IMAGES = 0.5.3 \
-	0.6.2 \
-	0.6.3 \
-	0.6.4 \
-	0.6.6 \
-	0.6.7 \
-	0.6.8 \
-	0.6.9 \
+TERRAFORM_IMAGES = 0.6.9 \
 	0.6.11
 
 PACKER_CURRENT_VERSION = 0.8.6
@@ -26,7 +19,10 @@ ANSIBLE_IMAGES = 1.9.4 \
 	2.0.0.2
 
 ANSIBLE_LINT_CURRENT_VERSION = 2.3.1
-ANSIBLE_LINT_IMAGES = 2.3.1 
+ANSIBLE_LINT_IMAGES = 2.3.1
+
+SYNCTHING_CURRENT_VERSION = 0.12.20
+SYNCTHING_IMAGES = 0.12.20
 
 JDK_IMAGES = 8u66
 
@@ -235,6 +231,47 @@ terraform_rm:
 
 
 
+.PHONY: syncthing 
+syncthing:
+	@for tf_ver in $(SYNCTHING_IMAGES); \
+	do \
+	echo " " ; \
+	echo " " ; \
+	echo "Building '$$tf_ver $@' image..." ; \
+	echo " " ; \
+	$(DOCKER_BIN) build --rm -t $(NAME)/$@:$$tf_ver $(CURRENT_DIR)/$@/$$tf_ver ; \
+	cp -pR $(CURRENT_DIR)/templates/$@/README.md $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/$@/g' $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/base:alpine/g' $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	sed -i "s/###-->ZZZ_SYNCTHING_VERSION<--###/$$tf_ver/g" $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	sed -i "s/###-->ZZZ_CURRENT_VERSION<--###/$(SYNCTHING_CURRENT_VERSION)/g" $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	done
+
+.PHONY: syncthing_test
+syncthing_test: 
+	@for tf_ver in $(SYNCTHING_IMAGES); \
+	do \
+	echo "Testing '$$tf_ver syncthing' image..." ; \
+	echo " " ; \
+	if ! $(DOCKER_BIN) run -it \
+		-v $(CURRENT_DIR)/syncthing/$$tf_ver:/data:rw \
+		$(NAME)/syncthing:$$tf_ver version | \
+		grep -q -F "syncthing v$$tf_ver" ; then echo "$(NAME)/syncthing:$$tf_ver - syncthing version command failed."; false; fi ; \
+	done
+
+.PHONY: syncthing_rm
+syncthing_rm: 
+	@for tf_ver in $(SYNCTHING_IMAGES); \
+	do \
+	echo "Removing '$$tf_ver syncthing' image..." ; \
+	echo " " ; \
+	if $(DOCKER_BIN) images $(NAME)/syncthing | awk '{ print $$2 }' | grep -q -F $$tf_ver; then $(DOCKER_BIN) rmi -f $(NAME)/syncthing:$$tf_ver; fi ; \
+	done
+
+
+
 .PHONY: packer 
 packer:
 	@for img_ver in $(PACKER_IMAGES); \
@@ -371,7 +408,7 @@ jdk:
 jdk_test: 
 	@for jdk_ver in $(JDK_IMAGES); \
 	do \
-	echo "Testing '$$jdk_ver terraform' image..." ; \
+	echo "Testing '$$jdk_ver jdk' image..." ; \
 	echo " " ; \
 	if ! $(DOCKER_BIN) run -it \
 		-v $(CURRENT_DIR)/java/jdk/$$jdk_ver:/data:rw \
@@ -421,21 +458,21 @@ dot_test:
 
 
 .PHONY: misc
-misc: mush jq ansible terraform packer jdk jinja2 ansible-lint
+misc: mush jq ansible terraform packer jdk jinja2 ansible-lint syncthing
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous images have been built."
 	@echo " "
 
 .PHONY: misc_test
-misc_test: jq_test mush_test ansible_test terraform_test packer_test jdk_test jinja2_test
+misc_test: jq_test mush_test ansible_test terraform_test packer_test jdk_test jinja2_test syncthing_test
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous tests have completed."
 	@echo " "
 
 .PHONY: misc_rm
-misc_rm: terraform_rm packer_rm jdk_rm ansible_rm ansible-lint_rm
+misc_rm: terraform_rm packer_rm jdk_rm ansible_rm ansible-lint_rm syncthing_rm
 	@if $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/jq; fi
 	@if $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F $(VERSION); then $(DOCKER_BIN) rmi -f $(NAME)/jq:$(VERSION); fi
 	@if $(DOCKER_BIN) images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/mush; fi
@@ -480,6 +517,7 @@ tag_latest:
 	$(DOCKER_BIN) tag -f $(NAME)/ansible:$(ANSIBLE_CURRENT_VERSION) $(NAME)/ansible:latest
 	$(DOCKER_BIN) tag -f $(NAME)/ansible-lint:$(ANSIBLE_LINT_CURRENT_VERSION) $(NAME)/ansible-lint:latest
 	$(DOCKER_BIN) tag -f $(NAME)/terraform:$(TERRAFORM_CURRENT_VERSION) $(NAME)/terraform:latest
+	$(DOCKER_BIN) tag -f $(NAME)/syncthing:$(SYNCTHING_CURRENT_VERSION) $(NAME)/syncthing:latest
 	$(DOCKER_BIN) tag -f $(NAME)/packer:$(PACKER_CURRENT_VERSION) $(NAME)/packer:latest
 	$(DOCKER_BIN) tag -f $(NAME)/jdk:8u66 $(NAME)/jdk:latest
 
@@ -493,11 +531,13 @@ release: release_base tag_latest
 	@if ! $(DOCKER_BIN) images $(NAME)/terraform | awk '{ print $$2 }' | grep -q -F 0.6.8 ; then echo "$(NAME)/terraform version $(TERRAFORM_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/packer | awk '{ print $$2 }' | grep -q -F 0.8.6 ; then echo "$(NAME)/packer version $(PACKER_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/jdk | awk '{ print $$2 }' | grep -q -F 8u66 ; then echo "$(NAME)/jdk version 8u66 is not yet built. Please run 'make build'"; false; fi
+	@if ! $(DOCKER_BIN) images $(NAME)/syncthing | awk '{ print $$2 }' | grep -q -F 0.6.8 ; then echo "$(NAME)/syncthing version $(SYNCTHING_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
 	$(DOCKER_BIN) push $(NAME)/jq
 	$(DOCKER_BIN) push $(NAME)/jinja2
 	$(DOCKER_BIN) push $(NAME)/ansible
 	$(DOCKER_BIN) push $(NAME)/ansible-lint
 	$(DOCKER_BIN) push $(NAME)/terraform
+	$(DOCKER_BIN) push $(NAME)/syncthing
 	$(DOCKER_BIN) push $(NAME)/packer
 	$(DOCKER_BIN) push $(NAME)/jdk
 
