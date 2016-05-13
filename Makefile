@@ -105,7 +105,7 @@ base_rm:
 ### Misc images
 
 .PHONY: ansible
-ansible:
+ansible: alpine
 	@for tf_ver in $(ANSIBLE_IMAGES); \
 	do \
 	echo " " ; \
@@ -153,7 +153,7 @@ ansible_rm:
 
 
 .PHONY: ansible-lint
-ansible-lint:
+ansible-lint: alpine
 	@for tf_ver in $(ANSIBLE_LINT_IMAGES); \
 	do \
 	echo " " ; \
@@ -195,7 +195,7 @@ ansible-lint_rm:
 
 
 .PHONY: terraform
-terraform:
+terraform: alpine
 	@for tf_ver in $(TERRAFORM_IMAGES); \
 	do \
 	echo " " ; \
@@ -236,7 +236,7 @@ terraform_rm:
 
 
 .PHONY: syncthing
-syncthing:
+syncthing: alpine
 	@for tf_ver in $(SYNCTHING_IMAGES); \
 	do \
 	echo " " ; \
@@ -277,7 +277,7 @@ syncthing_rm:
 
 
 .PHONY: packer
-packer:
+packer: alpine
 	@for img_ver in $(PACKER_IMAGES); \
 	do \
 	echo " " ; \
@@ -347,7 +347,7 @@ mush_test:
 
 
 .PHONY: jinja2
-jinja2:
+jinja2: alpine
 	@echo " "
 	@echo " "
 	@echo "Building 'jinja2' image..."
@@ -372,7 +372,7 @@ jinja2_test:
 
 
 .PHONY: jq
-jq:
+jq: alpine
 	@echo " "
 	@echo " "
 	@echo "Building 'jq' image..."
@@ -393,7 +393,7 @@ jq_test:
 
 
 .PHONY: jdk
-jdk:
+jdk: alpine
 	@for jdk_ver in $(JDK_IMAGES); \
 	do \
 	echo " " ; \
@@ -462,7 +462,7 @@ dot_test:
 
 
 .PHONY: jo
-jo:
+jo: alpine
 	@for jo_ver in $(JO_IMAGES); \
 	do \
 	echo " " ; \
