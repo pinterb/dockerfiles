@@ -26,9 +26,13 @@ ANSIBLE_IMAGES = 1.9.4 \
 	2.0.0.2
 
 ANSIBLE_LINT_CURRENT_VERSION = 2.3.1
-ANSIBLE_LINT_IMAGES = 2.3.1 
+ANSIBLE_LINT_IMAGES = 2.3.1
 
 JDK_IMAGES = 8u66
+
+JO_CURRENT_VERSION = 1.0
+JO_IMAGES = 1.0
+
 
 
 all: build test
@@ -104,7 +108,7 @@ base_rm:
 
 ### Misc images
 
-.PHONY: ansible 
+.PHONY: ansible
 ansible:
 	@for tf_ver in $(ANSIBLE_IMAGES); \
 	do \
@@ -124,7 +128,7 @@ ansible:
 	done
 
 .PHONY: ansible_test
-ansible_test: 
+ansible_test:
 	@for tf_ver in $(ANSIBLE_IMAGES); \
 	do \
 	echo "Testing '$$tf_ver ansible' image..." ; \
@@ -142,7 +146,7 @@ ansible_test:
 	done
 
 .PHONY: ansible_rm
-ansible_rm: 
+ansible_rm:
 	@for tf_ver in $(ANSIBLE_IMAGES); \
 	do \
 	echo "Removing '$$tf_ver ansible' image..." ; \
@@ -150,9 +154,9 @@ ansible_rm:
 	if $(DOCKER_BIN) images $(NAME)/ansible | awk '{ print $$2 }' | grep -q -F $$tf_ver; then $(DOCKER_BIN) rmi -f $(NAME)/ansible:$$tf_ver; fi ; \
 	done
 
-	
 
-.PHONY: ansible-lint 
+
+.PHONY: ansible-lint
 ansible-lint:
 	@for tf_ver in $(ANSIBLE_LINT_IMAGES); \
 	do \
@@ -172,7 +176,7 @@ ansible-lint:
 	done
 
 .PHONY: ansible-lint_test
-ansible-lint_test: 
+ansible-lint_test:
 	@for tf_ver in $(ANSIBLE_LINT_IMAGES); \
 	do \
 	echo "Testing '$$tf_ver ansible' image..." ; \
@@ -184,7 +188,7 @@ ansible-lint_test:
 	done
 
 .PHONY: ansible-lint_rm
-ansible-lint_rm: 
+ansible-lint_rm:
 	@for tf_ver in $(ANSIBLE_LINT_IMAGES); \
 	do \
 	echo "Removing '$$tf_ver ansible' image..." ; \
@@ -194,7 +198,7 @@ ansible-lint_rm:
 
 
 
-.PHONY: terraform 
+.PHONY: terraform
 terraform:
 	@for tf_ver in $(TERRAFORM_IMAGES); \
 	do \
@@ -213,7 +217,7 @@ terraform:
 	done
 
 .PHONY: terraform_test
-terraform_test: 
+terraform_test:
 	@for tf_ver in $(TERRAFORM_IMAGES); \
 	do \
 	echo "Testing '$$tf_ver terraform' image..." ; \
@@ -225,7 +229,7 @@ terraform_test:
 	done
 
 .PHONY: terraform_rm
-terraform_rm: 
+terraform_rm:
 	@for tf_ver in $(TERRAFORM_IMAGES); \
 	do \
 	echo "Removing '$$tf_ver terraform' image..." ; \
@@ -235,7 +239,7 @@ terraform_rm:
 
 
 
-.PHONY: packer 
+.PHONY: packer
 packer:
 	@for img_ver in $(PACKER_IMAGES); \
 	do \
@@ -253,7 +257,7 @@ packer:
 	done
 
 .PHONY: packer_test
-packer_test: 
+packer_test:
 	@for img_ver in $(PACKER_IMAGES); \
 	do \
 	echo "Testing '$$img_ver packer' image..." ; \
@@ -265,7 +269,7 @@ packer_test:
 	done
 
 .PHONY: packer_rm
-packer_rm: 
+packer_rm:
 	@for img_ver in $(PACKER_IMAGES); \
 	do \
 	echo "Removing '$$img_ver packer' image..." ; \
@@ -289,7 +293,7 @@ mush:
 	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/mush/README.md
 
 .PHONY: mush_test
-mush_test: 
+mush_test:
 	@echo "Testing 'mush' image..."
 	@echo " "
 	cat $(CURRENT_DIR)/mush/terraform.tfvars.tmpl | $(DOCKER_BIN) run -i \
@@ -305,7 +309,7 @@ mush_test:
 
 
 
-.PHONY: jinja2 
+.PHONY: jinja2
 jinja2:
 	@echo " "
 	@echo " "
@@ -319,7 +323,7 @@ jinja2:
 	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/jinja2/README.md
 
 .PHONY: jinja2_test
-jinja2_test: 
+jinja2_test:
 	@echo "Testing 'jinja2' image..."
 	@echo " "
 	$(DOCKER_BIN) run -i \
@@ -344,14 +348,14 @@ jq:
 	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/jq/README.md
 
 .PHONY: jq_test
-jq_test: 
+jq_test:
 	@echo "Testing 'jq' image..."
 	@echo " "
 	@if ! $(DOCKER_BIN) run $(NAME)/jq:$(VERSION) | grep -q -F "jq is a tool for processing JSON inputs"; then echo "$(NAME)/jq doesn't appear to run as expected."; false; fi
 
 
 
-.PHONY: jdk 
+.PHONY: jdk
 jdk:
 	@for jdk_ver in $(JDK_IMAGES); \
 	do \
@@ -368,7 +372,7 @@ jdk:
 	done
 
 .PHONY: jdk_test
-jdk_test: 
+jdk_test:
 	@for jdk_ver in $(JDK_IMAGES); \
 	do \
 	echo "Testing '$$jdk_ver terraform' image..." ; \
@@ -380,7 +384,7 @@ jdk_test:
 	done
 
 .PHONY: jdk_rm
-jdk_rm: 
+jdk_rm:
 	@for jdk_ver in $(JDK_IMAGES); \
 	do \
 	echo "Removing '$$jdk_ver jdk' image..." ; \
@@ -390,7 +394,7 @@ jdk_rm:
 
 
 
-.PHONY: dot 
+.PHONY: dot
 dot:
 	@echo " "
 	@echo " "
@@ -404,7 +408,7 @@ dot:
 	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/dot/README.md
 
 .PHONY: dot_test
-dot_test: 
+dot_test:
 	@echo "Testing 'dot' image..."
 	@echo " "
 	cat $(CURRENT_DIR)/mush/terraform.tfvars.tmpl | $(DOCKER_BIN) run -i \
@@ -420,22 +424,62 @@ dot_test:
 
 
 
+.PHONY: jo
+jo:
+	@for jo_ver in $(JO_IMAGES); \
+	do \
+	echo " " ; \
+	echo " " ; \
+	echo "Building '$$jo_ver $@' image..." ; \
+	echo " " ; \
+	$(DOCKER_BIN) build --rm -t $(NAME)/$@:$$jo_ver $(CURRENT_DIR)/$@/$$jo_ver ; \
+	cp -pR $(CURRENT_DIR)/templates/$@/README.md $(CURRENT_DIR)/$@/$$jo_ver/README.md ; \
+	sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/$@/g' $(CURRENT_DIR)/$@/$$jo_ver/README.md ; \
+	sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' $(CURRENT_DIR)/$@/$$jo_ver/README.md ; \
+	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/base:alpine/g' $(CURRENT_DIR)/$@/$$jo_ver/README.md ; \
+	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/$@/$$jo_ver/README.md ; \
+	sed -i "s/###-->ZZZ_JO_VERSION<--###/$$jo_ver/g" $(CURRENT_DIR)/$@/$$jo_ver/README.md ; \
+	sed -i "s/###-->ZZZ_CURRENT_VERSION<--###/$(JO_CURRENT_VERSION)/g" $(CURRENT_DIR)/$@/$$jo_ver/README.md ; \
+	done
+
+.PHONY: jo_test
+jo_test:
+	@for jo_ver in $(JO_IMAGES); \
+	do \
+	echo "Testing '$$jo_ver jo' image..." ; \
+	echo " " ; \
+	if ! $(DOCKER_BIN) run -it \
+		$(NAME)/jo:$$jo_ver -v | \
+		grep -q -F "jo $$jo_ver" ; then echo "$(NAME)/jo:$$jo_ver - jo version command failed."; false; fi ; \
+	done
+
+.PHONY: jo_rm
+jo_rm:
+	@for jo_ver in $(JO_IMAGES); \
+	do \
+	echo "Removing '$$jo_ver jo' image..." ; \
+	echo " " ; \
+	if $(DOCKER_BIN) images $(NAME)/jo | awk '{ print $$2 }' | grep -q -F $$jo_ver; then $(DOCKER_BIN) rmi -f $(NAME)/jo:$$jo_ver; fi ; \
+	done
+
+
+
 .PHONY: misc
-misc: mush jq ansible terraform packer jdk jinja2 ansible-lint
+misc: mush jq ansible terraform packer jdk jinja2 ansible-lint jo
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous images have been built."
 	@echo " "
 
 .PHONY: misc_test
-misc_test: jq_test mush_test ansible_test terraform_test packer_test jdk_test jinja2_test
+misc_test: jq_test mush_test ansible_test terraform_test packer_test jdk_test jinja2_test jo_test
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous tests have completed."
 	@echo " "
 
 .PHONY: misc_rm
-misc_rm: terraform_rm packer_rm jdk_rm ansible_rm ansible-lint_rm
+misc_rm: terraform_rm packer_rm jdk_rm ansible_rm ansible-lint_rm jo_rm
 	@if $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/jq; fi
 	@if $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F $(VERSION); then $(DOCKER_BIN) rmi -f $(NAME)/jq:$(VERSION); fi
 	@if $(DOCKER_BIN) images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/mush; fi
@@ -454,7 +498,7 @@ build: base misc
 
 
 
-.PHONY: test 
+.PHONY: test
 test: base_test misc_test
 	@echo " "
 	@echo " "
@@ -465,7 +509,7 @@ test: base_test misc_test
 
 # Push updates to Docker's registry
 .PHONY: release_base
-release_base: 
+release_base:
 	@if ! $(DOCKER_BIN) images $(NAME)/base | awk '{ print $$2 }' | grep -q -F alpine; then echo "$(NAME)/base:alpine is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/base | awk '{ print $$2 }' | grep -q -F ubuntu; then echo "$(NAME)/base:ubuntu is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/base | awk '{ print $$2 }' | grep -q -F debian; then echo "$(NAME)/base:debian is not yet built. Please run 'make build'"; false; fi
@@ -482,6 +526,7 @@ tag_latest:
 	$(DOCKER_BIN) tag -f $(NAME)/terraform:$(TERRAFORM_CURRENT_VERSION) $(NAME)/terraform:latest
 	$(DOCKER_BIN) tag -f $(NAME)/packer:$(PACKER_CURRENT_VERSION) $(NAME)/packer:latest
 	$(DOCKER_BIN) tag -f $(NAME)/jdk:8u66 $(NAME)/jdk:latest
+	$(DOCKER_BIN) tag -f $(NAME)/jo:$(JO_CURRENT_VERSION) $(NAME)/jo:latest
 
 .PHONY: release
 release: release_base tag_latest
@@ -493,6 +538,7 @@ release: release_base tag_latest
 	@if ! $(DOCKER_BIN) images $(NAME)/terraform | awk '{ print $$2 }' | grep -q -F 0.6.8 ; then echo "$(NAME)/terraform version $(TERRAFORM_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/packer | awk '{ print $$2 }' | grep -q -F 0.8.6 ; then echo "$(NAME)/packer version $(PACKER_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/jdk | awk '{ print $$2 }' | grep -q -F 8u66 ; then echo "$(NAME)/jdk version 8u66 is not yet built. Please run 'make build'"; false; fi
+	@if ! $(DOCKER_BIN) images $(NAME)/jo | awk '{ print $$2 }' | grep -q -F 0.6.8 ; then echo "$(NAME)/jo version $(JO_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
 	$(DOCKER_BIN) push $(NAME)/jq
 	$(DOCKER_BIN) push $(NAME)/jinja2
 	$(DOCKER_BIN) push $(NAME)/ansible
@@ -500,6 +546,7 @@ release: release_base tag_latest
 	$(DOCKER_BIN) push $(NAME)/terraform
 	$(DOCKER_BIN) push $(NAME)/packer
 	$(DOCKER_BIN) push $(NAME)/jdk
+	$(DOCKER_BIN) push $(NAME)/jo
 
 
 
@@ -510,7 +557,7 @@ tag_gh:
 
 
 
-# Clean-up the cruft 
+# Clean-up the cruft
 .PHONY: clean
 clean: clean_untagged misc_rm base_rm clean_untagged
 		rm -rf $(CURRENT_DIR)/mush/terraform.tfvars
