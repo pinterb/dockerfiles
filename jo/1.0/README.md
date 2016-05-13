@@ -4,17 +4,17 @@
 * **[jo][3]:** A shell command to create JSON.  
 
 ## Usage  
-```
-docker run -i pinterb/jo:1.0  prince="party like it's 1999" michael="billy jean" "stone temple pilots"="sex type thing" > music-themes.json
+````
+docker run -i pinterb/jo:1.0 prince="party like it's 1999" michael="billy jean" "stone temple pilots"="sex type thing" > music-themes.json
 
 cat music-themes.json
 {"prince":"party like it's 1999","michael":"billy jean","stone temple pilots":"sex type thing"}
     
-```shell
+````
 
-## Misc. Info 
-* Latest version: 1.0   
-* Built on: 2016-05-13T13:38:27EDT   
+## Misc. Info   
+* Latest version: 1.0  
+* Built on: 2016-05-13T13:51:44EDT  
 * Base image: pinterb/base:alpine   
 
 
