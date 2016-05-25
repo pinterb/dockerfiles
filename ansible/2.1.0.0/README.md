@@ -1,7 +1,7 @@
 # pinterb/ansible  
 
 [`pinterb/ansible`][1] is a [docker][2] image that bundles the following:  
-* **[Ansible 1.9.4][3]:** A radically simple IT automation system. It handles configuration-management, application deployment, cloud provisioning, ad-hoc task-execution, and multinode orchestration - including trivializing things like zero downtime rolling updates with load balancers. Ansible is written in [Python](https://www.python.org/).    
+* **[Ansible 2.1.0.0][3]:** A radically simple IT automation system. It handles configuration-management, application deployment, cloud provisioning, ad-hoc task-execution, and multinode orchestration - including trivializing things like zero downtime rolling updates with load balancers. Ansible is written in [Python](https://www.python.org/).    
 
 ## Details
 * The container runs as "dev" user (i.e. UID 1000). *Please keep this in mind as you mount volumes!* 
@@ -23,7 +23,7 @@ docker run -it --rm \
 	-v $(SSH_DIR):/home/dev/.ssh \
 	-v $(CURRENT_DIR):/state:rw \
 	-v $(PLAYBOOK_DIR):/ansible:rw \
-	pinterb/ansible:1.9.4 site.yml
+	pinterb/ansible:2.1.0.0 site.yml
 		
 ````
 

@@ -3,7 +3,12 @@ FROM pinterb/base:alpine
 MAINTAINER Brad Pinter <brad.pinter@gmail.com>
 
 RUN apk add --update \
-  g++ \
+  build-base \
+  gcc \
+  abuild \
+  binutils \
+  libffi-dev \
+  openssl-dev \
   perl \
   git \
   python-dev \
@@ -11,10 +16,10 @@ RUN apk add --update \
   sshpass \
   openssh-client \
   sudo \
+  py-setuptools \
   py-pip && \
   pip install --upgrade pip && \
   pip install \
-  paramiko \
   python-keyczar \
   PyYAML \
   Jinja2 \
@@ -46,7 +51,13 @@ RUN apk del \
   perl \
   git \
   make \
-  g++ && \
+  build-base \
+  g++ \
+  gcc \
+  abuild \
+  binutils \
+  libffi-dev \
+  openssl-dev && \
   rm -rf /var/cache/apk/*
 
 RUN addgroup dev && \

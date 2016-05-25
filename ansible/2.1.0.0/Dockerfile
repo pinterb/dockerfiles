@@ -19,7 +19,6 @@ RUN apk add --update \
   py-pip && \
   pip install --upgrade pip && \
   pip install \
-  paramiko \
   python-keyczar \
   PyYAML \
   Jinja2 \
@@ -27,11 +26,11 @@ RUN apk add --update \
   urllib3 \
   simplejson \
   python-consul \
-  docker-py==1.2.2 \
-  netaddr 
+  docker-py==1.8.1 \
+  netaddr
 
 # Install Ansible
-ENV ANSIBLE_TAG "1.9.4-1"
+ENV ANSIBLE_TAG "2.1.0.0-1"
 ENV ANSIBLE_GIT_REPO http://github.com/ansible/ansible.git
 
 RUN mkdir -p /etc/ansible/roles /opt && \
