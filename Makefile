@@ -30,6 +30,10 @@ JDK_IMAGES = 8u66
 JO_CURRENT_VERSION = 1.0
 JO_IMAGES = 1.0
 
+KARGO_CURRENT_VERSION = 0.3.10
+KARGO_IMAGES = 0.3.10 \
+	0.4.3
+
 
 
 all: build test
@@ -502,22 +506,64 @@ jo_rm:
 
 
 
+.PHONY: kargo
+kargo: alpine
+	@for tf_ver in $(KARGO_IMAGES); \
+	do \
+	echo " " ; \
+	echo " " ; \
+	echo " " ; \
+	echo "Building '$$tf_ver $@' image..." ; \
+	echo " " ; \
+	$(DOCKER_BIN) build --rm -t $(NAME)/$@:$$tf_ver $(CURRENT_DIR)/$@/$$tf_ver ; \
+	cp -pR $(CURRENT_DIR)/templates/$@/README.md $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/$@/g' $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/base:alpine/g' $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	sed -i "s/###-->ZZZ_CURRENT_VERSION<--###/$(KARGO_CURRENT_VERSION)/g" $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	sed -i "s/###-->ZZZ_VERSION<--###/$$tf_ver/g" $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	sed -i "s/###-->ZZZ_KARGO_VERSION<--###/$$tf_ver/g" $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
+	done
+
+.PHONY: kargo_test
+kargo_test:
+	@for tf_ver in $(KARGO_IMAGES); \
+	do \
+	echo "Testing '$$tf_ver kargo' image..." ; \
+	echo " " ; \
+	if ! $(DOCKER_BIN) run -it \
+		-v $(CURRENT_DIR)/kargo:/kargo:rw \
+		$(NAME)/kargo:$$tf_ver --version | \
+		grep -q -F "kargo $$tf_ver" ; then echo "$(NAME)/kargo:$$tf_ver - kargo command failed."; false; fi; \
+	done
+
+.PHONY: kargo_rm
+kargo_rm:
+	@for tf_ver in $(KARGO_IMAGES); \
+	do \
+	echo "Removing '$$tf_ver kargo' image..." ; \
+	echo " " ; \
+	if $(DOCKER_BIN) images $(NAME)/kargo | awk '{ print $$2 }' | grep -q -F $$tf_ver; then $(DOCKER_BIN) rmi -f $(NAME)/kargo:$$tf_ver; fi ; \
+	done
+
+
+
 .PHONY: misc
-misc: mush jq ansible terraform packer jdk jinja2 ansible-lint syncthing jo
+misc: mush jq ansible terraform packer jdk jinja2 ansible-lint syncthing jo kargo
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous images have been built."
 	@echo " "
 
 .PHONY: misc_test
-misc_test: jq_test mush_test ansible_test terraform_test packer_test jdk_test jinja2_test syncthing_test jo_test
+misc_test: jq_test mush_test ansible_test terraform_test packer_test jdk_test jinja2_test syncthing_test jo_test kargo_test
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous tests have completed."
 	@echo " "
 
 .PHONY: misc_rm
-misc_rm: terraform_rm packer_rm jdk_rm ansible_rm ansible-lint_rm syncthing_rm jo_rm
+misc_rm: terraform_rm packer_rm jdk_rm ansible_rm ansible-lint_rm syncthing_rm jo_rm kargo_rm
 	@if $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/jq; fi
 	@if $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F $(VERSION); then $(DOCKER_BIN) rmi -f $(NAME)/jq:$(VERSION); fi
 	@if $(DOCKER_BIN) images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/mush; fi
@@ -566,6 +612,7 @@ tag_latest:
 	$(DOCKER_BIN) tag -f $(NAME)/packer:$(PACKER_CURRENT_VERSION) $(NAME)/packer:latest
 	$(DOCKER_BIN) tag -f $(NAME)/jdk:8u66 $(NAME)/jdk:latest
 	$(DOCKER_BIN) tag -f $(NAME)/jo:$(JO_CURRENT_VERSION) $(NAME)/jo:latest
+	$(DOCKER_BIN) tag -f $(NAME)/kargo:$(KARGO_CURRENT_VERSION) $(NAME)/kargo:latest
 
 .PHONY: release
 release: release_base tag_latest
@@ -579,6 +626,7 @@ release: release_base tag_latest
 	@if ! $(DOCKER_BIN) images $(NAME)/jdk | awk '{ print $$2 }' | grep -q -F 8u66 ; then echo "$(NAME)/jdk version 8u66 is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/jo | awk '{ print $$2 }' | grep -q -F 0.6.8 ; then echo "$(NAME)/jo version $(JO_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/syncthing | awk '{ print $$2 }' | grep -q -F 0.6.8 ; then echo "$(NAME)/syncthing version $(SYNCTHING_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
+	@if ! $(DOCKER_BIN) images $(NAME)/kargo | awk '{ print $$2 }' | grep -q -F $(ANSIBLE_CURRENT_VERSION); then echo "$(NAME)/kargo version $(ANSIBLE_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
 	$(DOCKER_BIN) push $(NAME)/jq
 	$(DOCKER_BIN) push $(NAME)/jinja2
 	$(DOCKER_BIN) push $(NAME)/ansible
@@ -588,6 +636,7 @@ release: release_base tag_latest
 	$(DOCKER_BIN) push $(NAME)/packer
 	$(DOCKER_BIN) push $(NAME)/jdk
 	$(DOCKER_BIN) push $(NAME)/jo
+	$(DOCKER_BIN) push $(NAME)/kargo
 
 
 
