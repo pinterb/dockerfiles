@@ -11,12 +11,10 @@ TERRAFORM_IMAGES = 0.6.9 \
 	0.6.11
 
 PACKER_CURRENT_VERSION = 0.8.6
-PACKER_IMAGES = 0.7.5 \
-	0.8.6
+PACKER_IMAGES = 0.8.6 
 
 ANSIBLE_CURRENT_VERSION = 2.1.0.0
-ANSIBLE_IMAGES = 1.9.4 \
-	2.0.0.2 \
+ANSIBLE_IMAGES = 2.0.0.2 \
 	2.1.0.0
 
 ANSIBLE_LINT_CURRENT_VERSION = 2.3.1
@@ -33,6 +31,10 @@ JO_IMAGES = 1.0
 KARGO_CURRENT_VERSION = 0.3.10
 KARGO_IMAGES = 0.3.10 \
 	0.4.3
+
+CONSUL_CURRENT_VERSION = 0.6.4
+CONSUL_IMAGES = 0.6.4
+
 
 
 
@@ -517,6 +519,46 @@ jo_rm:
 
 
 
+.PHONY: consul 
+consul: 
+	@for consul_ver in $(CONSUL_IMAGES); \
+	do \
+	echo " " ; \
+	echo " " ; \
+	echo "Building '$$consul_ver $@' image..." ; \
+	echo " " ; \
+	$(DOCKER_BIN) build --rm -t $(NAME)/$@:$$consul_ver $(CURRENT_DIR)/$@/$$consul_ver ; \
+	cp -pR $(CURRENT_DIR)/templates/$@/README.md $(CURRENT_DIR)/$@/$$consul_ver/README.md ; \
+	sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/$@/g' $(CURRENT_DIR)/$@/$$consul_ver/README.md ; \
+	sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' $(CURRENT_DIR)/$@/$$consul_ver/README.md ; \
+	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/base:alpine/g' $(CURRENT_DIR)/$@/$$consul_ver/README.md ; \
+	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/$@/$$consul_ver/README.md ; \
+	sed -i "s/###-->ZZZ_CONSUL_VERSION<--###/$$consul_ver/g" $(CURRENT_DIR)/$@/$$consul_ver/README.md ; \
+	sed -i "s/###-->ZZZ_CURRENT_VERSION<--###/$(CONSUL_CURRENT_VERSION)/g" $(CURRENT_DIR)/$@/$$consul_ver/README.md ; \
+	done
+
+.PHONY: consul_test
+consul_test:
+	@for consul_ver in $(CONSUL_IMAGES); \
+	do \
+	echo "Testing '$$consul_ver consul' image..." ; \
+	echo " " ; \
+	if ! $(DOCKER_BIN) run -it \
+		$(NAME)/consul:$$consul_ver --version | \
+		grep -q -F "Consul v$$consul_ver" ; then echo "$(NAME)/consul:$$consul_ver - consul version command failed."; false; fi ; \
+	done
+
+.PHONY: consul_rm
+consul_rm:
+	@for consul_ver in $(CONSUL_IMAGES); \
+	do \
+	echo "Removing '$$consul_ver consul' image..." ; \
+	echo " " ; \
+	if $(DOCKER_BIN) images $(NAME)/consul | awk '{ print $$2 }' | grep -q -F $$consul_ver; then $(DOCKER_BIN) rmi -f $(NAME)/consul:$$consul_ver; fi ; \
+	done
+
+
+
 .PHONY: kargo
 kargo: alpine
 	@for tf_ver in $(KARGO_IMAGES); \
@@ -560,21 +602,21 @@ kargo_rm:
 
 
 .PHONY: misc
-misc: mush jq ansible terraform packer jdk jinja2 ansible-lint syncthing jo kargo
+misc: mush jq ansible terraform packer jdk jinja2 syncthing jo consul 
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous images have been built."
 	@echo " "
 
 .PHONY: misc_test
-misc_test: jq_test mush_test ansible_test terraform_test packer_test jdk_test jinja2_test syncthing_test jo_test kargo_test
+misc_test: jq_test mush_test ansible_test terraform_test packer_test jdk_test jinja2_test syncthing_test jo_test consul_test
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous tests have completed."
 	@echo " "
 
 .PHONY: misc_rm
-misc_rm: terraform_rm packer_rm jdk_rm ansible_rm ansible-lint_rm syncthing_rm jo_rm kargo_rm
+misc_rm: terraform_rm packer_rm jdk_rm ansible_rm syncthing_rm jo_rm consul_rm
 	@if $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/jq; fi
 	@if $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F $(VERSION); then $(DOCKER_BIN) rmi -f $(NAME)/jq:$(VERSION); fi
 	@if $(DOCKER_BIN) images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/mush; fi
@@ -618,13 +660,12 @@ tag_latest:
 	$(DOCKER_BIN) tag $(NAME)/mush:$(VERSION) $(NAME)/mush:latest
 	$(DOCKER_BIN) tag $(NAME)/jinja2:$(VERSION) $(NAME)/jinja2:latest
 	$(DOCKER_BIN) tag $(NAME)/ansible:$(ANSIBLE_CURRENT_VERSION) $(NAME)/ansible:latest
-	$(DOCKER_BIN) tag $(NAME)/ansible-lint:$(ANSIBLE_LINT_CURRENT_VERSION) $(NAME)/ansible-lint:latest
 	$(DOCKER_BIN) tag $(NAME)/terraform:$(TERRAFORM_CURRENT_VERSION) $(NAME)/terraform:latest
 	$(DOCKER_BIN) tag $(NAME)/syncthing:$(SYNCTHING_CURRENT_VERSION) $(NAME)/syncthing:latest
 	$(DOCKER_BIN) tag $(NAME)/packer:$(PACKER_CURRENT_VERSION) $(NAME)/packer:latest
 	$(DOCKER_BIN) tag $(NAME)/jdk:8u66 $(NAME)/jdk:latest
 	$(DOCKER_BIN) tag $(NAME)/jo:$(JO_CURRENT_VERSION) $(NAME)/jo:latest
-	$(DOCKER_BIN) tag $(NAME)/kargo:$(KARGO_CURRENT_VERSION) $(NAME)/kargo:latest
+	$(DOCKER_BIN) tag $(NAME)/consul:$(CONSUL_CURRENT_VERSION) $(NAME)/consul:latest
 
 .PHONY: release
 release: release_base tag_latest
@@ -632,23 +673,21 @@ release: release_base tag_latest
 	@if ! $(DOCKER_BIN) images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/mush version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/jinja2 | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME)/jinja2 version $(VERSION) is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/ansible | awk '{ print $$2 }' | grep -q -F $(ANSIBLE_CURRENT_VERSION); then echo "$(NAME)/ansible version $(ANSIBLE_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
-	@if ! $(DOCKER_BIN) images $(NAME)/ansible-lint | awk '{ print $$2 }' | grep -q -F $(ANSIBLE_LINT_CURRENT_VERSION); then echo "$(NAME)/ansible-lint version $(ANSIBLE_LINT_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
-	@if ! $(DOCKER_BIN) images $(NAME)/terraform | awk '{ print $$2 }' | grep -q -F 0.6.8 ; then echo "$(NAME)/terraform version $(TERRAFORM_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
-	@if ! $(DOCKER_BIN) images $(NAME)/packer | awk '{ print $$2 }' | grep -q -F 0.8.6 ; then echo "$(NAME)/packer version $(PACKER_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
+	@if ! $(DOCKER_BIN) images $(NAME)/terraform | awk '{ print $$2 }' | grep -q -F $(TERRAFORM_CURRENT_VERSION) ; then echo "$(NAME)/terraform version $(TERRAFORM_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
+	@if ! $(DOCKER_BIN) images $(NAME)/packer | awk '{ print $$2 }' | grep -q -F $(PACKER_CURRENT_VERSION) ; then echo "$(NAME)/packer version $(PACKER_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/jdk | awk '{ print $$2 }' | grep -q -F 8u66 ; then echo "$(NAME)/jdk version 8u66 is not yet built. Please run 'make build'"; false; fi
-	@if ! $(DOCKER_BIN) images $(NAME)/jo | awk '{ print $$2 }' | grep -q -F 0.6.8 ; then echo "$(NAME)/jo version $(JO_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
-	@if ! $(DOCKER_BIN) images $(NAME)/syncthing | awk '{ print $$2 }' | grep -q -F 0.6.8 ; then echo "$(NAME)/syncthing version $(SYNCTHING_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
-	@if ! $(DOCKER_BIN) images $(NAME)/kargo | awk '{ print $$2 }' | grep -q -F $(ANSIBLE_CURRENT_VERSION); then echo "$(NAME)/kargo version $(ANSIBLE_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
+	@if ! $(DOCKER_BIN) images $(NAME)/jo | awk '{ print $$2 }' | grep -q -F $(JO_CURRENT_VERSION) ; then echo "$(NAME)/jo version $(JO_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
+	@if ! $(DOCKER_BIN) images $(NAME)/syncthing | awk '{ print $$2 }' | grep -q -F $(SYNCTHING_CURRENT_VERSION) ; then echo "$(NAME)/syncthing version $(SYNCTHING_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
+	@if ! $(DOCKER_BIN) images $(NAME)/consul | awk '{ print $$2 }' | grep -q -F $(CONSUL_CURRENT_VERSION); then echo "$(NAME)/kargo version $(CONSUL_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
 	$(DOCKER_BIN) push $(NAME)/jq
 	$(DOCKER_BIN) push $(NAME)/jinja2
 	$(DOCKER_BIN) push $(NAME)/ansible
-	$(DOCKER_BIN) push $(NAME)/ansible-lint
 	$(DOCKER_BIN) push $(NAME)/terraform
 	$(DOCKER_BIN) push $(NAME)/syncthing
 	$(DOCKER_BIN) push $(NAME)/packer
 	$(DOCKER_BIN) push $(NAME)/jdk
 	$(DOCKER_BIN) push $(NAME)/jo
-	$(DOCKER_BIN) push $(NAME)/kargo
+	$(DOCKER_BIN) push $(NAME)/consul
 
 
 

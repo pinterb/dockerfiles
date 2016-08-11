@@ -1,36 +1,32 @@
 # pinterb/consul  
 
 [`pinterb/consul`][1] is a [docker][2] image that bundles the following:  
-* **[Terraform v0.6.9][3]:** A tool for building, changing, and versioning infrastructure safely and efficiently. Terraform can manage existing and popular service providers as well as custom in-house solutions.  
+* **[Consul v0.6.4][3]:** A distributed, highly available tool for service discovery, configuration, etc.  
 
 ## Details
-* The container runs as "dev" user (i.e. UID 1000). *Please keep this in mind as you mount volumes!* 
+* The container currently runs as root, BUT this is subject to change.
 * The following volumes exist (and are owned by dev):  
-  - /data
-  - /ops
-  - /state
-  - /home/dev/.ssh
-* /data is your default workdir.   
-* /home/dev is $HOME  
+  - /consul/data
+  - /consul/config
+* / is your default workdir.   
 
 ## Usage 
-This image can easily be extended.  But to run Terraform:
+This image can easily be extended.  But to run Consul:
 
 ````
 docker run -it --rm \
-	-v $(SSH_DIR):/home/dev/.ssh \
-	-v $(CURRENT_DIR):/state:rw \
-	-v $(PROVISION_CONFIG_DIR):/data:rw \
-	pinterb/terraform:0.6.9 apply --var-file=/state/terraform.tfvars -state=/state/terraform.tfstate /data   
+	-v /var/lib/data:/consul/data:rw \
+	-v $(CONSUL_CONFIG_DIR):/consul/config:rw \
+	pinterb/consul:0.6.4 agent -config-dir=/consul/config  
 		
 ````
 
 ## Misc. Info 
-* Latest version: 0.6.11  
-* Built on: 2016-08-08T19:48:58UTC   
+* Latest version: 0.6.4  
+* Built on: 2016-08-11T14:27:27EDT   
 * Base image: pinterb/base:alpine   
 
 
 [1]: https://hub.docker.com/r/pinterb/consul/   
 [2]: https://docker.com 
-[3]: https://terraform.io/  
+[3]: https://consul.io/  

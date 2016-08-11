@@ -3,19 +3,22 @@ FROM pinterb/base:alpine
 MAINTAINER Brad Pinter <brad.pinter@gmail.com>
 
 ENV PACKER_VERSION 0.8.6
+ENV GLIBC_PKG_VERSION 2.23-r3
 
-RUN apk update && \
-    apk add --update wget ca-certificates unzip gzip && \
-    apk add --update bash openssh-client sudo && \
-    wget -q "https://circle-artifacts.com/gh/andyshinn/alpine-pkg-glibc/6/artifacts/0/home/ubuntu/alpine-pkg-glibc/packages/x86_64/glibc-2.21-r2.apk" && \
-    apk add --allow-untrusted glibc-2.21-r2.apk && \
-    wget -q -O /packer.zip "https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip" && \
+RUN apk add --no-cache --update-cache ca-certificates wget gzip unzip bash sudo openssh-client graphviz && \
+  curl -Lo /etc/apk/keys/sgerrand.rsa.pub "https://github.com/sgerrand/alpine-pkg-glibc/releases/download/${GLIBC_PKG_VERSION}/sgerrand.rsa.pub" && \
+  curl -Lo glibc-${GLIBC_PKG_VERSION}.apk "https://github.com/sgerrand/alpine-pkg-glibc/releases/download/${GLIBC_PKG_VERSION}/glibc-${GLIBC_PKG_VERSION}.apk" && \
+  curl -Lo glibc-bin-${GLIBC_PKG_VERSION}.apk "https://github.com/sgerrand/alpine-pkg-glibc/releases/download/${GLIBC_PKG_VERSION}/glibc-bin-${GLIBC_PKG_VERSION}.apk" && \
+  curl -Lo glibc-i18n-${GLIBC_PKG_VERSION}.apk "https://github.com/sgerrand/alpine-pkg-glibc/releases/download/${GLIBC_PKG_VERSION}/glibc-i18n-${GLIBC_PKG_VERSION}.apk" && \
+  apk add glibc-${GLIBC_PKG_VERSION}.apk glibc-bin-${GLIBC_PKG_VERSION}.apk glibc-i18n-${GLIBC_PKG_VERSION}.apk
+
+RUN wget -q -O /packer.zip "https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip" && \
     unzip /packer.zip -d /bin && \
     wget -q -O /bin/azure.tar.gz "https://github.com/Azure/packer-azure/releases/download/prerelease/packer-azure-linux-amd64-prerelease.tar.gz" && \
     gunzip /bin/azure.tar.gz && \
     tar -xvf /bin/azure.tar -C /bin && \
     apk del --purge wget ca-certificates unzip gzip && \
-    rm -rf /var/cache/apk/* glibc-2.21-r2.apk /packer.zip /bin/azure.tar
+    rm -rf /var/cache/apk/* glibc-${GLIBC_PKG_VERSION}.apk /packer.zip /bin/azure.tar
     
 RUN addgroup dev && \
     adduser -G dev dev -D -h /home/dev && \

@@ -78,7 +78,7 @@ dnsimple_email = "bart.simpson@foxtv.io"
 
 ## Misc. Info 
 * Latest version: 0.0.15   
-* Built on: 2016-08-08T19:48:58UTC   
+* Built on: 2016-08-11T14:27:27EDT   
 * Base image: pinterb/base:alpine   
 
 

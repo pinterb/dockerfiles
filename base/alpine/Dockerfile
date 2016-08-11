@@ -1,13 +1,9 @@
-FROM alpine:3.3
+FROM alpine:3.4
 
-MAINTAINER Brad Pinter <brad.pinter@gmail.com>
-
-ENV GOSU_VERSION 1.7
+MAINTAINER Brad Pinter "brad.pinter@gmail.com"
 
 RUN apk update && \
-  apk add --no-cache --update-cache curl bash && \
-  curl -o /usr/local/bin/gosu -L https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-amd64  && \
-  chmod +x /usr/local/bin/gosu && \
+  apk add --no-cache --update-cache su-exec curl bash && \
   rm -rf /var/cache/apk/* /usr/local/src/*
 
 CMD []
