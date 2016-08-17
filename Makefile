@@ -11,7 +11,7 @@ TERRAFORM_IMAGES = 0.6.9 \
 	0.6.11
 
 PACKER_CURRENT_VERSION = 0.8.6
-PACKER_IMAGES = 0.8.6 
+PACKER_IMAGES = 0.8.6
 
 ANSIBLE_CURRENT_VERSION = 2.1.0.0
 ANSIBLE_IMAGES = 2.0.0.2 \
@@ -35,6 +35,8 @@ KARGO_IMAGES = 0.3.10 \
 CONSUL_CURRENT_VERSION = 0.6.4
 CONSUL_IMAGES = 0.6.4
 
+SWAGGER_CLI_CURRENT_VERSION = 1.0.0-beta.2
+SWAGGER_CLI_IMAGES = 1.0.0-beta.2
 
 
 
@@ -519,8 +521,8 @@ jo_rm:
 
 
 
-.PHONY: consul 
-consul: 
+.PHONY: consul
+consul:
 	@for consul_ver in $(CONSUL_IMAGES); \
 	do \
 	echo " " ; \
@@ -555,6 +557,46 @@ consul_rm:
 	echo "Removing '$$consul_ver consul' image..." ; \
 	echo " " ; \
 	if $(DOCKER_BIN) images $(NAME)/consul | awk '{ print $$2 }' | grep -q -F $$consul_ver; then $(DOCKER_BIN) rmi -f $(NAME)/consul:$$consul_ver; fi ; \
+	done
+
+
+
+.PHONY: swagger
+swagger:
+	@for swagger_ver in $(SWAGGER_CLI_IMAGES); \
+	do \
+	echo " " ; \
+	echo " " ; \
+	echo "Building '$$swagger_ver $@' image..." ; \
+	echo " " ; \
+	$(DOCKER_BIN) build --rm -t $(NAME)/$@:$$swagger_ver $(CURRENT_DIR)/$@/$$swagger_ver ; \
+	cp -pR $(CURRENT_DIR)/templates/$@/README.md $(CURRENT_DIR)/$@/$$swagger_ver/README.md ; \
+	sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/$@/g' $(CURRENT_DIR)/$@/$$swagger_ver/README.md ; \
+	sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' $(CURRENT_DIR)/$@/$$swagger_ver/README.md ; \
+	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/base:alpine/g' $(CURRENT_DIR)/$@/$$swagger_ver/README.md ; \
+	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/$@/$$swagger_ver/README.md ; \
+	sed -i "s/###-->ZZZ_SWAGGER_VERSION<--###/$$swagger_ver/g" $(CURRENT_DIR)/$@/$$swagger_ver/README.md ; \
+	sed -i "s/###-->ZZZ_CURRENT_VERSION<--###/$(SWAGGER_CLI_CURRENT_VERSION)/g" $(CURRENT_DIR)/$@/$$swagger_ver/README.md ; \
+	done
+
+.PHONY: swagger_test
+swagger_test:
+	@for swagger_ver in $(SWAGGER_CLI_IMAGES); \
+	do \
+	echo "Testing '$$swagger_ver swagger' image..." ; \
+	echo " " ; \
+	if ! $(DOCKER_BIN) run -it \
+		$(NAME)/swagger:$$swagger_ver --version | \
+		grep -q -F "$$swagger_ver" ; then echo "$(NAME)/swagger:$$swagger_ver - swagger-cli version command failed."; false; fi ; \
+	done
+
+.PHONY: swagger_rm
+swagger_rm:
+	@for swagger_ver in $(SWAGGER_CLI_IMAGES); \
+	do \
+	echo "Removing '$$swagger_ver swagger' image..." ; \
+	echo " " ; \
+	if $(DOCKER_BIN) images $(NAME)/swagger | awk '{ print $$2 }' | grep -q -F $$swagger_ver; then $(DOCKER_BIN) rmi -f $(NAME)/swagger:$$swagger_ver; fi ; \
 	done
 
 
@@ -602,21 +644,21 @@ kargo_rm:
 
 
 .PHONY: misc
-misc: mush jq ansible terraform packer jdk jinja2 syncthing jo consul 
+misc: mush jq ansible terraform packer jdk jinja2 syncthing jo consul swagger
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous images have been built."
 	@echo " "
 
 .PHONY: misc_test
-misc_test: jq_test mush_test ansible_test terraform_test packer_test jdk_test jinja2_test syncthing_test jo_test consul_test
+misc_test: jq_test mush_test ansible_test terraform_test packer_test jdk_test jinja2_test syncthing_test jo_test consul_test swagger_test
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous tests have completed."
 	@echo " "
 
 .PHONY: misc_rm
-misc_rm: terraform_rm packer_rm jdk_rm ansible_rm syncthing_rm jo_rm consul_rm
+misc_rm: terraform_rm packer_rm jdk_rm ansible_rm syncthing_rm jo_rm consul_rm swagger_rm
 	@if $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/jq; fi
 	@if $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F $(VERSION); then $(DOCKER_BIN) rmi -f $(NAME)/jq:$(VERSION); fi
 	@if $(DOCKER_BIN) images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/mush; fi
@@ -666,6 +708,7 @@ tag_latest:
 	$(DOCKER_BIN) tag $(NAME)/jdk:8u66 $(NAME)/jdk:latest
 	$(DOCKER_BIN) tag $(NAME)/jo:$(JO_CURRENT_VERSION) $(NAME)/jo:latest
 	$(DOCKER_BIN) tag $(NAME)/consul:$(CONSUL_CURRENT_VERSION) $(NAME)/consul:latest
+	$(DOCKER_BIN) tag $(NAME)/swagger:$(SWAGGER_CLI_CURRENT_VERSION) $(NAME)/swagger:latest
 
 .PHONY: release
 release: release_base tag_latest
@@ -678,7 +721,8 @@ release: release_base tag_latest
 	@if ! $(DOCKER_BIN) images $(NAME)/jdk | awk '{ print $$2 }' | grep -q -F 8u66 ; then echo "$(NAME)/jdk version 8u66 is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/jo | awk '{ print $$2 }' | grep -q -F $(JO_CURRENT_VERSION) ; then echo "$(NAME)/jo version $(JO_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/syncthing | awk '{ print $$2 }' | grep -q -F $(SYNCTHING_CURRENT_VERSION) ; then echo "$(NAME)/syncthing version $(SYNCTHING_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
-	@if ! $(DOCKER_BIN) images $(NAME)/consul | awk '{ print $$2 }' | grep -q -F $(CONSUL_CURRENT_VERSION); then echo "$(NAME)/kargo version $(CONSUL_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
+	@if ! $(DOCKER_BIN) images $(NAME)/consul | awk '{ print $$2 }' | grep -q -F $(CONSUL_CURRENT_VERSION); then echo "$(NAME)/consul version $(CONSUL_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
+	@if ! $(DOCKER_BIN) images $(NAME)/swagger | awk '{ print $$2 }' | grep -q -F $(SWAGGER_CLI_CURRENT_VERSION); then echo "$(NAME)/swagger version $(SWAGGER_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
 	$(DOCKER_BIN) push $(NAME)/jq
 	$(DOCKER_BIN) push $(NAME)/jinja2
 	$(DOCKER_BIN) push $(NAME)/ansible
@@ -688,6 +732,7 @@ release: release_base tag_latest
 	$(DOCKER_BIN) push $(NAME)/jdk
 	$(DOCKER_BIN) push $(NAME)/jo
 	$(DOCKER_BIN) push $(NAME)/consul
+	$(DOCKER_BIN) push $(NAME)/swagger
 
 
 
