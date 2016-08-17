@@ -24,7 +24,6 @@ RUN ssh-keygen -t rsa -N '' -f /home/dev/.ssh/dummy_rsa && \
 ENV PATH /home/dev/bin:$PATH
 
 # Packages for using swagger-codegen
-#RUN apk add --no-cache maven ca-certificates git && \
 RUN apk add --no-cache ca-certificates wget git && \
   rm -rf /var/cache/apk/*
 
@@ -36,7 +35,7 @@ RUN rm apache-maven-${MVN_VERSION}-bin.tar.gz
 RUN mv apache-maven-${MVN_VERSION} /usr/lib/mvn
 
 
-# Install Ansible
+# Download swagger-codegen 
 ENV SWAGGER_CODEGEN_TAG "2.2.0"
 ENV SWAGGER_CODEGEN_GIT_REPO http://github.com/swagger-api/swagger-codegen.git
 
@@ -44,6 +43,7 @@ RUN mkdir -p /opt && \
  git clone --branch v$SWAGGER_CODEGEN_TAG --depth 1 $SWAGGER_CODEGEN_GIT_REPO \
  /opt/swagger-codegen
 
+# Build swagger-codegen
 WORKDIR /opt/swagger-codegen
 RUN /usr/lib/mvn/bin/mvn clean package
 
@@ -74,8 +74,7 @@ ENV HOME /home/dev
 USER dev
 #WORKDIR /data
 
-ENTRYPOINT ["java -jar
-modules/swagger-codegen-cli/target/swagger-codegen-cli.jar"]
+ENTRYPOINT ["java", "-jar", "modules/swagger-codegen-cli/target/swagger-codegen-cli.jar"]
 CMD ["langs"]
 
-CMD ["/bin/bash"]
+#CMD ["/bin/bash"]
