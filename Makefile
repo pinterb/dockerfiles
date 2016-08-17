@@ -38,6 +38,9 @@ CONSUL_IMAGES = 0.6.4
 SWAGGER_CLI_CURRENT_VERSION = 1.0.0-beta.2
 SWAGGER_CLI_IMAGES = 1.0.0-beta.2
 
+SWAGGER_CODEGEN_CURRENT_VERSION = 2.2.0
+SWAGGER_CODEGEN_IMAGES = 2.2.0
+
 
 
 all: build test
@@ -597,6 +600,46 @@ swagger_rm:
 	echo "Removing '$$swagger_ver swagger' image..." ; \
 	echo " " ; \
 	if $(DOCKER_BIN) images $(NAME)/swagger | awk '{ print $$2 }' | grep -q -F $$swagger_ver; then $(DOCKER_BIN) rmi -f $(NAME)/swagger:$$swagger_ver; fi ; \
+	done
+
+
+
+.PHONY: swagger-codegen
+swagger-codegen:
+	@for swagger_ver in $(SWAGGER_CODEGEN_IMAGES); \
+	do \
+	echo " " ; \
+	echo " " ; \
+	echo "Building '$$swagger_ver $@' image..." ; \
+	echo " " ; \
+	$(DOCKER_BIN) build --rm -t $(NAME)/$@:$$swagger_ver $(CURRENT_DIR)/$@/$$swagger_ver ; \
+	cp -pR $(CURRENT_DIR)/templates/$@/README.md $(CURRENT_DIR)/$@/$$swagger_ver/README.md ; \
+	sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/$@/g' $(CURRENT_DIR)/$@/$$swagger_ver/README.md ; \
+	sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' $(CURRENT_DIR)/$@/$$swagger_ver/README.md ; \
+	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/base:alpine/g' $(CURRENT_DIR)/$@/$$swagger_ver/README.md ; \
+	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/$@/$$swagger_ver/README.md ; \
+	sed -i "s/###-->ZZZ_SWAGGER_VERSION<--###/$$swagger_ver/g" $(CURRENT_DIR)/$@/$$swagger_ver/README.md ; \
+	sed -i "s/###-->ZZZ_CURRENT_VERSION<--###/$(SWAGGER_CLI_CURRENT_VERSION)/g" $(CURRENT_DIR)/$@/$$swagger_ver/README.md ; \
+	done
+
+.PHONY: swagger-codegen_test
+swagger-codegen_test:
+	@for swagger_ver in $(SWAGGER_CODEGEN_IMAGES); \
+	do \
+	echo "Testing '$$swagger_ver swagger' image..." ; \
+	echo " " ; \
+	if ! $(DOCKER_BIN) run -it \
+		$(NAME)/swagger-codegen:$$swagger_ver --version | \
+		grep -q -F "$$swagger_ver" ; then echo "$(NAME)/swagger-codegen:$$swagger_ver - swagger-codegen version command failed."; false; fi ; \
+	done
+
+.PHONY: swagger-codegen_rm
+swagger-codegen_rm:
+	@for swagger_ver in $(SWAGGER_CODEGEN_IMAGES); \
+	do \
+	echo "Removing '$$swagger_ver swagger' image..." ; \
+	echo " " ; \
+	if $(DOCKER_BIN) images $(NAME)/swagger-codegen | awk '{ print $$2 }' | grep -q -F $$swagger_ver; then $(DOCKER_BIN) rmi -f $(NAME)/swagger-codegen:$$swagger_ver; fi ; \
 	done
 
 
