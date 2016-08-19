@@ -24,9 +24,9 @@ docker run -it --rm \
 	-v $(SWAGGER_SPECS_ROOT_DIR):/data:rw \
 	-v $(SWAGGER_CODEGEN_OUTPUT_DIR):/output:rw \
 	###-->ZZZ_IMAGE<--###:###-->ZZZ_SWAGGER_CODEGEN_VERSION<--### generate \
-        -i /data/swagger.json \ 
-        -l java \ 
-        -o /output/client/petstore/java  
+	-i /data/swagger.json \ 
+	-l java \ 
+	-o /output/client/petstore/java  
 ````
 
 

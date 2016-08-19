@@ -687,21 +687,21 @@ kargo_rm:
 
 
 .PHONY: misc
-misc: mush jq ansible terraform packer jdk jinja2 syncthing jo consul swagger
+misc: mush jq ansible terraform packer jdk jinja2 syncthing jo consul swagger swagger-codegen
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous images have been built."
 	@echo " "
 
 .PHONY: misc_test
-misc_test: jq_test mush_test ansible_test terraform_test packer_test jdk_test jinja2_test syncthing_test jo_test consul_test swagger_test
+misc_test: jq_test mush_test ansible_test terraform_test packer_test jdk_test jinja2_test syncthing_test jo_test consul_test swagger_test swagger-codegen_test
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous tests have completed."
 	@echo " "
 
 .PHONY: misc_rm
-misc_rm: terraform_rm packer_rm jdk_rm ansible_rm syncthing_rm jo_rm consul_rm swagger_rm
+misc_rm: terraform_rm packer_rm jdk_rm ansible_rm syncthing_rm jo_rm consul_rm swagger_rm swagger-codegen_rm
 	@if $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/jq; fi
 	@if $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F $(VERSION); then $(DOCKER_BIN) rmi -f $(NAME)/jq:$(VERSION); fi
 	@if $(DOCKER_BIN) images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/mush; fi
@@ -752,6 +752,7 @@ tag_latest:
 	$(DOCKER_BIN) tag $(NAME)/jo:$(JO_CURRENT_VERSION) $(NAME)/jo:latest
 	$(DOCKER_BIN) tag $(NAME)/consul:$(CONSUL_CURRENT_VERSION) $(NAME)/consul:latest
 	$(DOCKER_BIN) tag $(NAME)/swagger:$(SWAGGER_CLI_CURRENT_VERSION) $(NAME)/swagger:latest
+	$(DOCKER_BIN) tag $(NAME)/swagger-codegen:$(SWAGGER_CODEGEN_CURRENT_VERSION) $(NAME)/swagger-codegen:latest
 
 .PHONY: release
 release: release_base tag_latest
@@ -766,6 +767,7 @@ release: release_base tag_latest
 	@if ! $(DOCKER_BIN) images $(NAME)/syncthing | awk '{ print $$2 }' | grep -q -F $(SYNCTHING_CURRENT_VERSION) ; then echo "$(NAME)/syncthing version $(SYNCTHING_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/consul | awk '{ print $$2 }' | grep -q -F $(CONSUL_CURRENT_VERSION); then echo "$(NAME)/consul version $(CONSUL_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/swagger | awk '{ print $$2 }' | grep -q -F $(SWAGGER_CLI_CURRENT_VERSION); then echo "$(NAME)/swagger version $(SWAGGER_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
+	@if ! $(DOCKER_BIN) images $(NAME)/swagger-codegen | awk '{ print $$2 }' | grep -q -F $(SWAGGER_CODEGEN_CURRENT_VERSION); then echo "$(NAME)/swagger-codegen version $(SWAGGER_CODEGEN_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
 	$(DOCKER_BIN) push $(NAME)/jq
 	$(DOCKER_BIN) push $(NAME)/jinja2
 	$(DOCKER_BIN) push $(NAME)/ansible
@@ -776,6 +778,7 @@ release: release_base tag_latest
 	$(DOCKER_BIN) push $(NAME)/jo
 	$(DOCKER_BIN) push $(NAME)/consul
 	$(DOCKER_BIN) push $(NAME)/swagger
+	$(DOCKER_BIN) push $(NAME)/swagger-codegen
 
 
 

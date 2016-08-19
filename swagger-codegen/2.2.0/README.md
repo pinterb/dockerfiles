@@ -22,17 +22,17 @@ This image can easily be extended.  But to generate a sample client library:
 docker run -it --rm \
 	-v $(SSH_DIR):/home/dev/.ssh \
 	-v $(SWAGGER_SPECS_ROOT_DIR):/data:rw \
-	-v $(SWAGGER_SPECS_OUTPUT_DIR):/output:rw \
+	-v $(SWAGGER_CODEGEN_OUTPUT_DIR):/output:rw \
 	pinterb/swagger-codegen:2.2.0 generate \
-        -i /data/swagger.json \ 
-        -l java \ 
-        -o /output/client/petstore/java  
+	-i /data/swagger.json \ 
+	-l java \ 
+	-o /output/client/petstore/java  
 ````
 
 
 ## Misc. Info 
 * Latest version: 2.2.0  
-* Built on: 2016-08-19T14:18:49UTC   
+* Built on: 2016-08-19T14:40:08UTC   
 * Base image: pinterb/base:alpine   
 
 
