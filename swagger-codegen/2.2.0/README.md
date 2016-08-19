@@ -1,11 +1,8 @@
 # pinterb/swagger-codegen  
 
 [`pinterb/swagger-codegen`][1] is a [docker][2] image that bundles the following:  
-* **[swagger-cli v2.2.0][3]:** Swagger 2.0 command-line tool.  Features include:
-  - Validate Swagger 2.0 APIs in JSON or YAML format
-  - Supports multi-file APIs via $ref pointers
-  - Bundle multiple Swagger files into one combined Swagger file
-  - Built-in HTTP server to serve your REST API — great for testing!
+* **[swagger-codegen v2.2.0][3]:** Swagger Codegen command-line tool. The swagger codegen 
+project, which allows generation of API client libraries, server stubs and documentation automatically given an [OpenAPI Spec][4].
 
 ## Details
 * The container runs as "dev" user (i.e. UID 1000). *Please keep this in mind as you mount volumes!* 
@@ -19,35 +16,27 @@
 * /home/dev is $HOME  
 
 ## Usage 
-This image can easily be extended.  But to run swagger validate:  
+This image can easily be extended.  But to generate a sample client library:  
 
 ````
 docker run -it --rm \
 	-v $(SSH_DIR):/home/dev/.ssh \
 	-v $(SWAGGER_SPECS_ROOT_DIR):/data:rw \
 	-v $(SWAGGER_SPECS_OUTPUT_DIR):/output:rw \
-	-p 8080:8080 \
-	pinterb/swagger-codegen:2.2.0 validate /data/swagger.yaml  
-````
-
-To run swagger bundle:  
-
-````
-docker run -it --rm \
-	-v $(SSH_DIR):/home/dev/.ssh \
-	-v $(SWAGGER_SPECS_ROOT_DIR):/data:rw \
-	-v $(SWAGGER_SPECS_OUTPUT_DIR):/output:rw \
-	-p 8080:8080 \
-	pinterb/swagger-codegen:2.2.0 bundle --dereference --outfile /output/swagger.yaml /data/swagger.yaml  
+	pinterb/swagger-codegen:2.2.0 generate \
+        -i /data/swagger.json \ 
+        -l java \ 
+        -o /output/client/petstore/java  
 ````
 
 
 ## Misc. Info 
-* Latest version: 1.0.0-beta.2  
-* Built on: 2016-08-17T17:02:14EDT   
+* Latest version: 2.2.0  
+* Built on: 2016-08-19T14:18:49UTC   
 * Base image: pinterb/base:alpine   
 
 
 [1]: https://hub.docker.com/r/pinterb/swagger-codegen/   
 [2]: https://docker.com 
-[3]: https://github.com/BigstickCarpet/swagger-cli  
+[3]: http://swagger.io/swagger-codegen/  
+[4]: https://github.com/OAI/OpenAPI-Specification    

@@ -47,15 +47,15 @@ RUN mkdir -p /opt && \
 WORKDIR /opt/swagger-codegen
 RUN /usr/lib/mvn/bin/mvn clean package
 
-#ENV PATH /opt/ansible/bin:/bin:/usr/bin:/sbin:/usr/sbin
-#ENV PYTHONPATH /opt/ansible/lib
-#ENV ANSIBLE_LIBRARY /opt/ansible/lib/ansible/modules/core:/opt/ansible/lib/ansible/modules/extras
+RUN mv /opt/swagger-codegen/modules/swagger-codegen-cli/target/swagger-codegen-cli.jar /opt/
+RUN mv /opt/swagger-codegen/modules/swagger-codegen/target/swagger-codegen-2.2.0.jar /opt/
+RUN mv /opt/swagger-codegen/modules/swagger-generator/target/swagger-generator-2.2.0.war /opt/
+WORKDIR /opt
+RUN rm -rf /opt/swagger-codegen/
 
 
-
-
-#RUN apk del --purge curl ca-certificates && \
-  #  rm -rf /var/cache/apk/*
+RUN apk del --purge wget ca-certificates && \
+  rm -rf /var/cache/apk/*
 
 # Create a shared data volume
 # We need to create an empty file, otherwise the volume will
@@ -72,9 +72,9 @@ EXPOSE 8080
 
 ENV HOME /home/dev
 USER dev
-#WORKDIR /data
+WORKDIR /data
 
-ENTRYPOINT ["java", "-jar", "modules/swagger-codegen-cli/target/swagger-codegen-cli.jar"]
+ENTRYPOINT ["java", "-jar", "/opt/swagger-codegen-cli.jar"]
 CMD ["langs"]
 
 #CMD ["/bin/bash"]

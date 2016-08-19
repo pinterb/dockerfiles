@@ -1,11 +1,8 @@
 # ###-->ZZZ_IMAGE<--###  
 
 [`###-->ZZZ_IMAGE<--###`][1] is a [docker][2] image that bundles the following:  
-* **[swagger-cli v###-->ZZZ_SWAGGER_VERSION<--###][3]:** Swagger 2.0 command-line tool.  Features include:
-  - Validate Swagger 2.0 APIs in JSON or YAML format
-  - Supports multi-file APIs via $ref pointers
-  - Bundle multiple Swagger files into one combined Swagger file
-  - Built-in HTTP server to serve your REST API — great for testing!
+* **[swagger-codegen v###-->ZZZ_SWAGGER_CODEGEN_VERSION<--###][3]:** Swagger Codegen command-line tool. The swagger codegen 
+project, which allows generation of API client libraries, server stubs and documentation automatically given an [OpenAPI Spec][4].
 
 ## Details
 * The container runs as "dev" user (i.e. UID 1000). *Please keep this in mind as you mount volumes!* 
@@ -19,26 +16,17 @@
 * /home/dev is $HOME  
 
 ## Usage 
-This image can easily be extended.  But to run swagger validate:  
+This image can easily be extended.  But to generate a sample client library:  
 
 ````
 docker run -it --rm \
 	-v $(SSH_DIR):/home/dev/.ssh \
 	-v $(SWAGGER_SPECS_ROOT_DIR):/data:rw \
-	-v $(SWAGGER_SPECS_OUTPUT_DIR):/output:rw \
-	-p 8080:8080 \
-	###-->ZZZ_IMAGE<--###:###-->ZZZ_SWAGGER_VERSION<--### validate /data/swagger.yaml  
-````
-
-To run swagger bundle:  
-
-````
-docker run -it --rm \
-	-v $(SSH_DIR):/home/dev/.ssh \
-	-v $(SWAGGER_SPECS_ROOT_DIR):/data:rw \
-	-v $(SWAGGER_SPECS_OUTPUT_DIR):/output:rw \
-	-p 8080:8080 \
-	###-->ZZZ_IMAGE<--###:###-->ZZZ_SWAGGER_VERSION<--### bundle --dereference --outfile /output/swagger.yaml /data/swagger.yaml  
+	-v $(SWAGGER_CODEGEN_OUTPUT_DIR):/output:rw \
+	###-->ZZZ_IMAGE<--###:###-->ZZZ_SWAGGER_CODEGEN_VERSION<--### generate \
+        -i /data/swagger.json \ 
+        -l java \ 
+        -o /output/client/petstore/java  
 ````
 
 
@@ -50,4 +38,5 @@ docker run -it --rm \
 
 [1]: https://hub.docker.com/r/###-->ZZZ_IMAGE<--###/   
 [2]: https://docker.com 
-[3]: https://github.com/BigstickCarpet/swagger-cli  
+[3]: http://swagger.io/swagger-codegen/  
+[4]: https://github.com/OAI/OpenAPI-Specification    

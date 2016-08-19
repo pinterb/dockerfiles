@@ -6,9 +6,9 @@ MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 CURRENT_DIR := $(shell dirname $(MKFILE_PATH))
 DOCKER_BIN := $(shell which docker)
 
-TERRAFORM_CURRENT_VERSION = 0.6.11
-TERRAFORM_IMAGES = 0.6.9 \
-	0.6.11
+TERRAFORM_CURRENT_VERSION = 0.7.0
+TERRAFORM_IMAGES = 0.6.11 \
+	0.7.0
 
 PACKER_CURRENT_VERSION = 0.8.6
 PACKER_IMAGES = 0.8.6
@@ -618,8 +618,8 @@ swagger-codegen:
 	sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' $(CURRENT_DIR)/$@/$$swagger_ver/README.md ; \
 	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/$(NAME)\/base:alpine/g' $(CURRENT_DIR)/$@/$$swagger_ver/README.md ; \
 	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/$@/$$swagger_ver/README.md ; \
-	sed -i "s/###-->ZZZ_SWAGGER_VERSION<--###/$$swagger_ver/g" $(CURRENT_DIR)/$@/$$swagger_ver/README.md ; \
-	sed -i "s/###-->ZZZ_CURRENT_VERSION<--###/$(SWAGGER_CLI_CURRENT_VERSION)/g" $(CURRENT_DIR)/$@/$$swagger_ver/README.md ; \
+	sed -i "s/###-->ZZZ_SWAGGER_CODEGEN_VERSION<--###/$$swagger_ver/g" $(CURRENT_DIR)/$@/$$swagger_ver/README.md ; \
+	sed -i "s/###-->ZZZ_CURRENT_VERSION<--###/$(SWAGGER_CODEGEN_CURRENT_VERSION)/g" $(CURRENT_DIR)/$@/$$swagger_ver/README.md ; \
 	done
 
 .PHONY: swagger-codegen_test
@@ -629,15 +629,15 @@ swagger-codegen_test:
 	echo "Testing '$$swagger_ver swagger' image..." ; \
 	echo " " ; \
 	if ! $(DOCKER_BIN) run -it \
-		$(NAME)/swagger-codegen:$$swagger_ver --version | \
-		grep -q -F "$$swagger_ver" ; then echo "$(NAME)/swagger-codegen:$$swagger_ver - swagger-codegen version command failed."; false; fi ; \
+		$(NAME)/swagger-codegen:$$swagger_ver langs | \
+		grep -q -F "go-server" ; then echo "$(NAME)/swagger-codegen:$$swagger_ver - swagger-codegen langs command failed."; false; fi ; \
 	done
 
 .PHONY: swagger-codegen_rm
 swagger-codegen_rm:
 	@for swagger_ver in $(SWAGGER_CODEGEN_IMAGES); \
 	do \
-	echo "Removing '$$swagger_ver swagger' image..." ; \
+	echo "Removing '$$swagger_ver swagger-codegen' image..." ; \
 	echo " " ; \
 	if $(DOCKER_BIN) images $(NAME)/swagger-codegen | awk '{ print $$2 }' | grep -q -F $$swagger_ver; then $(DOCKER_BIN) rmi -f $(NAME)/swagger-codegen:$$swagger_ver; fi ; \
 	done
