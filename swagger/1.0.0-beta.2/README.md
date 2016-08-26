@@ -8,15 +8,13 @@
   - Built-in HTTP server to serve your REST API — great for testing!
 
 ## Details
-* The container runs as "dev" user (i.e. UID 5000). *Please keep this in mind as you mount volumes!* 
+* By default, he container runs as "dev" user (i.e. UID 1000). But the UID/GID can be can be overridden by setting the PUID/PGID environment variables. *Please keep this in mind as you mount volumes!* 
 * The following volumes exist (and are owned by dev):  
   - /data
   - /output
   - /state
   - /config
-  - /home/dev/.ssh
 * /data is your default workdir.   
-* /home/dev is $HOME  
 
 ## Usage 
 This image can easily be extended.  But to run swagger validate:  
@@ -26,6 +24,7 @@ docker run -it --rm \
 	-v $(SSH_DIR):/home/dev/.ssh \
 	-v $(SWAGGER_SPECS_ROOT_DIR):/data:rw \
 	-v $(SWAGGER_SPECS_OUTPUT_DIR):/output:rw \
+	-e "PGID=$(id -g)" -e "PUID=$(id -u)" \
 	-p 8080:8080 \
 	pinterb/swagger:1.0.0-beta.2 validate /data/swagger.yaml  
 ````
@@ -37,6 +36,7 @@ docker run -it --rm \
 	-v $(SSH_DIR):/home/dev/.ssh \
 	-v $(SWAGGER_SPECS_ROOT_DIR):/data:rw \
 	-v $(SWAGGER_SPECS_OUTPUT_DIR):/output:rw \
+	-e "PGID=$(id -g)" -e "PUID=$(id -u)" \
 	-p 8080:8080 \
 	pinterb/swagger:1.0.0-beta.2 bundle --dereference --outfile /output/swagger.yaml /data/swagger.yaml  
 ````
@@ -44,7 +44,7 @@ docker run -it --rm \
 
 ## Misc. Info 
 * Latest version: 1.0.0-beta.2  
-* Built on: 2016-08-17T13:40:10EDT   
+* Built on: 2016-08-26T14:53:47UTC   
 * Base image: pinterb/base:alpine   
 
 

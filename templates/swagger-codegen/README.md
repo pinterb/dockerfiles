@@ -5,15 +5,13 @@
 project, which allows generation of API client libraries, server stubs and documentation automatically given an [OpenAPI Spec][4].
 
 ## Details
-* The container runs as "dev" user (i.e. UID 1000). *Please keep this in mind as you mount volumes!* 
+* By default, he container runs as "dev" user (i.e. UID 1000). But the UID/GID can be can be overridden by setting the PUID/PGID environment variables. *Please keep this in mind as you mount volumes!* 
 * The following volumes exist (and are owned by dev):  
   - /data
   - /output
   - /state
   - /config
-  - /home/dev/.ssh
 * /data is your default workdir.   
-* /home/dev is $HOME  
 
 ## Usage 
 This image can easily be extended.  But to generate a sample client library:  

@@ -8,15 +8,13 @@
   - Built-in HTTP server to serve your REST API — great for testing!
 
 ## Details
-* The container runs as "dev" user (i.e. UID 1000). *Please keep this in mind as you mount volumes!* 
+* By default, he container runs as "dev" user (i.e. UID 1000). But the UID/GID can be can be overridden by setting the PUID/PGID environment variables. *Please keep this in mind as you mount volumes!* 
 * The following volumes exist (and are owned by dev):  
   - /data
   - /output
   - /state
   - /config
-  - /home/dev/.ssh
 * /data is your default workdir.   
-* /home/dev is $HOME  
 
 ## Usage 
 This image can easily be extended.  But to run swagger validate:  
@@ -26,6 +24,7 @@ docker run -it --rm \
 	-v $(SSH_DIR):/home/dev/.ssh \
 	-v $(SWAGGER_SPECS_ROOT_DIR):/data:rw \
 	-v $(SWAGGER_SPECS_OUTPUT_DIR):/output:rw \
+	-e "PGID=$(id -g)" -e "PUID=$(id -u)" \
 	-p 8080:8080 \
 	###-->ZZZ_IMAGE<--###:###-->ZZZ_SWAGGER_VERSION<--### validate /data/swagger.yaml  
 ````
@@ -37,6 +36,7 @@ docker run -it --rm \
 	-v $(SSH_DIR):/home/dev/.ssh \
 	-v $(SWAGGER_SPECS_ROOT_DIR):/data:rw \
 	-v $(SWAGGER_SPECS_OUTPUT_DIR):/output:rw \
+	-e "PGID=$(id -g)" -e "PUID=$(id -u)" \
 	-p 8080:8080 \
 	###-->ZZZ_IMAGE<--###:###-->ZZZ_SWAGGER_VERSION<--### bundle --dereference --outfile /output/swagger.yaml /data/swagger.yaml  
 ````
