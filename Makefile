@@ -785,22 +785,27 @@ release: release_base tag_latest
 # Tag current version as a release on GitHub
 .PHONY: tag_gh
 tag_gh:
-		git tag -d rel-$(VERSION); git push origin :refs/tags/rel-$(VERSION); git tag rel-$(VERSION) && git push origin rel-$(VERSION)
+	git tag -d rel-$(VERSION); git push origin :refs/tags/rel-$(VERSION); git tag rel-$(VERSION) && git push origin rel-$(VERSION)
 
 
 
 # Clean-up the cruft
 .PHONY: clean
 clean: clean_untagged clean_slim misc_rm base_rm clean_untagged
-		rm -rf $(CURRENT_DIR)/mush/terraform.tfvars
-		rm -rf $(CURRENT_DIR)/jinja2/some.json
+	rm -rf $(CURRENT_DIR)/mush/terraform.tfvars
+	rm -rf $(CURRENT_DIR)/jinja2/some.json
 
 .PHONY: clean_slim
 clean_slim:
 	cd $(CURRENT_DIR)/base/ubuntu-slim && $(MAKE) clean
 	cd $(CURRENT_DIR)
 
+#	docker images -q --filter "dangling=true" | xargs -l docker rmi
+#	docker images --no-trunc | grep none | awk '{print $$3}' | xargs -r docker rmi
 .PHONY: clean_untagged
-clean_untagged:
-		for i in `docker ps --no-trunc -a -q`;do docker rm $$i;done
-		docker images --no-trunc | grep none | awk '{print $$3}' | xargs -r docker rmi
+clean_untagged: clean_stopped
+	docker images --no-trunc | grep none | awk '{print $$3}' | xargs -r docker rmi
+
+.PHONY: clean_stopped
+clean_stopped:
+	for i in `docker ps --no-trunc -a -q`;do docker rm $$i;done
