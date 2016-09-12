@@ -8,7 +8,7 @@
   - Built-in HTTP server to serve your REST API — great for testing!
 
 ## Details
-* By default, he container runs as "dev" user (i.e. UID 1000). But the UID/GID can be can be overridden by setting the PUID/PGID environment variables. *Please keep this in mind as you mount volumes!* 
+* By default, the container runs as "dev" user (i.e. UID 1000). But the UID/GID can be can be overridden by setting the PUID/PGID environment variables. *Please keep this in mind as you mount volumes!* 
 * The following volumes exist (and are owned by dev):  
   - /data
   - /output
