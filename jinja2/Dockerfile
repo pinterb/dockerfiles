@@ -35,14 +35,16 @@ RUN addgroup -g $PGID dev && \
 # Create a shared data volume
 # We need to create an empty file, otherwise the volume will
 # belong to root.
-RUN mkdir /data/ && \
- touch /data/.extra && \
- chown -R dev:dev /data
+RUN mkdir /data/ /out/ && \
+ touch /data/.extra /out/.extra && \
+ chown -R dev:dev /data && \
+ chown -R dev:dev /out
 
 ## Expose some volumes
-VOLUME ["/data"]
+VOLUME ["/data", "/out"]
 
 ENV TEMPLATES_DIR /data
+ENV OUT_DIR /out
 ENV TEMPLATE my.tmpl
 
 COPY render.py /home/dev/bin/render.py
@@ -52,5 +54,3 @@ COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 WORKDIR /data
 
 ENTRYPOINT ["docker-entrypoint.sh"]
-#ENTRYPOINT ["/usr/local/bin/render.py"]
-#CMD ["/bin/bash"]

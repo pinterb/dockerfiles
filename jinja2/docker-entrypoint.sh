@@ -55,6 +55,7 @@ if [[ "$UID_NAMED" -eq 0 ]]; then
 else
   if [ -n "$OUT_FILE" ]; then
     sudo -E --user "$USER" /home/dev/bin/render.py "$@" > "$OUT_FILE"
+    chown "$USER":"$GROUP" "$OUT_FILE"
   else
     sudo -E --user "$USER" /home/dev/bin/render.py "$@"
   fi

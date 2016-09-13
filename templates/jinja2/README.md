@@ -23,6 +23,7 @@ If I run my jinja2 container to render my some.json file:
 docker run -i \
     -v ${MY_TEMPLATE_DIR}:/data \
 	-e TEMPLATE=some.json.j2 \
+	-e "PGID=$(id -g)" -e "PUID=$(id -u)" \
 	###-->ZZZ_IMAGE<--###:###-->ZZZ_VERSION<--### datacenter='msp' acl_ttl='30m' > ${PWD}/some.json
 ```
 
@@ -34,6 +35,20 @@ The rendered output would be:
     "acl_ttl": "30m"
 }
 ```
+
+
+Additionally, if you want to write your rendered output to the same directory as your template, just specify the file name by setting the OUT_FILE environment variable:
+
+```sh
+docker run -i \
+    -v ${MY_TEMPLATE_DIR}:/data \
+    -v ${MY_OUTPUT_DIR}:/out \
+	-e TEMPLATE=some.json.j2 \
+	-e OUT_FILE=/out/some.json \
+	-e "PGID=$(id -g)" -e "PUID=$(id -u)" \
+	###-->ZZZ_IMAGE<--###:###-->ZZZ_VERSION<--### datacenter='msp' acl_ttl='30m'
+```
+
 
 The key things to remember are:   
 * Mount the directory containing your template(s) to the container's /data directory

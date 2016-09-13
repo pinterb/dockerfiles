@@ -57,4 +57,4 @@ echo ""
 
 
 # run terraform 
-sudo -E --user "$USER" /bin/terraform "$@"
+sudo --user "$USER" /bin/terraform "$@"
