@@ -20,6 +20,8 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     autoescape=True)
 # [END imports]
 
+def env_override(value, key):
+  return os.getenv(key, value)
 
 def render_template(argv):
     # our template values are just passed in as cli arguments (e.g. key=value);
@@ -28,7 +30,8 @@ def render_template(argv):
     for cliarg in argv:
         x = cliarg.split('=')
         context[x[0]] = x[1]
-        
+    
+    JINJA_ENVIRONMENT.filters['env_override'] = env_override 
     template = JINJA_ENVIRONMENT.get_template(TEMPLATE)
     sys.stdout.write(template.render(context))
     

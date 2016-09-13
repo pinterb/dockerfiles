@@ -3,5 +3,5 @@
     "extra_token": "{{ extra_token | default('dummy_value') }}",
 {%- endif %}
     "datacenter": "{{ datacenter }}",
-    "acl_ttl": "{{ acl_ttl }}"
+    "acl_ttl": "{{ acl_ttl | env_override('MY_TTL') }}"
 }
