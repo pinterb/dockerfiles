@@ -56,5 +56,5 @@ echo ""
 echo ""
 
 
-# run swagger-cli 
-sudo --user "$USER" /bin/terraform "$@"
+# run terraform 
+sudo -E --user "$USER" /bin/terraform "$@"
