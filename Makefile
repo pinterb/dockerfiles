@@ -245,7 +245,7 @@ terraform_test:
 	echo " " ; \
 	if ! $(DOCKER_BIN) run -it \
 		-v $(CURRENT_DIR)/terraform/$$tf_ver:/data:rw \
-	    -e "PGID=$$(id -g)" -e "PUID=$$(id -u)" \
+		-e "PGID=$$(id -g)" -e "PUID=$$(id -u)" \
 		$(NAME)/terraform:$$tf_ver version | \
 		grep -q -F "Terraform v$$tf_ver" ; then echo "$(NAME)/terraform:$$tf_ver - terraform version command failed."; false; fi ; \
 	done
@@ -392,6 +392,7 @@ jinja2_test:
 	$(DOCKER_BIN) run -i \
 		-v $(CURRENT_DIR)/jinja2:/data \
 		-e TEMPLATE=some.json.j2 \
+		-e "PGID=0" -e "PUID=0" \
 		$(NAME)/jinja2:$(VERSION) datacenter='msp' acl_ttl='30m' > $(CURRENT_DIR)/jinja2/some.json
 	@if ! cat $(CURRENT_DIR)/jinja2/some.json | grep -q -F '"datacenter": "msp"'; then echo "jinja2/some.json was not rendered with the expected results."; false; fi
 
