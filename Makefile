@@ -19,8 +19,8 @@ ANSIBLE_IMAGES = 2.0.0.2 \
 ANSIBLE_LINT_CURRENT_VERSION = 2.3.1
 ANSIBLE_LINT_IMAGES = 2.3.1
 
-SYNCTHING_CURRENT_VERSION = 0.12.20
-SYNCTHING_IMAGES = 0.12.20
+SYNCTHING_CURRENT_VERSION = 0.14.7
+SYNCTHING_IMAGES = 0.14.7
 
 JDK_IMAGES = 8u66
 
@@ -278,7 +278,7 @@ syncthing: alpine
 	sed -i "s/###-->ZZZ_SYNCTHING_VERSION<--###/$$tf_ver/g" $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
 	sed -i "s/###-->ZZZ_CURRENT_VERSION<--###/$(SYNCTHING_CURRENT_VERSION)/g" $(CURRENT_DIR)/$@/$$tf_ver/README.md ; \
 	done
-
+		
 .PHONY: syncthing_test
 syncthing_test:
 	@for tf_ver in $(SYNCTHING_IMAGES); \

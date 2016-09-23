@@ -58,4 +58,4 @@ echo ""
 
 
 # run terraform 
-sudo --user "$USER" /bin/terraform "$@"
+sudo --user "$USER" /bin/syncthing "$@"

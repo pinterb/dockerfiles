@@ -1,0 +1,3 @@
+#!/bin/sh
+
+cat /config/config.xml | grep '<node id=' | grep 'syncthing-'$1 | awk '{print $2}' | awk -F '=' '{print $2}' | sed 's/\"//g'

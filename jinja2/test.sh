@@ -9,7 +9,7 @@ docker run -i \
   -e TEMPLATE=some.json.j2 \
   -e OUT_FILE=/out/some.json \
   -e PGID=$(id -g) -e PUID=$(id -u) \
-  pinterb/jinja2:0.0.15 datacenter='msp' acl_ttl='3m'
+  pinterb/jinja2:0.0.16 datacenter='msp' acl_ttl='3m'
 
 docker run -i \
   -v ${PWD}:/data \
@@ -17,5 +17,5 @@ docker run -i \
   -e OUT_FILE=/out/some.json \
   -e TEMPLATE=some.json.j2 \
   -e PGID=$(id -g) -e PUID=$(id -u) \
-  pinterb/jinja2:0.0.15 datacenter='msp' acl_ttl='33m'
+  pinterb/jinja2:0.0.16 datacenter='msp' acl_ttl='33m'
 
