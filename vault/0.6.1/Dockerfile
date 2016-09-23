@@ -6,5 +6,5 @@ LABEL vendor="HashiCorp" \
       com.hashicorp.vault.version="0.6.1" \
       com.hashicorp.vault.release-date="2016-08-22"
 
-## Expose the config volume
-VOLUME ["/vault/config"]
+## Expose the config & tls volumes
+VOLUME ["/vault/config", "/vault/tls"]
