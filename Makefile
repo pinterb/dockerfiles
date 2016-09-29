@@ -286,7 +286,7 @@ syncthing_test:
 	echo "Testing '$$tf_ver syncthing' image..." ; \
 	echo " " ; \
 	if ! $(DOCKER_BIN) run -it \
-		-v $(CURRENT_DIR)/syncthing/$$tf_ver:/data:rw \
+		-v $(CURRENT_DIR)/syncthing/$$tf_ver/example/data:/data:rw \
 		$(NAME)/syncthing:$$tf_ver version | \
 		grep -q -F "syncthing v$$tf_ver" ; then echo "$(NAME)/syncthing:$$tf_ver - syncthing version command failed."; false; fi ; \
 	done

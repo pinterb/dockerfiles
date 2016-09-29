@@ -46,8 +46,7 @@ RUN chown -R dev:dev /data && \
 VOLUME ["/data", "/ops", "/state", "/config"]
 EXPOSE 8080 8384 22000
 
-USER dev
-WORKDIR /data
+WORKDIR /config
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT ["docker-entrypoint.sh"]
