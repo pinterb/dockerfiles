@@ -16,45 +16,54 @@ GID_ACTUAL=$(id -g ${GROUP})
 UID_NAMED=${PUID:-1000}
 GID_NAMED=${PGID:-1000}
 
-#if [ ! "$(id -u dev)" -eq "$PUID" ]; then usermod -o -u "$PUID" dev ; fi
-#if [ ! "$(id -g dev)" -eq "$PGID" ]; then groupmod -o -g "$PGID" dev ; fi
+DEBUG=${DEBUG:-0}
+
+# Debug function
+# Usage: dbug message in parts 
+function dbug {
+  if [ $DEBUG -eq 1 ];
+  then
+    echo "$@"
+  fi
+}
+
 
 #
 # Display settings on standard out.
 #
-echo ""
-echo "named settings"
-echo "=============="
-echo ""
-echo "  Username:        ${USER}"
-echo "  Groupname:       ${GROUP}"
-echo "  UID actual:      ${UID_ACTUAL}"
-echo "  GID actual:      ${GID_ACTUAL}"
-echo "  UID preferred:   ${UID_NAMED}"
-echo "  GID preferred:   ${GID_NAMED}"
-echo ""
+dbug ""
+dbug "named settings"
+dbug "=============="
+dbug ""
+dbug "  Username:        ${USER}"
+dbug "  Groupname:       ${GROUP}"
+dbug "  UID actual:      ${UID_ACTUAL}"
+dbug "  GID actual:      ${GID_ACTUAL}"
+dbug "  UID preferred:   ${UID_NAMED}"
+dbug "  GID preferred:   ${GID_NAMED}"
+dbug ""
 
 
 #
 # Change UID / GID of named user.
 #
-echo "Updating UID / GID... "
+dbug "Updating UID / GID... "
 if [[ "$UID_ACTUAL" -ne "$UID_NAMED" || "$GID_ACTUAL" -ne "$GID_NAMED" ]]; then
-  echo "  * Change user / group"
+  dbug "  * Change user / group"
   deluser "$USER"
   addgroup -g "$GID_NAMED" "$GROUP"
   adduser -u "$UID_NAMED" -D -H -G "$GROUP" -h /config -s /bin/bash "$USER"
-  echo "    - user / group changed."
+  dbug "    - user / group changed."
 
-  echo "  * Set owner and permissions for old uid/gid files"
+  dbug "  * Set owner and permissions for old uid/gid files"
   find / -user "$UID_ACTUAL" -exec chown "$USER" {} \;
   find / -user "$GID_ACTUAL" -exec chown "$GROUP" {} \;
-  echo "    - file permissions changed."
+  dbug "    - file permissions changed."
 else
-  echo "  * UID & GID matched...nothing to do."
+  dbug "  * UID & GID matched...nothing to do."
 fi
-echo ""
-echo ""
+dbug ""
+dbug ""
 
 
 # run codegen

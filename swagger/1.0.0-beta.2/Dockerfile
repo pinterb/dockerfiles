@@ -8,6 +8,7 @@ LABEL vendor="BigstickCarpet" \
 
 ENV PUID 1000 
 ENV PGID 1000 
+ENV DEBUG 0 
 
 # create dev user
 RUN apk --update add --no-cache bash nodejs sudo wget git ca-certificates && \
