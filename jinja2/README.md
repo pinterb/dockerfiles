@@ -24,7 +24,7 @@ docker run -i \
     -v ${MY_TEMPLATE_DIR}:/data \
 	-e TEMPLATE=some.json.j2 \
 	-e "PGID=$(id -g)" -e "PUID=$(id -u)" \
-	pinterb/jinja2:0.0.15 datacenter='msp' acl_ttl='30m' > ${PWD}/some.json
+	pinterb/jinja2:0.0.16 datacenter='msp' acl_ttl='30m' > ${PWD}/some.json
 ```
 
 
@@ -46,7 +46,7 @@ docker run -i \
 	-e TEMPLATE=some.json.j2 \
 	-e OUT_FILE=/out/some.json \
 	-e "PGID=$(id -g)" -e "PUID=$(id -u)" \
-	pinterb/jinja2:0.0.15 datacenter='msp' acl_ttl='30m'
+	pinterb/jinja2:0.0.16 datacenter='msp' acl_ttl='30m'
 ```
 
 
@@ -59,8 +59,8 @@ The key things to remember are:
 * **YMMV!!!**
 
 ## Misc. Info 
-* Latest version: 0.0.15   
-* Built on: 2016-09-13T16:51:37EDT   
+* Latest version: 0.0.16   
+* Built on: 2016-10-21T17:26:41UTC   
 * Base image: pinterb/base:alpine ([dockerfile][6])  
 * [Dockerfile][7]
 

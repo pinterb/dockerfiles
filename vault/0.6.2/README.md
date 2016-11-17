@@ -19,7 +19,7 @@ docker run -it --rm \
 
 ## Misc. Info 
 * Latest version: 0.6.2  
-* Built on: 2016-10-11T14:34:28UTC   
+* Built on: 2016-11-04T14:22:59UTC   
 * Base image: vault:0.6.1   
 
 

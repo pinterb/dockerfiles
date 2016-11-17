@@ -43,6 +43,8 @@ SWAGGER_CODEGEN_IMAGES = 2.2.0
 VAULT_CURRENT_VERSION = 0.6.2
 VAULT_IMAGES = 0.6.2
 
+JENKINS_JNLP_SLAVE_CURRENT_VERSION = 2.62
+JENKINS_JNLP_SLAVE_IMAGES = 2.62
 
 
 all: build test
@@ -730,22 +732,59 @@ vault_rm:
 
 
 
+.PHONY: jenkins-jnlp-slave
+jenkins-jnlp-slave:
+	@for jenkins_jnlp_slave_ver in $(JENKINS_JNLP_SLAVE_IMAGES); \
+	do \
+	echo " " ; \
+	echo " " ; \
+	echo "Building '$$jenkins_jnlp_slave_ver $@' image..." ; \
+	echo " " ; \
+	$(DOCKER_BIN) build --rm -t $(NAME)/$@:$$jenkins_jnlp_slave_ver $(CURRENT_DIR)/$@/$$jenkins_jnlp_slave_ver ; \
+	cp -pR $(CURRENT_DIR)/templates/$@/README.md $(CURRENT_DIR)/$@/$$jenkins_jnlp_slave_ver/README.md ; \
+	sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/$@/g' $(CURRENT_DIR)/$@/$$jenkins_jnlp_slave_ver/README.md ; \
+	sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' $(CURRENT_DIR)/$@/$$jenkins_jnlp_slave_ver/README.md ; \
+	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/jenkinsci\/jnlp-slave/g' $(CURRENT_DIR)/$@/$$jenkins_jnlp_slave_ver/README.md ; \
+	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/$@/$$jenkins_jnlp_slave_ver/README.md ; \
+	sed -i "s/###-->ZZZ_JENKINS_JNLP_SLAVE_VERSION<--###/$$jenkins_jnlp_slave_ver/g" $(CURRENT_DIR)/$@/$$jenkins_jnlp_slave_ver/README.md ; \
+	sed -i "s/###-->ZZZ_CURRENT_VERSION<--###/$(JENKINS_JNLP_SLAVE_CURRENT_VERSION)/g" $(CURRENT_DIR)/$@/$$jenkins_jnlp_slave_ver/README.md ; \
+	done
+
+.PHONY: jenkins-jnlp-slave_test
+jenkins-jnlp-slave_test:
+	@for jenkins_jnlp_slave_ver in $(JENKINS_JNLP_SLAVE_IMAGES); \
+	do \
+	echo "Testing '$$jenkins_jnlp_slave_ver jenkins-jnlp-slave' image..." ; \
+	echo " " ; \
+	done
+
+.PHONY: jenkins-jnlp-slave_rm
+jenkins-jnlp-slave_rm:
+	@for jenkins_jnlp_slave_ver in $(JENKINS_JNLP_SLAVE_IMAGES); \
+	do \
+	echo "Removing '$$jenkins_jnlp_slave_ver jenkins-jnlp-slave' image..." ; \
+	echo " " ; \
+	if $(DOCKER_BIN) images $(NAME)/jenkins-jnlp-slave | awk '{ print $$2 }' | grep -q -F $$jenkins_jnlp_slave_ver; then $(DOCKER_BIN) rmi -f $(NAME)/jenkins-jnlp-slave:$$jenkins_jnlp_slave_ver; fi ; \
+	done
+
+
+
 .PHONY: misc
-misc: mush jq ansible terraform packer jdk jinja2 syncthing jo consul swagger swagger-codegen vault
+misc: mush jq ansible terraform packer jdk jinja2 syncthing jo consul swagger swagger-codegen vault jenkins-jnlp-slave
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous images have been built."
 	@echo " "
 
 .PHONY: misc_test
-misc_test: jq_test mush_test ansible_test terraform_test packer_test jdk_test jinja2_test syncthing_test jo_test consul_test swagger_test swagger-codegen_test vault_test
+misc_test: jq_test mush_test ansible_test terraform_test packer_test jdk_test jinja2_test syncthing_test jo_test consul_test swagger_test swagger-codegen_test vault_test jenkins-jnlp-slave_test
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous tests have completed."
 	@echo " "
 
 .PHONY: misc_rm
-misc_rm: terraform_rm packer_rm jdk_rm ansible_rm syncthing_rm jo_rm consul_rm swagger_rm swagger-codegen_rm vault_rm
+misc_rm: terraform_rm packer_rm jdk_rm ansible_rm syncthing_rm jo_rm consul_rm swagger_rm swagger-codegen_rm vault_rm jenkins-jnlp-slave_rm
 	@if $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/jq; fi
 	@if $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F $(VERSION); then $(DOCKER_BIN) rmi -f $(NAME)/jq:$(VERSION); fi
 	@if $(DOCKER_BIN) images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/mush; fi
@@ -798,6 +837,7 @@ tag_latest:
 	$(DOCKER_BIN) tag $(NAME)/swagger:$(SWAGGER_CLI_CURRENT_VERSION) $(NAME)/swagger:latest
 	$(DOCKER_BIN) tag $(NAME)/swagger-codegen:$(SWAGGER_CODEGEN_CURRENT_VERSION) $(NAME)/swagger-codegen:latest
 	$(DOCKER_BIN) tag $(NAME)/vault:$(VAULT_CURRENT_VERSION) $(NAME)/vault:latest
+	$(DOCKER_BIN) tag $(NAME)/jenkins-jnlp-slave:$(JENKINS_JNLP_SLAVE_CURRENT_VERSION) $(NAME)/jenkins-jnlp-slave:latest
 
 .PHONY: release
 release: release_base tag_latest
@@ -814,6 +854,7 @@ release: release_base tag_latest
 	@if ! $(DOCKER_BIN) images $(NAME)/swagger | awk '{ print $$2 }' | grep -q -F $(SWAGGER_CLI_CURRENT_VERSION); then echo "$(NAME)/swagger version $(SWAGGER_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/swagger-codegen | awk '{ print $$2 }' | grep -q -F $(SWAGGER_CODEGEN_CURRENT_VERSION); then echo "$(NAME)/swagger-codegen version $(SWAGGER_CODEGEN_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/vault | awk '{ print $$2 }' | grep -q -F $(VAULT_CURRENT_VERSION); then echo "$(NAME)/vault version $(VAULT_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
+	@if ! $(DOCKER_BIN) images $(NAME)/jenkins-jnlp-slave | awk '{ print $$2 }' | grep -q -F $(JENKINS_JNLP_SLAVE_CURRENT_VERSION); then echo "$(NAME)/jenkins-jnlp-slave version $(JENKINS_JNLP_SLAVE_VERSIO) is not yet built. Please run 'make build'"; false; fi
 	$(DOCKER_BIN) push $(NAME)/jq
 	$(DOCKER_BIN) push $(NAME)/jinja2
 	$(DOCKER_BIN) push $(NAME)/ansible
@@ -826,6 +867,7 @@ release: release_base tag_latest
 	$(DOCKER_BIN) push $(NAME)/swagger
 	$(DOCKER_BIN) push $(NAME)/swagger-codegen
 	$(DOCKER_BIN) push $(NAME)/vault
+	$(DOCKER_BIN) push $(NAME)/jenkins-jnlp-slave
 
 
 
