@@ -16,7 +16,7 @@ $ helm install --name my-release -f values.yaml stable/jenkins
 
 ## Misc. Info 
 * Latest version: 2.62  
-* Built on: 2016-11-17T18:47:47UTC   
+* Built on: 2016-11-17T21:19:44UTC   
 * Base image: jenkinsci/jnlp-slave   
 
 
