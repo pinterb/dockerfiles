@@ -1,7 +1,10 @@
 VERSION = 0.0.16
 NAME = pinterb
 
-CREATE_DATE := $(shell date +%FT%T%Z)
+VCS_URL ?= $(shell git remote get-url origin)
+VCS_REF ?= $(shell git rev-parse --short HEAD)
+
+CREATE_DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 CURRENT_DIR := $(shell dirname $(MKFILE_PATH))
 DOCKER_BIN := $(shell which docker)
@@ -740,7 +743,12 @@ jenkins-jnlp-slave:
 	echo " " ; \
 	echo "Building '$$jenkins_jnlp_slave_ver $@' image..." ; \
 	echo " " ; \
-	$(DOCKER_BIN) build --rm -t $(NAME)/$@:$$jenkins_jnlp_slave_ver $(CURRENT_DIR)/$@/$$jenkins_jnlp_slave_ver ; \
+	$(DOCKER_BIN) build --rm \
+	--build-arg VCS_URL=$(VCS_URL) \
+	--build-arg VCS_REF=$(VCS_REF) \
+	--build-arg BUILD_DATE=$(CREATE_DATE) \
+	--build-arg VERSION=$$jenkins_jnlp_slave_ver \
+	-t $(NAME)/$@:$$jenkins_jnlp_slave_ver $(CURRENT_DIR)/$@/$$jenkins_jnlp_slave_ver ; \
 	cp -pR $(CURRENT_DIR)/templates/$@/README.md $(CURRENT_DIR)/$@/$$jenkins_jnlp_slave_ver/README.md ; \
 	sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/$@/g' $(CURRENT_DIR)/$@/$$jenkins_jnlp_slave_ver/README.md ; \
 	sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' $(CURRENT_DIR)/$@/$$jenkins_jnlp_slave_ver/README.md ; \

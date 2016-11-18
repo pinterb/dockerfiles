@@ -2,28 +2,68 @@ FROM jenkinsci/jnlp-slave
 
 MAINTAINER Brad Pinter <brad.pinter@gmail.com>
 
-LABEL vendor="Jenkins" \
-      org.jenkins-ci.jenkinsci.version="2.62" \
-      org.jenkins-ci.jenkinsci.release-date="2016-08-15"
+# Metadata params
+ARG VCS_URL
+ARG VCS_REF
+ARG BUILD_DATE
+ARG VERSION
 
-ENV CLOUDSDK_CORE_DISABLE_PROMPTS 1
-ENV HELM_VERSION 2.0.0
-ENV PATH /opt/google-cloud-sdk/bin:$PATH
+# Metadata
+LABEL org.label-schema.name="Jenkins JNLP-enabled slave agent" \
+      org.label-schema.description="A Jenkins slave agent that is intended to be used with a Jenkins master that has the kubernernetes plugin installed." \
+      org.label-schema.vendor="CDW" \
+      org.label-schema.url="https://cdw.com" \
+      org.label-schema.vcs-url=$VCS_URL \
+      org.label-schema.vcs-ref=$VCS_REF \
+      org.label-schema.version=$VERSION \
+      org.label-schema.build-date=$BUILD_DATE \
+      org.label-schema.schema-version="1.0.0-rc.1"
 
 USER root
 
-RUN apt-get update -y
-RUN apt-get install -y jq make
+RUN apt-get update -y && \
+    apt-get install -y --no-install-recommends \
+      g++ \
+      gcc \
+      libc6-dev \
+      make \
+      jq && \
+    rm -rf /var/lib/apt/lists/*
+
+# Google Cloud SDK w/kubectl
+ENV CLOUDSDK_CORE_DISABLE_PROMPTS 1
+ENV PATH /opt/google-cloud-sdk/bin:$PATH
+
 RUN curl https://sdk.cloud.google.com | bash && mv google-cloud-sdk /opt
 RUN gcloud components install kubectl
 
-WORKDIR /tmp
+# Docker
+RUN wget -O /usr/bin/docker --no-check-certificate \
+    https://get.docker.com/builds/Linux/x86_64/docker-1.10.3
+RUN chmod a+x /usr/bin/docker
 
-RUN curl -Lo helm.${HELM_VERSION}.tar.gz "http://storage.googleapis.com/kubernetes-helm/helm-v${HELM_VERSION}-linux-amd64.tar.gz"
-RUN gunzip /tmp/helm.${HELM_VERSION}.tar.gz && \
-  tar -xvf /tmp/helm.2.0.0.tar && \
-  cp /tmp/linux-amd64/helm /usr/local/bin/ && \
-  rm /tmp/helm.2.0.0.tar && \
-  rm -rf /tmp/linux-amd64/
+# Helm
+ENV HELM_VERSION v2.0.0
 
-WORKDIR /home/jenkins
+RUN curl -fsSL "https://storage.googleapis.com/kubernetes-helm/helm-$HELM_VERSION-linux-amd64.tar.gz" -o helm.tar.gz && \
+    tar -C /usr/local/ -xzf helm.tar.gz && \
+    cp /usr/local/linux-amd64/helm /usr/local/bin/
+
+# Golang (eventually move this to a container that extends this one?)
+ENV GOLANG_VERSION 1.7.3
+ENV GOLANG_DOWNLOAD_URL https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
+ENV GOLANG_DOWNLOAD_SHA256 508028aac0654e993564b6e2014bf2d4a9751e3b286661b0b0040046cf18028e
+
+RUN curl -fsSL "$GOLANG_DOWNLOAD_URL" -o golang.tar.gz && \
+    echo "$GOLANG_DOWNLOAD_SHA256  golang.tar.gz" | sha256sum -c - && \
+    tar -C /usr/local -xzf golang.tar.gz && \
+    rm golang.tar.gz
+
+ENV GOPATH /go
+ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
+
+RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
+WORKDIR $GOPATH
+
+RUN go get -u github.com/Masterminds/glide && \
+    go get -u github.com/tools/godep
