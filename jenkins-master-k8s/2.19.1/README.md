@@ -1,6 +1,6 @@
-# pinterb/jenkins  
+# pinterb/jenkins-master-k8s  
 
-[`pinterb/jenkins`][1] is a [docker][2] image that bundles the following:  
+[`pinterb/jenkins-master-k8s`][1] is a [docker][2] image that bundles the following:  
 * **[Jenkins v2.19.1][3]:** The leading open source automation, CI/CD server.
 
 ## Details
@@ -16,11 +16,11 @@ $ helm install --name my-release -f values.yaml stable/jenkins
 
 ## Misc. Info 
 * Latest version: 2.19.1  
-* Built on: 2016-11-18T20:54:34Z   
+* Built on: 2016-11-18T21:07:30Z   
 * Base image: jenkins   
 
 
-[1]: https://hub.docker.com/r/pinterb/jenkins/   
+[1]: https://hub.docker.com/r/pinterb/jenkins-master-k8s/   
 [2]: https://docker.com 
 [3]: https://jenkins.io/ 
 [4]: http://kubernetes.io/ 
