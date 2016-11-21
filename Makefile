@@ -49,8 +49,8 @@ VAULT_IMAGES = 0.6.2
 JENKINS_JNLP_SLAVE_CURRENT_VERSION = 2.62
 JENKINS_JNLP_SLAVE_IMAGES = 2.62
 
-JENKINS_CURRENT_VERSION = 2.19.1
-JENKINS_IMAGES = 2.19.1
+JENKINS_CURRENT_VERSION = 2.19.3
+JENKINS_IMAGES = 2.19.3
 
 
 
@@ -818,7 +818,7 @@ jenkins-master-k8s_rm:
 	do \
 	echo "Removing '$$jenkins_ver jenkins' image..." ; \
 	echo " " ; \
-	if $(DOCKER_BIN) images $(NAME)/jenkins | awk '{ print $$2 }' | grep -q -F $$jenkins_ver; then $(DOCKER_BIN) rmi -f $(NAME)/jenkins:$$jenkins_ver; fi ; \
+	if $(DOCKER_BIN) images $(NAME)/jenkins-master-k8s | awk '{ print $$2 }' | grep -q -F $$jenkins_ver; then $(DOCKER_BIN) rmi -f $(NAME)/jenkins-master-k8s:$$jenkins_ver; fi ; \
 	done
 
 
@@ -943,8 +943,10 @@ clean: clean_untagged clean_slim misc_rm base_rm clean_untagged
 
 .PHONY: clean_slim
 clean_slim:
-	cd $(CURRENT_DIR)/base/ubuntu-slim && $(MAKE) clean
-	cd $(CURRENT_DIR)
+	@if $(DOCKER_BIN) images $(NAME)/base | awk '{ print $$2 }' | grep -q -F ubuntu-slim; then \
+	cd $(CURRENT_DIR)/base/ubuntu-slim && $(MAKE) clean; \
+	cd $(CURRENT_DIR); \
+	fi;
 
 #	docker images -q --filter "dangling=true" | xargs -l docker rmi
 #	docker images --no-trunc | grep none | awk '{print $$3}' | xargs -r docker rmi
