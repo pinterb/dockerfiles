@@ -16,7 +16,7 @@ $ helm install --name my-release -f values.yaml stable/jenkins
 
 ## Misc. Info 
 * Latest version: 2.19.3  
-* Built on: 2016-11-21T15:22:15Z   
+* Built on: 2016-11-28T15:38:22Z   
 * Base image: jenkins   
 
 
