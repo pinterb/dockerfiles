@@ -56,7 +56,7 @@ cat $(TEMPLATES_DIR)/terraform.tfvars.tmpl |  docker run -i \
 	-e AZURE_CERT=/home/dev/.azure.cer \
 	-e AZURE_REGION="West US"  \
 	-e DOMAIN_NAME="example.com" \
-	pinterb/mush:0.0.15 > $(BUILD_DIR)/terraform.tfvars
+	pinterb/mush:0.0.16 > $(BUILD_DIR)/terraform.tfvars
 ```
 
 
@@ -77,8 +77,8 @@ dnsimple_email = "bart.simpson@foxtv.io"
 
 
 ## Misc. Info 
-* Latest version: 0.0.15   
-* Built on: 2016-09-13T15:50:32EDT   
+* Latest version: 0.0.16   
+* Built on: 2016-11-28T15:42:49Z   
 * Base image: pinterb/base:alpine   
 
 

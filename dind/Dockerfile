@@ -1,4 +1,4 @@
-FROM jenkinsci/jnlp-slave
+FROM pinterb/base:debian
 
 MAINTAINER Brad Pinter <brad.pinter@gmail.com>
 
@@ -23,6 +23,9 @@ USER root
 
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends \
+      vim \
+      git \
+      wget \
       g++ \
       gcc \
       libc6-dev \
@@ -34,8 +37,8 @@ RUN apt-get update -y && \
 ENV CLOUDSDK_CORE_DISABLE_PROMPTS 1
 ENV PATH /opt/google-cloud-sdk/bin:$PATH
 
-RUN curl https://sdk.cloud.google.com | bash && mv google-cloud-sdk /opt
-RUN gcloud components install kubectl
+#RUN curl https://sdk.cloud.google.com | bash && mv google-cloud-sdk /opt
+#RUN gcloud components install kubectl
 
 # Docker
 RUN wget -O /usr/bin/docker --no-check-certificate \
@@ -43,11 +46,11 @@ RUN wget -O /usr/bin/docker --no-check-certificate \
 RUN chmod a+x /usr/bin/docker
 
 # Helm
-ENV HELM_VERSION v2.0.0
+#ENV HELM_VERSION v2.0.0
 
-RUN curl -fsSL "https://storage.googleapis.com/kubernetes-helm/helm-$HELM_VERSION-linux-amd64.tar.gz" -o helm.tar.gz && \
-    tar -C /usr/local/ -xzf helm.tar.gz && \
-    cp /usr/local/linux-amd64/helm /usr/local/bin/
+#RUN curl -fsSL "https://storage.googleapis.com/kubernetes-helm/helm-$HELM_VERSION-linux-amd64.tar.gz" -o helm.tar.gz && \
+  #    tar -C /usr/local/ -xzf helm.tar.gz && \
+  #  cp /usr/local/linux-amd64/helm /usr/local/bin/
 
 # Golang (eventually move this to a container that extends this one?)
 ENV GOLANG_VERSION 1.7.3
@@ -66,6 +69,10 @@ RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
 WORKDIR $GOPATH
 
 RUN go get -u github.com/Masterminds/glide && \
-    go get -u github.com/tools/godep && \
-    go get github.com/alecthomas/gometalinter && \
-    gometalinter --install
+    go get -u github.com/tools/godep
+
+RUN mkdir -p "$GOPATH/src/github.com/cdwlabs" && \
+    cd "$GOPATH/src/github.com/cdwlabs" && \
+    git clone https://github.com/pinterb/armor
+
+CMD ["/bin/bash"]

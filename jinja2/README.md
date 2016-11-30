@@ -60,7 +60,7 @@ The key things to remember are:
 
 ## Misc. Info 
 * Latest version: 0.0.16   
-* Built on: 2016-10-21T17:26:41UTC   
+* Built on: 2016-11-28T15:42:49Z   
 * Base image: pinterb/base:alpine ([dockerfile][6])  
 * [Dockerfile][7]
 
