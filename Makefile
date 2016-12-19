@@ -711,7 +711,7 @@ vault:
 	cp -pR $(CURRENT_DIR)/templates/$@/README.md $(CURRENT_DIR)/$@/$$vault_ver/README.md ; \
 	sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/$@/g' $(CURRENT_DIR)/$@/$$vault_ver/README.md ; \
 	sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' $(CURRENT_DIR)/$@/$$vault_ver/README.md ; \
-	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/vault:0.6.1/g' $(CURRENT_DIR)/$@/$$vault_ver/README.md ; \
+	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/vault:0.6.4/g' $(CURRENT_DIR)/$@/$$vault_ver/README.md ; \
 	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/$@/$$vault_ver/README.md ; \
 	sed -i "s/###-->ZZZ_VAULT_VERSION<--###/$$vault_ver/g" $(CURRENT_DIR)/$@/$$vault_ver/README.md ; \
 	sed -i "s/###-->ZZZ_CURRENT_VERSION<--###/$(VAULT_CURRENT_VERSION)/g" $(CURRENT_DIR)/$@/$$vault_ver/README.md ; \
