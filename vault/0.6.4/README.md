@@ -19,8 +19,8 @@ docker run -it --rm \
 
 ## Misc. Info 
 * Latest version: 0.6.4  
-* Built on: 2016-12-19T20:44:01Z   
-* Base image: vault:0.6.1   
+* Built on: 2016-12-19T21:23:11Z   
+* Base image: vault:0.6.4   
 
 
 [1]: https://hub.docker.com/r/pinterb/vault/   
