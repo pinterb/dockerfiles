@@ -32,7 +32,7 @@ ENV MAVEN_HOME /opt/maven
 USER jenkins
 RUN /usr/local/bin/install-plugins.sh \
   kubernetes:0.11 \
-  credentials:2.1.12 \
+  credentials:2.1.13 \
   credentials-binding:1.10 \
   google-oauth-plugin:0.4 \
   aws-credentials:1.19 \
@@ -44,7 +44,7 @@ RUN /usr/local/bin/install-plugins.sh \
   docker-build-step:1.39 \
   dockerhub-notification:2.2.0 \
   docker-build-publish:1.3.2 \
-  aws-codebuild:0.5 \
+  aws-codebuild:0.6 \
   github-api:1.85 \
   github:1.26.1 \
   github-branch-source:2.0.3 \
@@ -52,6 +52,7 @@ RUN /usr/local/bin/install-plugins.sh \
   github-issues:1.2.1 \
   github-pr-comment-build:1.0 \
   pipeline-githubnotify-step:1.0.1 \
+  pipeline-utility-steps:1.2.2 \
   ghprb:1.35.0 \
   github-pr-coverage-status:1.4.0 \
   github-oauth:0.25 \
