@@ -21,12 +21,12 @@ LABEL org.label-schema.name="Jenkins Master" \
 
 USER root
 RUN apt-get install -y wget git
-RUN wget --no-verbose -O /tmp/apache-maven-3.2.2.tar.gz http://archive.apache.org/dist/maven/maven-3/3.2.2/binaries/apache-maven-3.2.2-bin.tar.gz
-RUN echo "87e5cc81bc4ab9b83986b3e77e6b3095 /tmp/apache-maven-3.2.2.tar.gz" | md5sum -c
-RUN tar xzf /tmp/apache-maven-3.2.2.tar.gz -C /opt/
-RUN ln -s /opt/apache-maven-3.2.2 /opt/maven
+RUN wget --no-verbose -O /tmp/apache-maven-3.3.9.tar.gz http://archive.apache.org/dist/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz
+RUN echo "516923b3955b6035ba6b0a5b031fbd8b /tmp/apache-maven-3.3.9.tar.gz" | md5sum -c
+RUN tar xzf /tmp/apache-maven-3.3.9.tar.gz -C /opt/
+RUN ln -s /opt/apache-maven-3.3.9 /opt/maven
 RUN ln -s /opt/maven/bin/mvn /usr/local/bin
-RUN rm -f /tmp/apache-maven-3.2.2.tar.gz
+RUN rm -f /tmp/apache-maven-3.3.9.tar.gz
 ENV MAVEN_HOME /opt/maven
 
 USER jenkins
@@ -37,7 +37,7 @@ RUN /usr/local/bin/install-plugins.sh \
   google-oauth-plugin:0.4 \
   aws-credentials:1.19 \
   aws-bucket-credentials:0.1.1 \
-  aws-lambda:0.5.8 \
+  aws-lambda:0.5.9 \
   aws-sqs:1.004 \
   snsnotify:1.13 \
   docker-workflow:1.10 \
@@ -49,7 +49,7 @@ RUN /usr/local/bin/install-plugins.sh \
   github:1.26.1 \
   github-branch-source:2.0.3 \
   github-organization-folder:1.6 \
-  github-issues:1.2.1 \
+  github-issues:1.2.2 \
   github-pr-comment-build:1.0 \
   pipeline-githubnotify-step:1.0.1 \
   pipeline-utility-steps:1.2.2 \
