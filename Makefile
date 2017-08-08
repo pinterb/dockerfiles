@@ -52,6 +52,8 @@ JENKINS_JNLP_SLAVE_IMAGES = 2.62
 JENKINS_CURRENT_VERSION = 2.32.3
 JENKINS_IMAGES = 2.32.3
 
+CENVY_GO_CURRENT_VERSION = 1.8.3
+CENVY_GO_IMAGES = 1.8.3
 
 
 all: build test
@@ -823,22 +825,63 @@ jenkins_rm:
 
 
 
+.PHONY: cenvy-go
+cenvy-go:
+	@for cenvy_ver in $(CENVY_GO_IMAGES); \
+	do \
+	echo " " ; \
+	echo " " ; \
+	echo "Building '$$cenvy_ver $@' image..." ; \
+	echo " " ; \
+	$(DOCKER_BIN) build --rm \
+	--build-arg VCS_URL=$(VCS_URL) \
+	--build-arg VCS_REF=$(VCS_REF) \
+	--build-arg BUILD_DATE=$(CREATE_DATE) \
+	--build-arg VERSION=$$cenvy_ver \
+	-t $(NAME)/$@:$$cenvy_ver $(CURRENT_DIR)/$@/$$cenvy_ver ; \
+	cp -pR $(CURRENT_DIR)/templates/$@/README.md $(CURRENT_DIR)/$@/$$cenvy_ver/README.md ; \
+	sed -i 's/###-->ZZZ_IMAGE<--###/$(NAME)\/$@/g' $(CURRENT_DIR)/$@/$$cenvy_ver/README.md ; \
+	sed -i 's/###-->ZZZ_VERSION<--###/$(VERSION)/g' $(CURRENT_DIR)/$@/$$cenvy_ver/README.md ; \
+	sed -i 's/###-->ZZZ_BASE_IMAGE<--###/eclipse\/ubuntu_jre/g' $(CURRENT_DIR)/$@/$$cenvy_ver/README.md ; \
+	sed -i 's/###-->ZZZ_DATE<--###/$(CREATE_DATE)/g' $(CURRENT_DIR)/$@/$$cenvy_ver/README.md ; \
+	sed -i "s/###-->ZZZ_GOLANG_VERSION<--###/$$cenvy_ver/g" $(CURRENT_DIR)/$@/$$cenvy_ver/README.md ; \
+	sed -i "s/###-->ZZZ_CURRENT_VERSION<--###/$(CENVY_GO_CURRENT_VERSION)/g" $(CURRENT_DIR)/$@/$$cenvy_ver/README.md ; \
+	done
+
+.PHONY: cenvy-go_test
+cenvy-go_test:
+	@for cenvy_ver in $(CENVY_GO_IMAGES); \
+	do \
+	echo "Testing '$$cenvy_ver cenvy-go' image..." ; \
+	echo " " ; \
+	done
+
+.PHONY: cenvy-go_rm
+cenvy-go_rm:
+	@for cenvy_ver in $(CENVY_GO_IMAGES); \
+	do \
+	echo "Removing '$$cenvy_ver cenvy-go' image..." ; \
+	echo " " ; \
+	if $(DOCKER_BIN) images $(NAME)/cenvy-go | awk '{ print $$2 }' | grep -q -F $$cenvy_ver; then $(DOCKER_BIN) rmi -f $(NAME)/cenvy-go:$$cenvy_ver; fi ; \
+
+
+
 .PHONY: misc
-misc: mush jq ansible terraform packer jdk jinja2 syncthing jo consul swagger swagger-codegen vault jenkins-jnlp-slave jenkins
+misc: mush jq ansible terraform packer jdk jinja2 syncthing jo consul swagger swagger-codegen vault jenkins-jnlp-slave jenkins cenvy-go
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous images have been built."
 	@echo " "
 
 .PHONY: misc_test
-misc_test: jq_test mush_test ansible_test terraform_test packer_test jdk_test jinja2_test syncthing_test jo_test consul_test swagger_test swagger-codegen_test vault_test jenkins-jnlp-slave_test jenkins_test
+misc_test: jq_test mush_test ansible_test terraform_test packer_test jdk_test jinja2_test syncthing_test jo_test consul_test swagger_test swagger-codegen_test vault_test jenkins-jnlp-slave_test jenkins_test cenvy-go_test
 	@echo " "
 	@echo " "
 	@echo "Miscellaneous tests have completed."
 	@echo " "
 
 .PHONY: misc_rm
-misc_rm: terraform_rm packer_rm jdk_rm ansible_rm syncthing_rm jo_rm consul_rm swagger_rm swagger-codegen_rm vault_rm jenkins-jnlp-slave_rm jenkins_rm
+misc_rm: terraform_rm packer_rm jdk_rm ansible_rm syncthing_rm jo_rm consul_rm swagger_rm swagger-codegen_rm vault_rm jenkins-jnlp-slave_rm jenkins_rm cenvy-go_rm
 	@if $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/jq; fi
 	@if $(DOCKER_BIN) images $(NAME)/jq | awk '{ print $$2 }' | grep -q -F $(VERSION); then $(DOCKER_BIN) rmi -f $(NAME)/jq:$(VERSION); fi
 	@if $(DOCKER_BIN) images $(NAME)/mush | awk '{ print $$2 }' | grep -q -F latest; then $(DOCKER_BIN) rmi $(NAME)/mush; fi
@@ -893,6 +936,7 @@ tag_latest:
 	$(DOCKER_BIN) tag $(NAME)/vault:$(VAULT_CURRENT_VERSION) $(NAME)/vault:latest
 	$(DOCKER_BIN) tag $(NAME)/jenkins-jnlp-slave:$(JENKINS_JNLP_SLAVE_CURRENT_VERSION) $(NAME)/jenkins-jnlp-slave:latest
 	$(DOCKER_BIN) tag $(NAME)/jenkins:$(JENKINS_CURRENT_VERSION) $(NAME)/jenkins:latest
+	$(DOCKER_BIN) tag $(NAME)/cenvy-go:$(CENVY_GO_CURRENT_VERSION) $(NAME)/cenvy-go:latest
 
 .PHONY: release
 release: release_base tag_latest
@@ -911,6 +955,7 @@ release: release_base tag_latest
 	@if ! $(DOCKER_BIN) images $(NAME)/vault | awk '{ print $$2 }' | grep -q -F $(VAULT_CURRENT_VERSION); then echo "$(NAME)/vault version $(VAULT_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/jenkins-jnlp-slave | awk '{ print $$2 }' | grep -q -F $(JENKINS_JNLP_SLAVE_CURRENT_VERSION); then echo "$(NAME)/jenkins-jnlp-slave version $(JENKINS_JNLP_SLAVE_VERSION) is not yet built. Please run 'make build'"; false; fi
 	@if ! $(DOCKER_BIN) images $(NAME)/jenkins | awk '{ print $$2 }' | grep -q -F $(JENKINS_CURRENT_VERSION); then echo "$(NAME)/jenkins version $(JENKINS_VERSION) is not yet built. Please run 'make build'"; false; fi
+	@if ! $(DOCKER_BIN) images $(NAME)/cenvy-go | awk '{ print $$2 }' | grep -q -F $(CENVY_GO_CURRENT_VERSION); then echo "$(NAME)/cenvy-go version $(CENVY_GO_CURRENT_VERSION) is not yet built. Please run 'make build'"; false; fi
 	$(DOCKER_BIN) push $(NAME)/jq
 	$(DOCKER_BIN) push $(NAME)/jinja2
 	$(DOCKER_BIN) push $(NAME)/ansible
@@ -925,6 +970,7 @@ release: release_base tag_latest
 	$(DOCKER_BIN) push $(NAME)/vault
 	$(DOCKER_BIN) push $(NAME)/jenkins-jnlp-slave
 	$(DOCKER_BIN) push $(NAME)/jenkins
+	$(DOCKER_BIN) push $(NAME)/cenvy-go
 
 
 
